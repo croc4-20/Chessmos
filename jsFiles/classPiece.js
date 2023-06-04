@@ -1,499 +1,685 @@
+let clickedPiece;
+let pieces;
+let handleClick;
 
-const { default: ChessGame } = await import('./classPiece.js');
-const { default: ChessBoard } = await import('./classBoard.js');
-
-   const chessGame = new ChessGame();
-  // createChessPieces();
-
-const chessBoard = new ChessBoard();
-   const chessPiece = new ChessPiece(type, color, row, col, imagePath, element);
+async function initialize() 
+{
+  //const { default: ChessPiece } = await import('./classPiece.js');
+  const { default: ChessBoard } = await import('./classBoard.js');
+  const { default: ChessGame } = await import('./classGame.js');
+  const { default: ChessArray } = await import('./classArray.js');
+ 
+ 
+  const chessArray = new ChessArray();
+  const chessBoard = new ChessBoard();
+  //const game = new ChessGame(this.game.chessArray, this.game.chessBoard, () => this).bind(this);
+  //const game = new ChessGame(chessArray, chessBoard, () => this.bind(this));
+  const game = new ChessGame(chessArray, chessBoard, this);
   
+ const pieces = [
 
-export default class ChessPiece {
-    constructor(type, color, row, col, imagePath, element) {
-      this.type = type;
-      this.color = color;
-      this.row = row;
-      this.col = col;
-      //this.handleClick = this.handleClick.bind(this);
-      //this.isWhiteTurn = true;
-      this.imagePath = imagePath;
-      switch (type) {
-            case "pawn":
-                this.element = elements.pawnElement;
-                break;
-            case "rook":
-                this.element = elements.rookElement;
-                break;
-            case "knight":
-                this.element = elements.knightElement;
-                break;
-            case "bishop":
-                this.element = elements.bishopElement;
-                break;
-            case "queen":
-                this.element = elements.queenElement;
-                break;
-            case "king":
-                this.element = elements.kingElement;
-                break;
-            default:
-                throw new Error("Invalid piece type");
-        }
-        this.element = elements[`${type}Element`];
-    this.element.addEventListener('click', this.handleClick.bind(this));
-      squareElement.appendChild(this.element);
-      this.element.style.background  = `url(${imagePath})`;
-    }
+{ type: 'rook', color: 'black', row: 7, col: 0, imagePath: 'images/blackROOK.png', elementId: 'square-7-0', game: game },
+{ type: 'knight', color: 'black', row: 7, col: 1, imagePath: 'images/blackKNIGHT.png', elementId: 'square-7-1', game: game },
+{ type: 'bishop', color: 'black', row: 7, col: 2, imagePath: 'images/blackBISHOP.png', elementId: 'square-7-2', game: game },
+{ type: 'queen', color: 'black', row: 7, col: 3, imagePath: 'images/blackQUEEN.png', elementId: 'square-7-3', game: game },
+{ type: 'king', color: 'black', row: 7, col: 4, imagePath: 'images/blackKING.png', elementId: 'square-7-4', game: game },
+{ type: 'bishop', color: 'black', row: 7, col: 5, imagePath: 'images/blackBISHOP.png', elementId: 'square-7-5', game: game },
+{ type: 'knight', color: 'black', row: 7, col: 6, imagePath: 'images/blackKNIGHT.png', elementId: 'square-7-6', game: game },
+{ type: 'rook', color: 'black', row: 7, col: 7, imagePath: 'images/blackROOK.png', elementId: 'square-7-7', game: game },
+ 
+{ type: 'pawn', color: 'black', row: 6, col: 0, imagePath: 'images/blackPAWN.png', elementId: 'square-6-0', game: game },
+{ type: 'pawn', color: 'black', row: 6, col: 1, imagePath: 'images/blackPAWN.png', elementId: 'square-6-1', game: game },
+{ type: 'pawn', color: 'black', row: 6, col: 2, imagePath: 'images/blackPAWN.png', elementId: 'square-6-2', game: game },
+{ type: 'pawn', color: 'black', row: 6, col: 3, imagePath: 'images/blackPAWN.png', elementId: 'square-6-3', game: game },
+{ type: 'pawn', color: 'black', row: 6, col: 4, imagePath: 'images/blackPAWN.png', elementId: 'square-6-4', game: game },
+{ type: 'pawn', color: 'black', row: 6, col: 5, imagePath: 'images/blackPAWN.png', elementId: 'square-6-5', game: game },
+{ type: 'pawn', color: 'black', row: 6, col: 6, imagePath: 'images/blackPAWN.png', elementId: 'square-6-6', game: game },
+{ type: 'pawn', color: 'black', row: 6, col: 7, imagePath: 'images/blackPAWN.png', elementId: 'square-6-7', game: game },
 
-    createChessPieces() {
-       
-       const elements = {
-    pawnElement: document.createElement('div'),
-    rookElement: document.createElement('div'),
-    knightElement: document.createElement('div'),
-    bishopElement: document.createElement('div'),
-    queenElement: document.createElement('div'),
-    kingElement: document.createElement('div'),
-};
+{ type: 'rook', color: 'white', row: 0, col: 0, imagePath: 'images/whiteROOK.png', elementId: 'square-0-0', game: game },
+{ type: 'knight', color: 'white', row: 0, col: 1, imagePath: 'images/whiteKNIGHT.png', elementId: 'square-0-1', game: game },
+{ type: 'bishop', color: 'white', row: 0, col: 2, imagePath: 'images/whiteBISHOP.png', elementId: 'square-0-2', game: game },
+{ type: 'queen', color: 'white', row: 0, col: 3, imagePath: 'images/whiteQUEEN.png', elementId: 'square-0-3', game: game },
+{ type: 'king', color: 'white', row: 0, col: 4, imagePath: 'images/whiteKING.png', elementId: 'square-0-4', game: game },
+{ type: 'bishop', color: 'white', row: 0, col: 5, imagePath: 'images/whiteBISHOP.png', elementId: 'square-0-5', game: game },
+{ type: 'knight', color: 'white', row: 0, col: 6, imagePath: 'images/whiteKNIGHT.png', elementId: 'square-0-6', game: game },
+{ type: 'rook', color: 'white', row: 0, col: 7, imagePath: 'images/whiteROOK.png', elementId: 'square-0-7', game: game },
 
-const blackPawn0 = new ChessPiece("pawn", "black", 6, 0, "images/blackPAWN.png", pawnElement);
-const blackPawn1 = new ChessPiece("pawn", "black", 6, 1, "images/blackPAWN.png", pawnElement);
-const blackPawn2 = new ChessPiece("pawn", "black", 6, 2, "images/blackPAWN.png", pawnElement);
-const blackPawn3 = new ChessPiece("pawn", "black", 6, 3, "images/blackPAWN.png", pawnElement);
-const blackPawn4 = new ChessPiece("pawn", "black", 6, 4, "images/blackPAWN.png", pawnElement);
-const blackPawn5 = new ChessPiece("pawn", "black", 6, 5, "images/blackPAWN.png", pawnElement);
-const blackPawn6 = new ChessPiece("pawn", "black", 6, 6, "images/blackPAWN.png", pawnElement);
-const blackPawn7 = new ChessPiece("pawn", "black", 6, 7, "images/blackPAWN.png", pawnElement);
+{ type: 'pawn', color: 'white', row: 1, col: 0, imagePath: 'images/whitePAWN.png', elementId: 'square-1-0', game: game },
+{ type: 'pawn', color: 'white', row: 1, col: 1, imagePath: 'images/whitePAWN.png', elementId: 'square-1-1', game: game },
+{ type: 'pawn', color: 'white', row: 1, col: 2, imagePath: 'images/whitePAWN.png', elementId: 'square-1-2', game: game },
+{ type: 'pawn', color: 'white', row: 1, col: 3, imagePath: 'images/whitePAWN.png', elementId: 'square-1-3', game: game },
+{ type: 'pawn', color: 'white', row: 1, col: 4, imagePath: 'images/whitePAWN.png', elementId: 'square-1-4', game: game },
+{ type: 'pawn', color: 'white', row: 1, col: 5, imagePath: 'images/whitePAWN.png', elementId: 'square-1-5', game: game },
+{ type: 'pawn', color: 'white', row: 1, col: 6, imagePath: 'images/whitePAWN.png', elementId: 'square-1-6', game: game },
+{ type: 'pawn', color: 'white', row: 1, col: 7, imagePath: 'images/whitePAWN.png', elementId: 'square-1-7', game: game },
+ 
+]
 
-const whitePawn0 = new ChessPiece("pawn", "white", 1, 0, "images/whitePAWN.png", pawnElement);
-const whitePawn1 = new ChessPiece("pawn", "white", 1, 1, "images/whitePAWN.png", pawnElement);
-const whitePawn2 = new ChessPiece("pawn", "white", 1, 2, "images/whitePAWN.png", pawnElement);
-const whitePawn3 = new ChessPiece("pawn", "white", 1, 3, "images/whitePAWN.png", pawnElement);
-const whitePawn4 = new ChessPiece("pawn", "white", 1, 4, "images/whitePAWN.png", pawnElement);
-const whitePawn5 = new ChessPiece("pawn", "white", 1, 5, "images/whitePAWN.png", pawnElement);
-const whitePawn6 = new ChessPiece("pawn", "white", 1, 6, "images/whitePAWN.png", pawnElement);
-const whitePawn7 = new ChessPiece("pawn", "white", 1, 7, "images/whitePAWN.png", pawnElement);
-
-const blackRook0 = new ChessPiece("rook", "black", 7, 0, "images/blackROOK.png", rookElement);
-const blackRook1 = new ChessPiece("rook", "black", 7, 7, "images/blackROOK.png", rookElement);
-const whiteRook0 = new ChessPiece("rook", "white", 0, 0, "images/whiteROOK.png", rookElement);
-const whiteRook1 = new ChessPiece("rook", "white", 0, 7, "images/whiteROOK.png", rookElement);
-
-const blackKnight0 = new ChessPiece("knight", "black", 7, 1, "images/blackKNIGHT.png", knightElement);
-const blackKnight = new ChessPiece("knight", "black", 7, 6, "images/blackKNIGHT.png", knightElement);
-const whiteKnight0 = new ChessPiece("knight", "white", 0, 1, "images/whiteKNIGHT.png", knightElement);
-const whiteKnight = new ChessPiece("knight", "white", 0, 6, "images/whiteKNIGHT.png", knightElement);
-
-const blackKing = new ChessPiece("king", "black", 7, 4, "images/blacKING.png", kingElement);
-const whiteKing = new ChessPiece("king", "white", 0, 4, "images/whiteKING.png", kingElement);
+ 
+for (const piece of pieces) 
+{
+    const chessPiece = new ChessPiece(piece.type, piece.color, piece.row, piece.col, piece.imagePath, piece.elementId, piece.game);
+    const squareElement = document.getElementById(chessPiece.elementId);
+    squareElement.innerHTML = `<div class="chess-piece ${chessPiece.color}-${chessPiece.type}"></div>`;
+    squareElement.classList.add('has-piece');
+    squareElement.querySelector('.chess-piece').style.backgroundImage = `url(${chessPiece.imagePath})`;
+    squareElement.style.gridRow = chessPiece.row + 1;
+    squareElement.style.gridColumn = chessPiece.col + 1;
     
-const blackBishop0 = new ChessPiece("bishop", "black", 7, 2, "images/blackBISHOP.png", bishopElement);
-const blackBishop = new ChessPiece("bishop", "black", 7, 5, "images/blackBISHOP.png", bishopElement);
-const whiteBishop0 = new ChessPiece("bishop", "white", 0, 2, "images/whiteBISHOP.png", bishopElement);
-const whiteBishop = new ChessPiece("bishop", "white", 0, 5, "images/whiteBISHOP.png", bishopElement);
 
-const blackQueen = new ChessPiece("queen", "black", 7, 3, "images/blackQUEEN.png", queenElement);
-const whiteQueen = new ChessPiece("queen", "white", 0, 3, "images/whiteQUEEN.png", queenElement);
-
-this.addChessPiece(blackQueen);
-this.addChessPiece(whiteQueen);
-
-this.addChessPiece(blackKing);
-this.addChessPiece(whiteKing);
-
-this.addChessPiece(blackKnight0);
-this.addChessPiece(blackKnight1);
-
-this.addChessPiece(whiteKnight0);
-this.addChessPiece(whiteKnight1);
-
-this.addChessPiece(blackBishop0);
-this.addChessPiece(blackBishop);
-
-this.addChessPiece(whiteBishop0);
-this.addChessPiece(whiteBishop);
-
-this.addChessPiece(whiteRook0);
-this.addChessPiece(whiteRook1);
-this.addChessPiece(blackRook0);
-this.addChessPiece(blackRook1);
-
-
-this.addChessPiece(blackPawn0);
-this.addChessPiece(blackPawn1);
-this.addChessPiece(blackPawn2);
-this.addChessPiece(blackPawn3);
-this.addChessPiece(blackPawn4);
-this.addChessPiece(blackPawn5);
-this.addChessPiece(blackPawn6);
-this.addChessPiece(blackPawn7);
-
-this.addChessPiece(whitePawn0);
-this.addChessPiece(whitePawn1);
-this.addChessPiece(whitePawn2);
-this.addChessPiece(whitePawn3);
-this.addChessPiece(whitePawn4);
-this.addChessPiece(whitePawn5);
-this.addChessPiece(whitePawn6);
-this.addChessPiece(whitePawn7);
-
-}
-
-    handleClick(pieceElement) 
-    {
-      console.log('piece clicked');
-      // Check if it is the current player's turn to move
-      if (this.isWhiteTurn !== (this.color === 'white')) 
-      {
-        // It is not the current player's turn, so do nothing
-        return;
-      }
-      pieceElement.classList.add('selected-piece');
-      // It is the current player's turn, so select the piece
-      this.element.classList.add('selected-piece');
-    this.selectedPiece = this;
-    this.handlePieceSelection(this);
-    }
-
-    
-createElement() {
-    this.element = document.createElement("img");
-    this.element.src = this.imagePath;
-    this.element.classList.add("chess-piece");
-    this.element.classList.add(`${this.color}-${this.type}`);
-    pieceElement.style.backgroundImage = `url(images/${this.color}${this.type.charAt(0).toUpperCase()}${this.type.slice(1)}.png)`;
-    this.element.addEventListener("click", (event) => {
-        console.log("Piece clicked!");
-    });
   }
 
 
+// console.log(typeof ChessPiece);
+  // console.log(ChessPiece);
+  console.log(typeof ChessBoard);
+  console.log(ChessBoard);
+  console.log(typeof ChessGame);
+  console.log(ChessGame);
+  console.log(typeof ChessArray);
+  console.log(ChessArray);
+console.log("Classes imported successfully");
+    
+  
+}
+initialize().then(() => {
+  // Get all chess squares
+ 
+    console.log("Pieces have been initialized and instances have been created.");
+});
+
+export default class ChessPiece {
+  constructor(type, color, row, col, imagePath, elementId, game, squares) {
+    // debugger
+    
+   
+   this.type = type;
+    switch (type) {
+  case "pawn":
+    console.log("Pawn created");
+    break;
+  case "rook":
+    console.log("Rook created");
+    break;
+  case "knight":
+    console.log("Knight created");
+    break;
+  case "bishop":
+    console.log("Bishop created");
+    break;
+  case "queen":
+    console.log("Queen created");
+    break;
+  case "king":
+    console.log("King created");
+    break;
+  default:
+    throw new Error("Invalid piece type");
+}
+    //this.type = type;
+    this.color = color;
+      console.log('Constructor color:', this.color);
+      
+    this.row = row;
+      
+    this.col = col;
+      
+    this.imagePath = imagePath;
+    const id = `square-${this.row}-${this.col}`;
+    this.elementId = elementId || id;
+    this.game = game;
+    this.selectedSquare = null;
+    this.prevTarget = null;
+    this.squares = squares;
+    //this.squares = [];
+    this.validMoves = [];
+    this.selectedPiece = null;
+    this.currentPlayer = game.currentPlayer;
+        // Bind handleMove to the ChessPiece object
+    //this.handleMove = this.handleMove.bind(this);
+    this.boundHandleClick = this.handleClick.bind(this);
+      
+    this.element = document.getElementById(this.elementId);
+    
+    if (this.element) 
+    {
+      console.log('Adding event listener to:', this.element);
+      this.element.removeEventListener('click', this.boundHandleClick);
+      this.element.addEventListener('click', this.boundHandleClick);
+    } 
+    else 
+    {
+      console.error(`Invalid element ID: ${id}`);
+    }
+      
+   if (elementId) {
+  console.log("Type:", type, "color:", color, "! row,col: ", row, col, "imagePath: ", imagePath, "elementId :", elementId, "game", game, "squares", squares);
+}
+
+}
+    createChessPieces() {
+    const elements = {
+        pawnElement: document.createElement('div'),
+        rookElement: document.createElement('div'),
+        knightElement: document.createElement('div'),
+        bishopElement: document.createElement('div'),
+        queenElement: document.createElement('div'),
+        kingElement: document.createElement('div'),
+    };
+
+    const chessPieces = {
+        whitePawns: [],
+        blackPawns: [],
+        whiteRooks: [],
+        blackRooks: [],
+        whiteKnights: [],
+        blackKnights: [],
+        whiteBishops: [],
+        blackBishops: [],
+        whiteQueen: [],
+        blackQueen: [],
+        whiteKing: [],
+        blackKing: [],
+    };
+
+      // create white pawns
+    for (let col = 0; col < 8; col++) {
+        const pawn = new ChessPiece('pawn', 'white', 1, col, './images/whitePAWN.png', `pawn_1_${col}`, this);
+        chessPieces.whitePawns.push(pawn);
+        this.addPieceToBoard(pawn);
+            console.log("White pawn added to board"); 
 
 
-    addChessPiece(type, color, row, col, imagePath, element) {
-  const pieceElement = new ChessPiece(type, color, row, col, imagePath, element).element;
-  const squareElement = document.getElementById(`square-${row}-${col}`);
-  if(squareElement)
+    }
+
+      // create black pawns
+    for (let col = 0; col < 8; col++) {
+        const pawn = new ChessPiece('pawn', 'black', 6, col, './images/blackPAWN.png', `pawn_6_${col}`, this);
+        chessPieces.blackPawns.push(pawn);
+        this.addPieceToBoard(pawn);
+    }
+
+      // create white rooks
+    const rook1 = new ChessPiece('rook', 'white', 0, 0, './images/whiteROOK.png', 'rook_0_0', this);
+    const rook2 = new ChessPiece('rook', 'white', 0, 7, './images/whiteROOK.png', 'rook_0_7', this);
+    chessPieces.whiteRooks.push(rook1, rook2);
+    this.addPieceToBoard(rook1);
+    this.addPieceToBoard(rook2);
+
+      // create black rooks
+    const rook3 = new ChessPiece('rook', 'black', 7, 0, './images/blackROOK.png', 'rook_7_0', this);
+    const rook4 = new ChessPiece('rook', 'black', 7, 7, './images/blackROOK.png', 'rook_7_7', this);
+    chessPieces.blackRooks.push(rook3, rook4);
+    this.addPieceToBoard(rook3);
+    this.addPieceToBoard(rook4);
+
+      // create white knights
+    const knight1 = new ChessPiece('knight', 'white', 0, 1, './images/whiteKNIGHT.png', 'knight_0_1', this);
+    const knight2 = new ChessPiece('knight', 'white', 0, 6, './images/whiteKNIGHT.png', 'knight_0_6', this);
+    chessPieces.whiteKnights.push(knight1, knight2);
+    this.addPieceToBoard(knight1);
+    this.addPieceToBoard(knight2);
+
+      // create black knights
+    const knight3 = new ChessPiece('knight', 'black', 7, 1, './images/blackKNIGHT.png', 'knight_7_1', this);
+    const knight4 = new ChessPiece('knight', 'black', 7, 6, './images/blackKNIGHT.png', 'knight_7_6', this);
+    chessPieces.blackKnights.push(knight3, knight4);
+    this.addPieceToBoard(knight3);
+    this.addPieceToBoard(knight4);
+
+      // create black bishops
+    const bishop2 = new ChessPiece('bishop', 'black', 7, 2, './images/blackBishop.png', 'bishop_7_2', this);
+    const bishop3 = new ChessPiece('bishop', 'black', 7, 5, './images/blackBishop.png', 'bishop_7_5', this);
+    chessPieces.blackBishops.push(bishop2, bishop3);
+    this.addPieceToBoard(bishop2);
+    this.addPieceToBoard(bishop3);
+
+      // create white bishops
+    const bishop1 = new ChessPiece('bishop', 'white', 0, 2, './images/whiteBISHOP.png', 'bishop_0_2', this);
+    const bishop4 = new ChessPiece('bishop', 'white', 0, 5, './images/whiteBISHOP.png', 'bishop_0_5', this);
+    chessPieces.whiteBishops.push(bishop1, bishop4);
+    this.addPieceToBoard(bishop1);
+    this.addPieceToBoard(bishop4);
+
+      // create black queen
+    const queen2 = new ChessPiece('queen', 'black', 7, 3, './images/blackQUEEN.png', 'queen_7_3', this);
+    chessPieces.blackQueen.push(queen2);
+    this.addPieceToBoard(queen2);
+
+      // create black king
+    const king2 = new ChessPiece('king', 'black', 7, 4, './images/blackKING.png', 'king_7_4', this);
+    chessPieces.blackKing.push(king2);
+    this.addPieceToBoard(king2);
+
+      // create white queen
+    const queen1 = new ChessPiece('queen', 'white', 0, 3, './images/whiteQUEEN.png', 'queen_0_3', this);
+    chessPieces.whiteQueen.push(queen1);
+    this.addPieceToBoard(queen1);
+
+      // create white king
+    const king1 = new ChessPiece('king', 'white', 0, 4, './images/whiteKING.png', 'king_0_4', this, squares);
+    chessPieces.whiteKing.push(king1);
+    this.addPieceToBoard(king1);
+
+}
+
+initialize() {
+    console.log('Initialization complete');
+  }
+
+initSquares(board, game) {
+  this.squares = [];
+  this.squares.push(...document.querySelectorAll('.chess-square.has-piece'));
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const square = board[row][col];
+      if (square) {
+        this.squares.push(square);
+        this.game.board[row][col] = square.querySelector('.chess-piece');
+      } else {
+        this.game.board[row][col] = null;
+      }
+    }
+  }
+}
+
+
+
+
+handleClick = (event) => {
+  console.log("Clicked element:", event.target);
+
+  const clickedSquareElement = event.target.closest('.chess-square');
+  if (!clickedSquareElement) {
+    return;
+  }
+  console.log("Clicked square ID:", clickedSquareElement.id);
+
+  const clickedPieceElement = clickedSquareElement.querySelector('.chess-piece');
+  console.log("clickedPieceElement:", clickedPieceElement);
+
+  const clickedPiece = clickedPieceElement ? this.getPieceFromElement(clickedPieceElement) : null;
+ console.log('getPieceFromElement result:', clickedPiece);
+  if (clickedPieceElement && !clickedPiece) return;
+  console.log("After clickedPieceElement check");
+  console.log("clickedPiece:", clickedPiece);
+
+  // If the clicked piece is the same as the selected piece, deselect it and return
+  if (this.selectedPiece && this.selectedPiece.element === clickedPieceElement) {
+    this.selectedPiece.element.classList.remove('selected-piece');
+    this.clearSelectedSquares(); // Clear the valid moves pattern
+    this.selectedPiece = null;
+    return;
+  }
+
+  if (!this.game || !this.game.board) {
+    console.log("Game is not defined or has no board property.");
+    return;
+  }
+
+  if (!clickedPieceElement && this.selectedPiece) {
+    const newRow = parseInt(clickedSquareElement.dataset.row);
+    const newCol = parseInt(clickedSquareElement.dataset.col);
+
+    // Check if the clicked square is a legal move for the selected piece
+    const validMoves = this.selectedPiece.piece.calculateValidMoves(this.selectedPiece.piece.row, this.selectedPiece.piece.col, this.game.board);
+
+    if (validMoves.some(move => move.row === newRow && move.col === newCol)) {
+  this.selectedPiece = {
+    row: this.selectedPiece.piece.row,
+    col: this.selectedPiece.piece.col,
+    element: this.selectedPiece.element,
+    piece: this.selectedPiece.piece,
+    validMoves: validMoves,
+  };
+  this.movePiece(clickedSquareElement);
+  this.deselectPiece(this.selectedPiece.element);
+  this.endTurn();
+} else {
+  console.log("Illegal move!");
+}
+    return;
+  }
+
+  if (!clickedPieceElement) {
+    console.log("No piece on clicked square.");
+    return;
+  }
+
+  if (clickedPiece.color !== this.game.currentPlayer) {
+    alert("It's not your turn!");
+    return;
+  }
+
+  if (!this.selectedPiece) {
+    clickedPieceElement.classList.add('selected-piece');
+    this.selectedPiece = {
+      row: clickedPiece.row,
+      col: clickedPiece.col,
+      element: clickedPieceElement,
+      piece: clickedPiece,
+      validMoves: this.calculateValidMoves(clickedPiece.row, clickedPiece.col, this.game.board),
+    };
+
+    // Show the valid moves pattern for the selected piece
+    this.showValidMoves(this.selectedPiece);
+  } else {
+    // If a different piece is clicked, deselect the previous piece and select the new one
+    this.deselectPiece(this.selectedPiece.element);
+    this.selectedPiece = null;
+
+    clickedPieceElement.classList.add('selected-piece');
+    this.selectedPiece = {
+      row: clickedPiece.row,
+      col: clickedPiece.col,
+      element: clickedPieceElement,
+      validMoves: this.calculateValidMoves(clickedPiece.row, clickedPiece.col, this.game.board),
+    };
+
+      // Show the valid moves pattern for the selected piece
+    this.showValidMoves(this.selectedPiece);
+
+      // Clear selected squares and piece
+    this.clearSelectedSquares();
+
+  }
+};
+showValidMoves(selectedPiece) {
+  console.log("showValidMoves called", selectedPiece);
+
+  // Clear previous valid moves
+  const allSquares = document.querySelectorAll('.chess-square');
+
+  allSquares.forEach(square => {
+    square.classList.remove('valid-move');
+    const pattern = square.querySelector('.pattern');
+    if (pattern) {
+      square.removeChild(pattern);
+    }
+  });
+
+  console.log("selectedPiece", selectedPiece)
+  // Calculate new valid moves
+  const validMoves = selectedPiece.piece.calculateValidMoves(selectedPiece.row, selectedPiece.col, this.game.board);
+
+  // Highlight new valid moves
+  for (const move of validMoves) {
+    const square = document.querySelector(`.chess-square[data-row="${move.row}"][data-col="${move.col}"]`);
+
+    // Add a green background to the valid move square
+    square.classList.add('valid-move');
+
+    // Create a pattern on the valid move square
+    const pattern = document.createElement('div');
+    pattern.classList.add('pattern');
+    square.appendChild(pattern);
+  }
+}
+//     clearValidMoves() 
+//     {
+//         for (const square of this.squares) 
+//         {
+//         square.classList.remove('valid-move');
+//         square.innerHTML = '';
+//         }
+//     }
+    
+    
+clearSelectedSquares = (game) => 
+{
+  if (!this.selectedPiece) {
+    return;
+  }
+    
+  this.selectedPiece.isValidMove(this.currentRow, this.currentCol, this.newRow, this.newCol).forEach(([row, col]) => {
+
+    const square = getSquare(row, col);
+    square.classList.remove('valid-move');
+  });
+    // check if this.game.validMoves is defined
+  //console.log('this.game.validMoves:', isValidMoves); 
+   let validMoves = [];
+  //let selectedPiece = null;
+
+  const selectedPiece = document.querySelector('.selected-piece');
+  if (selectedPieceElement) 
   {
-  squareElement.appendChild(pieceElement);
-}
-}
-
-
-    handlePieceSelection(selectedPiece, currentSquareElement) {
-      // Highlight the selected piece
-      selectedPiece.classList.add("selected");
-
-      // Add event listeners to each square on the board
-      const squares = document.querySelectorAll(".chess-square");
-      squares.forEach(square => {
-        square.addEventListener("click", function () {
-          // Check if the move to the new square is legal
-          if (board.isLegalMove(selectedPiece, this, currentSquareElement)) {
-            // If the move is legal, move the piece to the new square
-            this.appendChild(selectedPiece);
-
-            // Deselect the piece
-            deselectPiece(selectedPiece);
-          } else {
-            // If the move is not legal, display an error message
-            console.log("Illegal move!");
-          }
-        });
-      });
-    }
- /*   createPieces() {
-    // Create an array of all the chess piece types
-    const pieceTypes = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'];
-
-    // Create an array of all the chess piece colors
-    const pieceColors = ['white', 'black'];
-
-    // Create an empty array to store all the chess pieces
-    const Pieces = [];
-
-    // Loop through the piece types and colors
-    for (let type of pieceTypes) {
-        for (let color of pieceColors) {
-            // Create a new chess piece and add it to the array
-            Pieces.push(new Piece(type, color));
-        }
-    }
-
-    // Loop through the chess pieces array and add each piece to the board
-    for (let piece of Pieces) {
-        addPiece(piece);
-    }
+    selectedPiece.classList.remove('selected-piece');
+  }
+};
+    
+/*createElement() 
+{
+    this.element = document.createElement("img");
+    this.element.src = this.imagePath;
+    this.element.classList.add("chess-piece");
+    this.element.classList.add(`square-${this.color}-${this.type}`);
+    this.element.style.backgroundImage = `url(images/${this.color}${this.type.charAt(0).toUpperCase()}${this.type.slice(1)}.png)`;
+    this.element.addEventListener("click", (event) => 
+    {
+        console.log("Piece clicked!");
+    });
 }
 */
-    //currentlySelectedPiece = null;
+getPieceFromElement(pieceElement) {
 
-    selectPiece(pieceElement) {
-      // Deselect any previously selected piece
-      deselectPiece(currentlySelectedPiece);
+  const squareElement = pieceElement.parentElement;
 
-      // Select the new piece
-      currentlySelectedPiece = pieceElement;
+  console.log("pieceElement:", pieceElement);
+  console.log("squareElement:", squareElement);
+  const row = parseInt(squareElement.dataset.row);
+  const col = parseInt(squareElement.dataset.col);
 
-      // Get the current square element
-      const currentSquareElement = currentlySelectedPiece.parentElement;
+  console.log("Row:", row);
+  console.log("Col:", col);
+  console.log("Game board:", this.game.board);
+  console.log("Game.board[row][col]:", this.game.board[row][col]);
+  
 
-      // Highlight the selected piece
-      currentlySelectedPiece.classList.add("selected");
+  return this.game.board[row][col];
+}
 
-      // remove highlighting on the previously selected piece's valid squares
-      if (previouslySelectedPiece) {
-        removeHighlighting(previouslySelectedPiece);
-      }
 
-      // add highlighting on the new piece's valid squares
-      highlightValidMoves(currentlySelectedPiece);
+    addChessPiece(type, color, row, col, imagePath, elementId, game, squares) {
+  const squareElement = squares.item(row * 8 + col); // Get square element from NodeList
+  if (!squareElement) {
+    console.error(`Cannot add piece at row ${row}, col ${col}. Square does not exist.`);
+    return;
+  }
 
-      // Other statements go here...
+  const chessPiece = new ChessPiece(type, color, row, col, imagePath, elementId, game, squares);
+  console.log("Adding piece: ", chessPiece);
 
-      // Step 1: Add event listeners to each piece on the board
-      const pieces = document.querySelectorAll(".piece");
-      chessPieces.forEach(piece => {
-        piece.addEventListener("click", function () {
-          selectPiece(piece);
-        });
-      });
-    }
+    console.log(`Added piece color: ${chessPiece.color}, row: ${row}, col: ${col}`);
 
-    deselectPiece(selectedPiece) {
-      // Deselect the piece
-      selectedPiece.classList.remove("selected");
-      // Remove event listeners from each square on the board
-      const chessSquares = document.querySelectorAll(".chess-square");
-      chessSquares.forEach(square => {
-        square.removeEventListener("click", function () {});
-      });
-    }
-    highlightValidMoves(piece) {
-      const validMoves = piece.getValidMoves();
-      validMoves.forEach(([row, col]) => {
-        const square = this.squareElements[row][col];
-        square.classList.add('highlight');
-      });
-    }
+  const pieceElement = chessPiece.element;
+  if (!pieceElement) {
+    console.error(`Failed to create piece element for ${color} ${type} at row ${row}, col ${col}.`);
+    return;
+  }
 
-    handleMove(event) {
-      let isWhiteTurn; // Declare the isWhiteTurn variable
-      let selectedPiece;
+  const existingPieceElement = squareElement.firstChild;
+  if (existingPieceElement) {
+    squareElement.replaceChild(pieceElement, existingPieceElement);
+  } else {
+    squareElement.appendChild(pieceElement);
+  }
+  this.game.board[row][col] = chessPiece;
+}
 
-      // Check if the clicked element is a chess square
-      if (event.target.classList.contains("chess-square")) {
-        const selectedPiece = document.querySelector('.selected');
+calculateValidMoves(row, col, board) {
+  console.log("Board in calculateValidMoves:", board);
+  const validMoves = [];
 
-        // Get the current position of the selected piece
-        const currentRow = Number(selectedPiece.id.split("-")[0]);
-        const currentCol = Number(selectedPiece.id.split("-")[1]);
+    // The pawn can move forward only (white moves up, black moves down)
+  const direction = this.color === "white" ? 1 : -1;
 
-        // Get the clicked square's position
-        const newRow = Number(event.target.id.split("-")[0]);
-        const newCol = Number(event.target.id.split("-")[1]);
+  console.log("Row:", row);
+  console.log("Col:", col);
+  console.log("Direction:", direction);
 
-        // Check if the move is valid (add your own logic here)
-        if (ChessBoard.isValidMove(currentRow, currentCol, newRow, newCol)) {
-          // Update the board state
-          board[newRow][newCol] = board[currentRow][currentCol];
-          board[currentRow][currentCol] = null;
+    // Check for the forward move (one square)
+  const newRow = row + direction;
+  console.log("New row:", newRow);
+  if (newRow >= 0 && newRow < 8) {
+    const forwardSquare = game.board[newRow][col];
+    if (!forwardSquare) {
+      validMoves.push({ row: newRow, col: col });
+      console.log("Added forward move:", { row: newRow, col: col });
 
-          // Update the DOM to reflect the new board state
-          event.target.appendChild(selectedPiece);
-          document.getElementById(`square-${currentRow}-${currentCol}`).innerHTML = "";
-
-          // Increment the timer by 1 minute
-          timer += 60;
-
-          // Switch player turn
-          let isWhiteTurn = !isWhiteTurn;
+        // Check for the double-move on the pawn's first move
+      if ((this.color === "white" && row === 1) || (this.color === "black" && row === 6)) 
+      {
+        const doubleMoveRow = newRow + direction;
+        const doubleMoveSquare = this.game.board[doubleMoveRow][col];
+        console.log("Double move square:", doubleMoveSquare);
+        if (!doubleMoveSquare) 
+        {
+          validMoves.push({ row: doubleMoveRow, col: col });
         }
       }
-      selectedPiece.classList.remove("selected");
-
-      // Remove event listeners from each square on the board
-      const chessSquares = document.querySelectorAll(".chess-square");
-      chessSquares.forEach(square => {
-        square.removeEventListener("click", function () {});
-      });
+    } 
+    else 
+    {
+      console.log("Forward square blocked:", forwardSquare);
     }
+  } 
+  else 
+  {
+    console.log("New row out of bounds:", newRow);
+  }
 
-    canAttack(piece, row, col, color) {
-      // get the piece's type, color, and current position.
-      let type = ChessPiece.type;
-      let pieceRow = piece.row;
-      let pieceCol = piece.col;
+  const newRowForCapture = newRow;
 
-      // check if the piece can attack the square based on its type and color
-      switch (type) {
-        case 'pawn':
-          // pawns can attack diagonally, one square ahead and to the left or right.
-          if (color === 'white' && Math.abs(pieceRow - row) == 1 && Math.abs(pieceCol - col) == 1 && row < pieceRow) {
-            return true;
-          } else if (color === 'black' && Math.abs(pieceRow - row) == 1 && Math.abs(pieceCol - col) == 1 && row > pieceRow) {
-            return true;
-          }
-          break;
-        case 'rook':
-          // rooks can attack horizontally or vertically, as long as there are no pieces blocking their path
-          if (pieceRow == row || pieceCol == col) {
-            // check for pieces blocking the rook's path.
-            if (!isBlocked(piece, row, col)) {
-              return true;
-            }
-          }
-          break;
-        case 'knight':
-          // knights can attack squares that are two rows and one column, or two columns and one row away.
-          if (Math.abs(pieceRow - row) == 2 && Math.abs(pieceCol - col) == 1 || Math.abs(pieceRow - row) == 1 && Math.abs(pieceCol - col) == 2) {
-            return true;
-          }
-          break;
-        case 'bishop':
-          // bishops can attack diagonally, as long as there are no pieces blocking their path.
-          if (Math.abs(pieceRow - row) == Math.abs(pieceCol - col)) {
-            // check for pieces blocking the bishop's path
-            if (!isBlocked(piece, row, col)) {
-              return true;
-            }
-          }
-          break;
-        case 'queen':
-          // queens can attack horizontally, vertically, or diagonally, as long as there are no pieces blocking their path
-          if (pieceRow == row || pieceCol == col || Math.abs(pieceRow - row) == Math.abs(pieceCol - col)) {
-            // check for pieces blocking the queen's path
-            if (!isBlocked(piece, row, col)) {
-              return true;
-            }
-          }
-          break;
-        case 'king':
-          // kings can attack squares that are one row and one column away
-          if (Math.abs(pieceRow - row) <= 1 && Math.abs(pieceCol - col) <= 1) {
-            return true;
-          }
-          break;
-      }
-
-      // if none of the above conditions are met, the piece cannot attack the square
-      return false;
-    }
-
-    isValidMove(currentPiece, currentRow, currentCol, newRow, newCol) {
-      // get the type and color of the piece
-      let type = currentPiece.type;
-      let color = currentPiece.color;
-      const piece = new chessPiece(pieceElement);
-      // check if the piece can move to the new square based on its type and the rules of chess
-      switch (type) {
-        case 'pawn':
-          // pawns can move forward one square, or forward two squares on their first move
-          if (color == 'white') {
-            if (newRow == currentRow - 1 && newCol == currentCol && !board[newRow][newCol]) {
-              // move is valid
-              return true;
-            } else if (newRow == currentRow - 2 && newCol == currentCol && !board[newRow][newCol] && !board[currentRow - 1][currentCol] && currentRow == 6) {
-              // move is valid
-              return true;
-            }
-          } else if (color == 'black') {
-            if (newRow == currentRow + 1 && newCol == currentCol && !board[newRow][newCol]) {
-              // move is valid
-              return true;
-            } else if (newRow == currentRow + 2 && newCol == currentCol && !board[newRow][newCol] && !board[currentRow + 1][currentCol] && currentRow == 1) {
-              // move is valid
-              return true;
-            }
-          }
-          break;
-        case 'rook':
-          // rooks can move horizontally or vertically, as long as there are no pieces blocking their path
-          if (newRow == currentRow || newCol == currentCol) {
-            // check for pieces blocking the rook's path
-            if (!isBlocked(piece, newRow, newCol)) {
-              // move is valid
-              return true;
-            }
-          }
-          break;
-        case 'knight':
-          // knights can move to squares that are two rows and one column, or two columns and one row away
-          if (Math.abs(newRow - currentRow) == 2 && Math.abs(newCol - currentCol) == 1 || Math.abs(newRow - currentRow) == 1 && Math.abs(newCol - currentCol) == 2) {
-            // move is valid
-            return true;
-          }
-          break;
-        case 'bishop':
-          // bishops can move diagonally, as long as there are no pieces blocking their path
-          if (Math.abs(newRow - currentRow) == Math.abs(newCol - currentCol)) {
-            // check for pieces blocking the bishop's path
-            if (!isBlocked(piece, newRow, newCol)) {
-              // move is valid
-              return true;
-            }
-          }
-          break;
-        case 'queen':
-          // queens can move horizontally, vertically, or diagonally, as long as there are no pieces blocking their path
-          if (newRow == currentRow || newCol == currentCol || Math.abs(newRow - currentRow) == Math.abs(newCol - currentCol)) {
-            // check for pieces blocking the queen's path
-            if (!isBlocked(currentRow, currentCol, newRow, newCol)) {
-              return true;
-            }
-          }
-          break;
-        case 'king':
-          // kings can move to any adjacent square (horizontally, vertically, or diagonally)
-          if (Math.abs(newRow - currentRow) <= 1 && Math.abs(newCol - currentCol) <= 1) {
-            return true;
-          }
-          break;
-        default:
-          // if the piece is not recognized, return false
-          return false;
-      }
-      if (piece.isValidMove(currentRow, currentCol, newRow, newCol)) {
-        return true;
+    // Check for captures (diagonal moves)
+  //const newRowForCapture = newRow;
+  const captureCols = [col - 1, col + 1];
+  if (newRowForCapture >= 0 && newRowForCapture < 8) {
+    for (const captureCol of captureCols) {
+      console.log("New row for capture:", newRowForCapture);
+      console.log("Capture col:", captureCol);
+      if (captureCol >= 0 && captureCol < 8) {
+        const captureSquare = board[newRowForCapture][captureCol];
+        console.log("Capture square:", captureSquare);
+        if (captureSquare && captureSquare.color !== this.color) {
+          validMoves.push({ row: newRowForCapture, col: captureCol });
+          console.log("Added capture move:", { row: newRowForCapture, col: captureCol });
+        } else {
+          console.log("Invalid capture square:", captureSquare);
+        }
       } else {
-        return false;
+        console.log("Capture col out of bounds:", captureCol);
       }
     }
+  } else {
+    console.log("New row for capture out of bounds:", newRowForCapture);
+  }
+
+  console.log("Valid moves in calculateValidMoves:", validMoves);
+  return validMoves;
+}
+
+
+    isValidMove(currentRow, currentCol, newRow, newCol, board) {
+    // create a new ChessPiece object with the current piece's information
+    const currentPiece = new ChessPiece(this.type, this.color, this.row, this.col, this.imagePath, this.element, this.board);
+
+    // check if the move is within the board boundaries
+    if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) {
+        return false;
+    }
+
+    // check if the piece can move to the new square based on its type and the rules of chess
+    switch (currentPiece.type) {
+        case 'pawn':
+            // pawns can move forward one square, or forward two squares on their first move
+            if (currentPiece.color == 'white') {
+                if (newRow == currentRow - 1 && newCol == currentCol && !board[newRow][newCol]) {
+                    return true;
+                } else if (newRow == currentRow - 2 && newCol == currentCol && !board[newRow][newCol] && !board[currentRow - 1][currentCol] && currentRow == 6) {
+                    return true;
+                }
+            } else if (currentPiece.color == 'black') {
+                if (newRow == currentRow + 1 && newCol == currentCol && !board[newRow][newCol]) {
+                    return true;
+                } else if (newRow == currentRow + 2 && newCol == currentCol && !board[newRow][newCol] && !board[currentRow + 1][currentCol] && currentRow == 1) {
+                    return true;
+                }
+            }
+            break;
+        case 'rook':
+            // rooks can move horizontally or vertically, as long as there are no pieces blocking their path
+            if (newRow == currentRow || newCol == currentCol) {
+                // check for pieces blocking the rook's path
+                if (!isBlocked(currentPiece, newRow, newCol)) {
+                    return true;
+                }
+            }
+            break;
+        case 'knight':
+            // knights can move to squares that are two rows and one column, or two columns and one row away
+            if (Math.abs(newRow - currentRow) == 2 && Math.abs(newCol - currentCol) == 1 || Math.abs(newRow - currentRow) == 1 && Math.abs(newCol - currentCol) == 2) {
+                return true;
+            }
+            break;
+        case 'bishop':
+            // bishops can move diagonally, as long as there are no pieces blocking their path
+            if (Math.abs(newRow - currentRow) == Math.abs(newCol - currentCol)) {
+                // check for pieces blocking the bishop's path
+                if (!isBlocked(currentPiece, newRow, newCol)) {
+                    return true;
+                }
+            }
+            break;
+        case 'queen':
+            // queens can move horizontally, vertically, or diagonally, as long as there are no pieces blocking their path
+            if (newRow == currentRow || newCol == currentCol || Math.abs(newRow - currentRow) == Math.abs(newCol - currentCol)) {
+                // check for pieces blocking the queen's path
+                if (!isBlocked(currentRow, currentCol, newRow, newCol)) {
+                    return true;
+                }
+            }
+            break;
+            case 'king':
+            // kings can move to any adjacent square (horizontally, vertically, or diagonally)
+            if (Math.abs(newRow - currentRow) <= 1 && Math.abs(newCol - currentCol) <= 1) {
+                return true;
+            }
+            break;
+        default:
+            // if the piece is not recognized, return false
+            return false;
+    }
+
+    // if the move is not valid, return false
+    return false;
+}
     getType() {
-      // returns the type of the piece (e.g. "pawn", "rook", etc.)
+        // returns the type of the piece (e.g. "pawn", "rook", etc.)
       return this.type;
     }
 
     getColor() {
-      // returns the color of the piece (e.g. "white", "black")
+        // returns the color of the piece (e.g. "white", "black")
       return this.color;
     }
-    getKing(color) {
-      // iterate over all of the squares on the board
-      for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
-          // get the piece at the current square
-          let piece = board.getBoard()[i][j];
 
-          // if the piece is a king of the right color, return it
-          if (piece && piece.type == 'king' && piece.color == color) {
-            return piece;
-          }
-        }
-      }
-    }
-    getPosition() {
-      // returns the current position of the piece on the board as an array [row, col]
+    getPosition() 
+    {
+        // returns the current position of the piece on the board as an array [row, col]
       return [this.row, this.col];
     }
 
-    setPosition(row, col) {
-      // sets the position of the piece on the board
+    setPosition(row, col) 
+    {
+        // sets the position of the piece on the board
       this.row = row;
       this.col = col;
     }
-    playMoveSound() {
+
+    playMoveSound() 
+    {
       const audioElement = document.createElement('audio');
       audioElement.src = '/sounds/move.mp3';
       document.body.appendChild(audioElement);
@@ -507,239 +693,13 @@ createElement() {
       audioElement.play();
     }
 
-    playWrongSound() {
-      // create an audio element for the wrong sound
+    playWrongSound() 
+    {
+        // create an audio element for the wrong sound
       const audioElement = document.createElement('audio');
       audioElement.src = '/sounds/wrong.mp3';
       document.body.appendChild(audioElement);
-      // play the sound
+        // play the sound
       audioElement.play();
     }
-    checkGameOver() {
-      // check if either player has no pieces left
-      if (getNumWhitePieces() == 0 || getNumBlackPieces() == 0) {
-        return true;
-      }
-
-      // check if either player is in checkmate
-      if (isCheckmate('white') || isCheckmate('black')) {
-        return true;
-      }
-
-      // check if the game is a draw (e.g., insufficient material to checkmate)
-      if (isDraw()) {
-        return true;
-      }
-
-      // if none of the above conditions are met, the game is not over
-      return false;
-    }
-
-    checkGameStatus() {
-      if (checkGameOver()) {
-        // game is over
-        // do something here to end the game (e.g., display a message or redirect to a game over screen)
-      } else {
-          // game is not over
-          // continue playing the game as normal
-        }
-    }
-
-    isLegalMove(piece, newSquare, board, currentSquare) 
-    {
-      // Get the piece's type (e.g. pawn, knight, etc.) and color
-      const pieceType = piece.type;
-      const pieceColor = piece.color;
-      // Get the current and new square coordinates
-      const currentSquareCoords = getSquareCoords(currentSquare);
-      const newSquareCoords = getSquareCoords(newSquare);
-
-      switch (pieceType) 
-      {
-        case "queen":
-          // Queens can move diagonally, horizontally, or vertically any number of squares, as long as there are no other pieces blocking the way
-          // Check if the move is diagonal
-          if (Math.abs(newSquareCoords[0] - currentSquareCoords[0]) === Math.abs(newSquareCoords[1] - currentSquareCoords[1])) {
-            if (!isClearPath(board, currentSquareCoords[0], currentSquareCoords[1], newSquareCoords[0], newSquareCoords[1])) {
-              return false;
-            }
-          }
-          // Check if the move is horizontal or vertical
-          if (newSquareCoords[0] === currentSquareCoords[0] || newSquareCoords[1] === currentSquareCoords[1]) {
-            if (!isClearPath(board, currentSquareCoords[0], currentSquareCoords[1], newSquareCoords[0], newSquareCoords[1])) {
-              return false;
-            }
-          }
-          return true;
-        case "rook":
-          // Rooks can move horizontally or vertically any number of squares, as long as there are no other pieces blocking the way
-          // Check if the move is horizontal or vertical
-          if (newSquareCoords[0] === currentSquareCoords[0] || newSquareCoords[1] === currentSquareCoords[1]) {
-            if (!isClearPath(board, currentSquareCoords[0], currentSquareCoords[1], newSquareCoords[0], newSquareCoords[1])) {
-              return false;
-            }
-          }
-          break;
-        case "bishop":
-          // Check if the move is diagonal
-          if (Math.abs(newSquareCoords[0] - currentSquareCoords[0]) === Math.abs(newSquareCoords[1] - currentSquareCoords[1])) {
-            // Check if there are no pieces blocking the way
-            if (isClearPath(board, currentSquareCoords[0], currentSquareCoords[1], newSquareCoords[0], newSquareCoords[1])) {
-              // The move is legal
-              return true;
-            }
-          }
-
-          // The move is not legal
-          return false;
-
-        case "knight":
-          // Knights can move in an L-shaped pattern (two squares in one direction, and one square in the other)
-          return Math.abs(newSquareCoords[0] - currentSquareCoords[0]) === 2 && Math.abs(newSquareCoords[1] - currentSquareCoords[1]) === 1 || Math.abs(newSquareCoords[0] - currentSquareCoords[0]) === 1 && Math.abs(newSquareCoords[1] - currentSquareCoords[1]) === 2;
-        case "pawn":
-          // Pawns can only move forward one square, unless it is their first move and they are allowed to move two squares
-          // They can also capture pieces diagonally
-          if (pieceColor === "white") {
-            // White pawns can only move forward
-            if (newSquareCoords[0] === currentSquareCoords[0] - 1) {
-              // Check if the pawn is moving straight ahead
-              if (newSquareCoords[1] === currentSquareCoords[1]) {
-                // Check if the square is unoccupied
-                if (!getPieceOnSquare(newSquare)) {
-                  return true;
-                }
-              }
-              // Check if the pawn is capturing a piece
-              if (Math.abs(newSquareCoords[1] - currentSquareCoords[1]) === 1) {
-                // Check if the square is occupied by an enemy piece
-                const enemyPiece = getPieceOnSquare(newSquare);
-                if (enemyPiece && enemyPiece.classList[1] !== pieceColor) {
-                  return true;
-                }
-              }
-            }
-            // Check if the pawn is making a double move (on their first move only)
-            // Black pawns can only move backwards
-            if (newSquareCoords[0] === currentSquareCoords[0] + 1) {
-              // Check if the pawn is moving straight ahead
-              if (newSquareCoords[1] === currentSquareCoords[1]) {
-                // Check if the square is unoccupied
-                if (!getPieceOnSquare(newSquare)) {
-                  return true;
-                }
-              }
-              // Check if the pawn is capturing a piece
-              if (Math.abs(newSquareCoords[1] - currentSquareCoords[1]) === 1) {
-                // Check if the square is occupied by an enemy piece
-                const enemyPiece = getPieceOnSquare(newSquare);
-                if (enemyPiece && enemyPiece.classList[1] !== pieceColor) {
-                  return true;
-                }
-              }
-            }
-            // Check if the pawn is making a double move (on their first move only)
-            if (newSquareCoords[0] === currentSquareCoords[0] + 2 && newSquareCoords[1] === currentSquareCoords[1] && !piece.hasMoved) {
-              // Check that there are no pieces blocking the move
-              const squareInBetween = document.getElementById(`square-${currentSquareCoords[0] + 1}-${currentSquareCoords[1]}`);
-              if (!getPieceOnSquare(squareInBetween)) {
-                return true;
-              }
-            }
-            break;
-          }
-        default:
-        case "king":
-          // Kings can move one square in any direction
-          if (Math.abs(newSquareCoords[0] - currentSquareCoords[0]) <= 1 && Math.abs(newSquareCoords[1] - currentSquareCoords[1]) <= 1) {
-            return true;
-          }
-          // Kings can also castle (move two squares towards the rook) if certain conditions are met
-          if (newSquareCoords[1] === currentSquareCoords[1] + 2 && !piece.hasMoved) {
-            // Check that there are no pieces between the king and the rook
-            const rightSquare = document.getElementById(`square-${currentSquareCoords[0]}-${currentSquareCoords[1] + 1}`);
-            const rookSquare = document.getElementById(`square-${currentSquareCoords[0]}-${currentSquareCoords[1] + 3}`);
-            if (getPieceOnSquare(rightSquare) || getPieceOnSquare(rookSquare)) {
-              return false;
-            }
-            // Check that the rook has not moved
-            const rook = getPieceOnSquare(rookSquare);
-            if (rook && rook.hasMoved) {
-              return false;
-            }
-            // Check that the king is not in check
-            if (isSquareInCheck(board, currentSquare)) {
-              return false;
-            }
-            // Check that the king does not move through a square that is in check
-            if (isSquareInCheck(board, rightSquare) || isSquareInCheck(board, newSquare)) {
-              return false;
-            }
-            return true;
-          }
-          if (newSquareCoords[1] === currentSquareCoords[1] - 2 && !piece.hasMoved) {
-            // Check that there are no pieces between the king and the rook
-            const leftSquare = document.getElementById(`square-${currentSquareCoords[0]}-${currentSquareCoords[1] - 1}`);
-            const rookSquare = document.getElementById(`square-${currentSquareCoords[0]}-${currentSquareCoords[1] - 4}`);
-            if (getPieceOnSquare(leftSquare) || getPieceOnSquare(rookSquare)) {
-              return false;
-            }
-            // Check that the rook has not moved
-            const rook = getPieceOnSquare(rookSquare);
-            if (rook && rook.hasMoved) {
-              return false;
-            }
-            // Check that the king is not in check
-            if (isSquareInCheck(board, currentSquare)) {
-              return false;
-            }
-            // Check that the king does not move through a square that is in check
-            if (isSquareInCheck(board, leftSquare) || isSquareInCheck(board, newSquare)) {
-              return false;
-            }
-            return true;
-          }
-        //break;
-      }
-    }
-    isClearPath(board, currentRow, currentCol, newRow, newCol) 
-    {
-      // Check if the move is horizontal or vertical
-      if (currentRow === newRow || currentCol === newCol) 
-      {
-        // Check if the path is clear along the row or column
-        const start = Math.min(currentRow, newRow);
-        const end = Math.max(currentRow, newRow);
-        for (let i = start + 1; i < end; i++) 
-        {
-          if (board[i][currentCol]) 
-          {
-            return false;
-          }
-        }
-      } else {
-        // The move is diagonal
-        // Check if the path is clear along the diagona
-        const rowDiff = Math.abs(newRow - currentRow);
-        const colDiff = Math.abs(newCol - currentCol);
-        if (rowDiff !== colDiff) 
-        {
-          // The move is not diagonal
-          return false;
-        }
-        const rowStep = (newRow - currentRow) / rowDiff;
-        const colStep = (newCol - currentCol) / colDiff;
-        let row = currentRow + rowStep;
-        let col = currentCol + colStep;
-        while (row !== newRow && col !== newCol) 
-        {
-          if (board[row][col]) 
-          {
-            return false;
-          }
-          row += rowStep;
-          col += colStep;
-        }
-      }
-      return true;
-    } 
-}
+   }
