@@ -24,7 +24,7 @@ await defineExtendedPiece();
 async function initialize(game, pieces) 
 {
   await defineExtentedPiece();
-  const { default: ChessPiece } = await import('./classPiece.js');
+  //const { default: ChessPiece } = await import('./classPiece.js');
   const { default: ChessBoard } = await import('./classBoard.js');
   const { default: ChessGame } = await import('./classGame.js');
   const { default: ChessArray } = await import('./classArray.js');
@@ -36,7 +36,8 @@ async function initialize(game, pieces)
   window.ChessArray = ChessArray;
       // Initialize the game objects using the imported classes
   const chessArray = new ChessArray();
-  const chessBoard = new ChessBoard(game, ChessPiece, pieces);
+  const chessBoard = new ChessBoard(this.game, ChessPiece, pieces);
+
   const chessGame = new ChessGame(chessArray, chessBoard, handlePieceSelection);
 
       // Attach event listeners
@@ -61,10 +62,12 @@ export default class ChessBoard
     this.gameStatus = "active";
     this.board = [];
 
-    this.boardElement = document.getElementById('chessboard'); // Set boardElement here
+    this.board.Element = document.getElementById('chessboard'); // Set boardElement here
     this.pieces = pieces;
     this.currentlySelectedPiece = null;
     this.game = game;
+   // this.board. = document.getElementById('this.board.');
+    this.board.length = 0;
     this.ChessPiece = ChessPiece;
     // this.setupInitialPosition(pieces);
     //this.createBoard();
@@ -75,66 +78,64 @@ export default class ChessBoard
   // Initialize the board with pieces in their starting position
 
    initializeBoard() {
-   this.game = 
-   {
-    board: [] 
-  };
+   this.board = chessboard;
     
     // create a 2D array to represent the board
     for (let row = 0; row < 8; row++) {
-      this.game.board[row] = [];
+      this.board[row] = [];
       for (let col = 0; col < 8; col++) {
-        this.game.board[row][col] = null;
-        console.log("Initial board state:", this.game.board);
+        this.board[row][col] = null;
       }
 
       
      }
 
     // Add black pieces
-  this.game.board[7][0] = new window.ChessPiece("rook", "black", 7, 0, "images/blackROOK.png", "square-7-0", this);
-  this.game.board[7][1] = new window.ChessPiece("knight", "black", 7, 1, "images/blackKNIGHT.png", "square-7-1", this);
-  this.game.board[7][2] = new window.ChessPiece("bishop", "black", 7, 2, "images/blackBISHOP.png", "square-7-2", this);
-  this.game.board[7][3] = new window.ChessPiece("queen", "black", 7, 3, "images/blackQUEEN.png", "square-7-3", this);
-  this.game.board[7][4] = new window.ChessPiece("king", "black", 7, 4, "images/blackKING.png", "square-7-4", this);
-  this.game.board[7][5] = new window.ChessPiece("bishop", "black", 7, 5, "images/blackBISHOP.png", "square-7-5", this);
-  this.game.board[7][6] = new window.ChessPiece("knight", "black", 7, 6, "images/blackKNIGHT.png", "square-7-6", this);
-  this.game.board[7][7] = new window.ChessPiece("rook", "black", 7, 7, "images/blackROOK.png", "square-7-7", this);
+  this.board[7][0] = new window.ChessPiece("rook", "black", 7, 0, "images/blackROOK.png", "square-7-0", this);
+  this.board[7][1] = new window.ChessPiece("knight", "black", 7, 1, "images/blackKNIGHT.png", "square-7-1", this);
+  this.board[7][2] = new window.ChessPiece("bishop", "black", 7, 2, "images/blackBISHOP.png", "square-7-2", this);
+  this.board[7][3] = new window.ChessPiece("queen", "black", 7, 3, "images/blackQUEEN.png", "square-7-3", this);
+  this.board[7][4] = new window.ChessPiece("king", "black", 7, 4, "images/blackKING.png", "square-7-4", this);
+  this.board[7][5] = new window.ChessPiece("bishop", "black", 7, 5, "images/blackBISHOP.png", "square-7-5", this);
+  this.board[7][6] = new window.ChessPiece("knight", "black", 7, 6, "images/blackKNIGHT.png", "square-7-6", this);
+  this.board[7][7] = new window.ChessPiece("rook", "black", 7, 7, "images/blackROOK.png", "square-7-7", this);
   
     //Add Black PAWNS
 
-  this.game.board[6][0] = new window.ChessPiece("pawn", "black", 6, 0, "images/blackPAWN.png", "square-6-0", this);
-  this.game.board[6][1] = new window.ChessPiece("pawn", "black", 6, 1, "images/blackPAWN.png", "square-6-1", this);
-  this.game.board[6][2] = new window.ChessPiece("pawn", "black", 6, 2, "images/blackPAWN.png", "square-6-2", this);
-  this.game.board[6][3] = new window.ChessPiece("pawn", "black", 6, 3, "images/blackPAWN.png", "square-6-3", this);
-  this.game.board[6][4] = new window.ChessPiece("pawn", "black", 6, 4, "images/blackPAWN.png", "square-6-4", this);
-  this.game.board[6][5] = new window.ChessPiece("pawn", "black", 6, 5, "images/blackPAWN.png", "square-6-5", this);
-  this.game.board[6][6] = new window.ChessPiece("pawn", "black", 6, 6, "images/blackPAWN.png", "square-6-6", this);
-  this.game.board[6][7] = new window.ChessPiece("pawn", "black", 6, 7, "images/blackPAWN.png", "square-6-7", this);
+  this.board[6][0] = new window.ChessPiece("pawn", "black", 6, 0, "images/blackPAWN.png", "square-6-0", this);
+  this.board[6][1] = new window.ChessPiece("pawn", "black", 6, 1, "images/blackPAWN.png", "square-6-1", this);
+  this.board[6][2] = new window.ChessPiece("pawn", "black", 6, 2, "images/blackPAWN.png", "square-6-2", this);
+  this.board[6][3] = new window.ChessPiece("pawn", "black", 6, 3, "images/blackPAWN.png", "square-6-3", this);
+  this.board[6][4] = new window.ChessPiece("pawn", "black", 6, 4, "images/blackPAWN.png", "square-6-4", this);
+  this.board[6][5] = new window.ChessPiece("pawn", "black", 6, 5, "images/blackPAWN.png", "square-6-5", this);
+  this.board[6][6] = new window.ChessPiece("pawn", "black", 6, 6, "images/blackPAWN.png", "square-6-6", this);
+  this.board[6][7] = new window.ChessPiece("pawn", "black", 6, 7, "images/blackPAWN.png", "square-6-7", this);
   
     // Add WHITE pieces
-  this.game.board[0][0] = new window.ChessPiece("rook", "white", 0, 0, "images/whiteROOK.png", "square-0-0", this);
-  this.game.board[0][1] = new window.ChessPiece("knight", "white", 0, 1, "images/whiteKNIGHT.png", "square-0-1", this);
-  this.game.board[0][2] = new window.ChessPiece("bishop", "white", 0, 2, "images/whiteBISHOP.png", "square-0-2", this);
-  this.game.board[0][3] = new window.ChessPiece("queen", "white", 0, 3, "images/whiteQUEEN.png", "square-0-3", this);
-  this.game.board[0][4] = new window.ChessPiece("king", "white", 0, 4, "images/whiteKING.png", "square-0-4", this);
-  this.game.board[0][5] = new window.ChessPiece("bishop", "white", 0, 5, "images/whiteBISHOP.png", "square-0-5", this);
-  this.game.board[0][6] = new window.ChessPiece("knight", "white", 0, 6, "images/whiteKNIGHT.png", "square-0-6", this);
-  this.game.board[0][7] = new window.ChessPiece("rook", "white", 0, 7, "images/whiteROOK.png", "square-0-7", this);
+  this.board[0][0] = new window.ChessPiece("rook", "white", 0, 0, "images/whiteROOK.png", "square-0-0", this);
+  this.board[0][1] = new window.ChessPiece("knight", "white", 0, 1, "images/whiteKNIGHT.png", "square-0-1", this);
+  this.board[0][2] = new window.ChessPiece("bishop", "white", 0, 2, "images/whiteBISHOP.png", "square-0-2", this);
+  this.board[0][3] = new window.ChessPiece("queen", "white", 0, 3, "images/whiteQUEEN.png", "square-0-3", this);
+  this.board[0][4] = new window.ChessPiece("king", "white", 0, 4, "images/whiteKING.png", "square-0-4", this);
+  this.board[0][5] = new window.ChessPiece("bishop", "white", 0, 5, "images/whiteBISHOP.png", "square-0-5", this);
+  this.board[0][6] = new window.ChessPiece("knight", "white", 0, 6, "images/whiteKNIGHT.png", "square-0-6", this);
+  this.board[0][7] = new window.ChessPiece("rook", "white", 0, 7, "images/whiteROOK.png", "square-0-7", this);
   
 
       //Add white pawns
-  this.game.board[1][0] = new window.ChessPiece("pawn", "white", 1, 0, "images/whitePAWN.png", "square-1-0", this);
-  this.game.board[1][1] = new window.ChessPiece("pawn", "white", 1, 1, "images/whitePAWN.png", "square-1-1", this);
-  this.game.board[1][2] = new window.ChessPiece("pawn", "white", 1, 2, "images/whitePAWN.png", "square-1-2", this);
-  this.game.board[1][3] = new window.ChessPiece("pawn", "white", 1, 3, "images/whitePAWN.png", "square-1-3", this);
-  this.game.board[1][4] = new window.ChessPiece("pawn", "white", 1, 4, "images/whitePAWN.png", "square-1-4", this);
-  this.game.board[1][5] = new window.ChessPiece("pawn", "white", 1, 5, "images/whitePAWN.png", "square-1-5", this);
-  this.game.board[1][6] = new window.ChessPiece("pawn", "white", 1, 6, "images/whitePAWN.png", "square-1-6", this);
-  this.game.board[1][7] = new window.ChessPiece("pawn", "white", 1, 7, "images/whitePAWN.png", "square-1-7", this);
+  this.board[1][0] = new window.ChessPiece("pawn", "white", 1, 0, "images/whitePAWN.png", "square-1-0", this);
+  this.board[1][1] = new window.ChessPiece("pawn", "white", 1, 1, "images/whitePAWN.png", "square-1-1", this);
+  this.board[1][2] = new window.ChessPiece("pawn", "white", 1, 2, "images/whitePAWN.png", "square-1-2", this);
+  this.board[1][3] = new window.ChessPiece("pawn", "white", 1, 3, "images/whitePAWN.png", "square-1-3", this);
+  this.board[1][4] = new window.ChessPiece("pawn", "white", 1, 4, "images/whitePAWN.png", "square-1-4", this);
+  this.board[1][5] = new window.ChessPiece("pawn", "white", 1, 5, "images/whitePAWN.png", "square-1-5", this);
+  this.board[1][6] = new window.ChessPiece("pawn", "white", 1, 6, "images/whitePAWN.png", "square-1-6", this);
+  this.board[1][7] = new window.ChessPiece("pawn", "white", 1, 7, "images/whitePAWN.png", "square-1-7", this);
   
   console.log("Initializing the board...");
-  this.renderBoard(this.game.board);
+  console.log("Initial board state:", this.board);
+  this.renderBoard(this.board);
+   this.squareElements = document.querySelectorAll(".chess-square");
   this.registerSquareClickHandlers();
   console.log("Board initialization completed.");
 }
@@ -159,9 +160,9 @@ renderBoard(board) {
         square.classList.add("dark");
       }
 
-      if (this.game.board[row][col] !== null) {
+      if (this.board[row][col] !== null) {
         const piece = document.createElement("img");
-        piece.src = this.game.board[row][col].imagePath;
+        piece.src = this.board[row][col].imagePath;
         piece.classList.add("chess-piece");
         square.appendChild(piece);
       }
@@ -172,8 +173,12 @@ renderBoard(board) {
 }
 
 registerSquareClickHandlers() {
+  const self = this; // Store the reference to 'this' for later use
+
   this.squareElements.forEach((squareElement) => {
-    squareElement.addEventListener("click", this.handleSquareClick.bind(this));
+    squareElement.addEventListener("click", function(event) {
+      self.handleSquareClick(event); // Pass the event object to handleSquareClick
+    });
   });
 }
 
@@ -187,7 +192,7 @@ setupInitialPosition(pieces, chessBoard, game, chessArray) {
 
     const newChessPiece = new ChessPiece(type, color, row, col, imagePath, elementId, game);
     chessBoard.addPiece(newChessPiece);
-    game.addPiece(newChessPiece);
+    this.board.addPiece(newChessPiece);
     chessArray.addPiece(newChessPiece);
 
     const squareElement = document.getElementById(elementId); // Use the provided elementId directly
@@ -275,14 +280,14 @@ async handleSquareClick(event) {
   const clickedSquareCol = parseInt(clickedSquare.dataset.col);
   console.log("Parsed clickedSquareRow:", clickedSquareRow);
 console.log("Parsed clickedSquareCol:", clickedSquareCol);
-  const clickedPiece = this.game.board[clickedSquareRow][clickedSquareCol];
+  const clickedPiece = this.board[clickedSquareRow][clickedSquareCol];
 
   console.log('clickedSquare:', clickedSquare);
   console.log('clickedSquareRow:', clickedSquareRow);
   console.log('clickedSquareCol:', clickedSquareCol);
   console.log('clickedPiece:', clickedPiece);
   console.log("Target square ID before movePiece:", clickedSquare.id);
-  console.log("Game board before movePiece:", this.game.board);
+  console.log("Game board before movePiece:", this.board);
 
   console.log("Handling square click event. Target:", event.target);
 
@@ -305,7 +310,7 @@ console.log("Parsed clickedSquareCol:", clickedSquareCol);
       if (moveResult) {
         this.currentlySelectedPiece.element.classList.remove("selected-piece");
         this.currentlySelectedPiece = null;
-        console.log("Game board after movePiece:", this.game.board);
+        console.log("Game board after movePiece:", this.board);
       } else {
         this.currentlySelectedPiece.element.classList.remove("selected-piece");
         this.clearValidMoves();

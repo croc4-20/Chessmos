@@ -77,7 +77,6 @@ export default class ChessGame
     this.currentPlayer = 'white';
     this.squares = document.querySelectorAll('.chess-square');
 
-      
     this.validMoves = [];
     this.game = {  
       board: this.board,
@@ -235,6 +234,7 @@ startNewGame()
   
    handleSquareClick(square) {
     // Check if a piece is already selected
+    console.log("handleSquareClick called");
     if (this.selectedPiece) {
       // Check if the clicked square is a legal move for the selected piece
       if (this.legalMoves.includes(square)) {

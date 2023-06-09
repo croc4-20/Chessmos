@@ -2,6 +2,7 @@ let clickedPiece;
 let pieces;
 let handleClick;
 
+
 async function initialize() 
 {
   //const { default: ChessPiece } = await import('./classPiece.js');
@@ -12,6 +13,7 @@ async function initialize()
  
   const chessArray = new ChessArray();
   const chessBoard = new ChessBoard();
+  chessBoard.initializeBoard();
   //const game = new ChessGame(this.game.chessArray, this.game.chessBoard, () => this).bind(this);
   //const game = new ChessGame(chessArray, chessBoard, () => this.bind(this));
   const game = new ChessGame(chessArray, chessBoard, this);
@@ -89,8 +91,11 @@ initialize().then(() => {
     console.log("Pieces have been initialized and instances have been created.");
 });
 
+const game = {
+  board: []
+};
 export default class ChessPiece {
-  constructor(type, color, row, col, imagePath, elementId, game, squares) {
+  constructor(type, color, row, col, imagePath, elementId, game) {
     // debugger
     
    
@@ -117,21 +122,19 @@ export default class ChessPiece {
   default:
     throw new Error("Invalid piece type");
 }
-    //this.type = type;
+    this.board = chessboard;
     this.color = color;
       console.log('Constructor color:', this.color);
-      
-    this.row = row;
-      
+    this.row = row;  
     this.col = col;
-      
     this.imagePath = imagePath;
     const id = `square-${this.row}-${this.col}`;
     this.elementId = elementId || id;
+    this.imagePath = imagePath;
     this.game = game;
     this.selectedSquare = null;
     this.prevTarget = null;
-    this.squares = squares;
+    //this.squares = squares;
     //this.squares = [];
     this.validMoves = [];
     this.selectedPiece = null;
@@ -154,7 +157,7 @@ export default class ChessPiece {
     }
       
    if (elementId) {
-  console.log("Type:", type, "color:", color, "! row,col: ", row, col, "imagePath: ", imagePath, "elementId :", elementId, "game", game, "squares", squares);
+  console.log("Type:", type, "color:", color, "! row,col: ", row, col, "imagePath: ", imagePath, "elementId :", elementId, "game", game);
 }
 
 }
@@ -185,82 +188,80 @@ export default class ChessPiece {
 
       // create white pawns
     for (let col = 0; col < 8; col++) {
-        const pawn = new ChessPiece('pawn', 'white', 1, col, './images/whitePAWN.png', `pawn_1_${col}`, this);
-        chessPieces.whitePawns.push(pawn);
-        this.addPieceToBoard(pawn);
-            console.log("White pawn added to board"); 
-
-
-    }
+        const pawn1 = new ChessPiece('pawn', 'white', 1, col, './images/whitePAWN.png', `pawn_1_${col}`, this);
+        chessPieces.whitePawns.push(pawn1);
+        this.addChessPiece('pawn', 'white', 1, col, './images/whitePAWN.png', `pawn_1_${col}`, this);
+   
+        console.log("White pawn added to board");
+      }
 
       // create black pawns
     for (let col = 0; col < 8; col++) {
-        const pawn = new ChessPiece('pawn', 'black', 6, col, './images/blackPAWN.png', `pawn_6_${col}`, this);
-        chessPieces.blackPawns.push(pawn);
-        this.addPieceToBoard(pawn);
+        const pawn6 = new ChessPiece('pawn', 'black', 6, col, './images/blackPAWN.png', `pawn_6_${col}`, this);
+        chessPieces.blackPawns.push(pawn6);
+        this.addChessPiece(pawn6);
     }
 
       // create white rooks
-    const rook1 = new ChessPiece('rook', 'white', 0, 0, './images/whiteROOK.png', 'rook_0_0', this);
+    const rook1 = new ChessPiece('rook', 'white', 0, 0, './images/whiteROOK.png', 'rook_0_0', this.game);
     const rook2 = new ChessPiece('rook', 'white', 0, 7, './images/whiteROOK.png', 'rook_0_7', this);
     chessPieces.whiteRooks.push(rook1, rook2);
-    this.addPieceToBoard(rook1);
-    this.addPieceToBoard(rook2);
+    this.addChessPiece(rook1, rook2);
+   
 
       // create black rooks
     const rook3 = new ChessPiece('rook', 'black', 7, 0, './images/blackROOK.png', 'rook_7_0', this);
     const rook4 = new ChessPiece('rook', 'black', 7, 7, './images/blackROOK.png', 'rook_7_7', this);
     chessPieces.blackRooks.push(rook3, rook4);
-    this.addPieceToBoard(rook3);
-    this.addPieceToBoard(rook4);
-
+    this.addChessPiece(rook3, rook4);
+   
       // create white knights
     const knight1 = new ChessPiece('knight', 'white', 0, 1, './images/whiteKNIGHT.png', 'knight_0_1', this);
     const knight2 = new ChessPiece('knight', 'white', 0, 6, './images/whiteKNIGHT.png', 'knight_0_6', this);
     chessPieces.whiteKnights.push(knight1, knight2);
-    this.addPieceToBoard(knight1);
-    this.addPieceToBoard(knight2);
+    this.addChessPiece(knight1, knight2);
+    
 
       // create black knights
     const knight3 = new ChessPiece('knight', 'black', 7, 1, './images/blackKNIGHT.png', 'knight_7_1', this);
     const knight4 = new ChessPiece('knight', 'black', 7, 6, './images/blackKNIGHT.png', 'knight_7_6', this);
     chessPieces.blackKnights.push(knight3, knight4);
-    this.addPieceToBoard(knight3);
-    this.addPieceToBoard(knight4);
+    this.addChessPiece(knight3, knight4);
+    
 
       // create black bishops
     const bishop2 = new ChessPiece('bishop', 'black', 7, 2, './images/blackBishop.png', 'bishop_7_2', this);
     const bishop3 = new ChessPiece('bishop', 'black', 7, 5, './images/blackBishop.png', 'bishop_7_5', this);
     chessPieces.blackBishops.push(bishop2, bishop3);
-    this.addPieceToBoard(bishop2);
-    this.addPieceToBoard(bishop3);
+    this.addChessPiece(bishop2, bishop3);
+    
 
       // create white bishops
     const bishop1 = new ChessPiece('bishop', 'white', 0, 2, './images/whiteBISHOP.png', 'bishop_0_2', this);
     const bishop4 = new ChessPiece('bishop', 'white', 0, 5, './images/whiteBISHOP.png', 'bishop_0_5', this);
     chessPieces.whiteBishops.push(bishop1, bishop4);
-    this.addPieceToBoard(bishop1);
-    this.addPieceToBoard(bishop4);
+    this.addChessPiece(bishop1, bishop4);
+    
 
       // create black queen
     const queen2 = new ChessPiece('queen', 'black', 7, 3, './images/blackQUEEN.png', 'queen_7_3', this);
     chessPieces.blackQueen.push(queen2);
-    this.addPieceToBoard(queen2);
+    this.addChessPiece(queen2);
 
       // create black king
     const king2 = new ChessPiece('king', 'black', 7, 4, './images/blackKING.png', 'king_7_4', this);
     chessPieces.blackKing.push(king2);
-    this.addPieceToBoard(king2);
+    this.addChessPiece(king2);
 
       // create white queen
     const queen1 = new ChessPiece('queen', 'white', 0, 3, './images/whiteQUEEN.png', 'queen_0_3', this);
     chessPieces.whiteQueen.push(queen1);
-    this.addPieceToBoard(queen1);
+    this.addChessPiece(queen1);
 
       // create white king
-    const king1 = new ChessPiece('king', 'white', 0, 4, './images/whiteKING.png', 'king_0_4', this, squares);
+    const king1 = new ChessPiece('king', 'white', 0, 4, './images/whiteKING.png', 'king_0_4', this);
     chessPieces.whiteKing.push(king1);
-    this.addPieceToBoard(king1);
+    this.addChessPiece(king1);
 
 }
 
@@ -268,40 +269,46 @@ initialize() {
     console.log('Initialization complete');
   }
 
-initSquares(board, game) {
-  this.squares = [];
-  this.squares.push(...document.querySelectorAll('.chess-square.has-piece'));
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      const square = board[row][col];
-      if (square) {
-        this.squares.push(square);
-        this.game.board[row][col] = square.querySelector('.chess-piece');
-      } else {
-        this.game.board[row][col] = null;
-      }
-    }
-  }
-}
+// initSquares(board, game) {
+//   console.log("board", board);
+//   this.squares = [];
+//   this.squares.push(...document.querySelectorAll('.chess-square.has-piece'));
+//   for (let row = 0; row < 8; row++) {
+//     for (let col = 0; col < 8; col++) {
+//       const square = board[row][col];
+//       if (square) {
+//         this.squares.push(square);
+//         this.game.board[row][col] = square.querySelector('.chess-piece');
+//       } else {
+//         this.game.board[row][col] = null;
+//       }
+//     }
+//   }
+// }
 
 
 
 
 handleClick = (event) => {
+  
   console.log("Clicked element:", event.target);
-
+  
   const clickedSquareElement = event.target.closest('.chess-square');
   if (!clickedSquareElement) {
     return;
   }
   console.log("Clicked square ID:", clickedSquareElement.id);
-
+  console.log("Before selecting piece element", this.game.board);
   const clickedPieceElement = clickedSquareElement.querySelector('.chess-piece');
+  console.log("After selecting piece element", this.game.board);
   console.log("clickedPieceElement:", clickedPieceElement);
 
   const clickedPiece = clickedPieceElement ? this.getPieceFromElement(clickedPieceElement) : null;
  console.log('getPieceFromElement result:', clickedPiece);
-  if (clickedPieceElement && !clickedPiece) return;
+  if (clickedPieceElement && !clickedPiece) {
+  console.log("Invalid piece selection!");
+  return;
+}
   console.log("After clickedPieceElement check");
   console.log("clickedPiece:", clickedPiece);
 
@@ -323,7 +330,7 @@ handleClick = (event) => {
     const newCol = parseInt(clickedSquareElement.dataset.col);
 
     // Check if the clicked square is a legal move for the selected piece
-    const validMoves = this.selectedPiece.piece.calculateValidMoves(this.selectedPiece.piece.row, this.selectedPiece.piece.col, this.game.board);
+    const validMoves = this.calculateValidMoves(clickedPiece.row, clickedPiece.col, this.game.board);
 
     if (validMoves.some(move => move.row === newRow && move.col === newCol)) {
   this.selectedPiece = {
@@ -331,8 +338,8 @@ handleClick = (event) => {
     col: this.selectedPiece.piece.col,
     element: this.selectedPiece.element,
     piece: this.selectedPiece.piece,
-    validMoves: validMoves,
-  };
+    validMoves: this.calculateValidMoves(this.selectedPiece.piece.row, this.selectedPiece.piece.col, this.game.board),
+      };
   this.movePiece(clickedSquareElement);
   this.deselectPiece(this.selectedPiece.element);
   this.endTurn();
@@ -359,7 +366,7 @@ handleClick = (event) => {
       col: clickedPiece.col,
       element: clickedPieceElement,
       piece: clickedPiece,
-      validMoves: this.calculateValidMoves(clickedPiece.row, clickedPiece.col, this.game.board),
+      validMoves: clickedPiece.calculateValidMoves(clickedPiece.row, clickedPiece.col, this.game.board),
     };
 
     // Show the valid moves pattern for the selected piece
@@ -374,7 +381,9 @@ handleClick = (event) => {
       row: clickedPiece.row,
       col: clickedPiece.col,
       element: clickedPieceElement,
-      validMoves: this.calculateValidMoves(clickedPiece.row, clickedPiece.col, this.game.board),
+      piece: clickedPiece,
+      validMoves: this.calculateValidMoves(this.selectedPiece.row, this.selectedPiece.col, this.game.board),
+
     };
 
       // Show the valid moves pattern for the selected piece
@@ -384,7 +393,12 @@ handleClick = (event) => {
     this.clearSelectedSquares();
 
   }
+
+
+const element = document.getElementById("id");
+element.addEventListener("click", handleClick);
 };
+
 showValidMoves(selectedPiece) {
   console.log("showValidMoves called", selectedPiece);
 
@@ -461,23 +475,29 @@ clearSelectedSquares = (game) =>
         console.log("Piece clicked!");
     });
 }
-*/
-getPieceFromElement(pieceElement) {
 
-  const squareElement = pieceElement.parentElement;
-
-  console.log("pieceElement:", pieceElement);
-  console.log("squareElement:", squareElement);
+getPieceFromElement(squareElement) {
   const row = parseInt(squareElement.dataset.row);
   const col = parseInt(squareElement.dataset.col);
-
-  console.log("Row:", row);
-  console.log("Col:", col);
-  console.log("Game board:", this.game.board);
-  console.log("Game.board[row][col]:", this.game.board[row][col]);
-  
+  console.log("row-col", row, col);
+  console.log("this.game.board", this.game.board);
 
   return this.game.board[row][col];
+}*/ 
+
+ getPieceFromElement(pieceElement, board) {
+  let squareElement = pieceElement.parentElement;
+  console.log("squareElement", squareElement);
+  const row = squareElement.getAttribute('data-row');
+  const col = squareElement.getAttribute('data-col');
+
+  console.log("row-col", row, col);
+  console.log("this.game.board", this.game.board);
+  if (row !== null && col !== null) {
+    return this.board[row][col];
+  }
+
+  return null;
 }
 
 
@@ -488,10 +508,9 @@ getPieceFromElement(pieceElement) {
     return;
   }
 
-  const chessPiece = new ChessPiece(type, color, row, col, imagePath, elementId, game, squares);
+  const chessPiece = new ChessPiece(type, color, row, col, imagePath, elementId, game);
   console.log("Adding piece: ", chessPiece);
-
-    console.log(`Added piece color: ${chessPiece.color}, row: ${row}, col: ${col}`);
+  console.log(`Added piece color: ${chessPiece.color}, row: ${row}, col: ${col}`);
 
   const pieceElement = chessPiece.element;
   if (!pieceElement) {
@@ -505,11 +524,11 @@ getPieceFromElement(pieceElement) {
   } else {
     squareElement.appendChild(pieceElement);
   }
-  this.game.board[row][col] = chessPiece;
+ game.board[row][col] = chessPiece;
 }
 
 calculateValidMoves(row, col, board) {
-  console.log("Board in calculateValidMoves:", board);
+  console.log("Board in calculateValidMoves:", this.game.board);
   const validMoves = [];
 
     // The pawn can move forward only (white moves up, black moves down)
@@ -523,7 +542,7 @@ calculateValidMoves(row, col, board) {
   const newRow = row + direction;
   console.log("New row:", newRow);
   if (newRow >= 0 && newRow < 8) {
-    const forwardSquare = game.board[newRow][col];
+    const forwardSquare = this.game.board[newRow][col];
     if (!forwardSquare) {
       validMoves.push({ row: newRow, col: col });
       console.log("Added forward move:", { row: newRow, col: col });
