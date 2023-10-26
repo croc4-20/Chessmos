@@ -67,6 +67,7 @@ export default class ChessGame
   {
     
     this.chessArray = chessArray;
+    this.chessBoard = chessBoard;
     this.board = Array(8).fill(null).map(() => Array(8).fill(null));
     this.pieces = this.chessArray?.board?.pieces || {};
     this.selectedPiece = null;
@@ -91,6 +92,7 @@ export default class ChessGame
     this.handleMove = this.handleMove.bind(this);
     this.handleSquareClick = this.handleSquareClick.bind(this);
 
+    //this.initializeBoard();
   }
 
  
@@ -137,16 +139,59 @@ export default class ChessGame
     }
   }
 
- handleMove(selectedPiece, row, col) {
+//  handleMove(selectedPiece, row, col) {
+//   const currentRow = selectedPiece.row;
+//   const currentCol = selectedPiece.col;
+
+//   const newRow = row;
+//   const newCol = col;
+
+//   if (this.chessArray.board.isValidMove(currentRow, currentCol, newRow, newCol)) {
+//     const sourcePiece = this.chessArray.board[currentRow][currentCol];
+//     const targetPiece = this.chessArray.board[newRow][newCol];
+
+//     if (targetPiece) {
+//       if (targetPiece.color === 'white') {
+//         this.whiteCaptured.push(targetPiece);
+//       } else {
+//         this.blackCaptured.push(targetPiece);
+//       }
+//     }
+
+//     this.chessArray.board[newRow][newCol] = sourcePiece;
+//     this.chessArray.board[currentRow][currentCol] = null;
+
+//     const targetSquare = document.getElementById(`square-${newRow}-${newCol}`);
+//     targetSquare.appendChild(selectedPiece.element);
+
+//     const sourceSquare = document.getElementById(`square-${currentRow}-${currentCol}`);
+//     sourceSquare.innerHTML = "";
+
+//     this.timer += 60;
+//     this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
+
+//     const isWhiteTurn = this.currentPlayer === 'white';
+//     if (this.chessArray.board.isCheck(isWhiteTurn)) {
+//       console.log(`${this.currentPlayer} is in check`);
+//     }
+
+//     const isBlackTurn = this.currentPlayer === 'black';
+//     if (this.chessArray.board.isCheckmate(isBlackTurn)) {
+//       console.log(`${this.currentPlayer} wins by checkmate!`);
+//     }
+//   }
+
+//   selectedPiece.element.classList.remove("selected");
+// }
+handleMove(selectedPiece, row, col) {
+  if (!this.chessArray || !this.chessArray.board || !selectedPiece) return;
+
   const currentRow = selectedPiece.row;
   const currentCol = selectedPiece.col;
 
-  const newRow = row;
-  const newCol = col;
-
-  if (this.chessArray.board.isValidMove(currentRow, currentCol, newRow, newCol)) {
+  if (this.chessArray.board.isValidMove(currentRow, currentCol, row, col)) {
     const sourcePiece = this.chessArray.board[currentRow][currentCol];
-    const targetPiece = this.chessArray.board[newRow][newCol];
+    const targetPiece = this.chessArray.board[row][col];
 
     if (targetPiece) {
       if (targetPiece.color === 'white') {
@@ -156,10 +201,10 @@ export default class ChessGame
       }
     }
 
-    this.chessArray.board[newRow][newCol] = sourcePiece;
+    this.chessArray.board[row][col] = sourcePiece;
     this.chessArray.board[currentRow][currentCol] = null;
 
-    const targetSquare = document.getElementById(`square-${newRow}-${newCol}`);
+    const targetSquare = document.getElementById(`square-${row}-${col}`);
     targetSquare.appendChild(selectedPiece.element);
 
     const sourceSquare = document.getElementById(`square-${currentRow}-${currentCol}`);
@@ -167,70 +212,84 @@ export default class ChessGame
 
     this.timer += 60;
     this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
+    this.selectedPiece = null;  // Reset selected piece
 
-    const isWhiteTurn = this.currentPlayer === 'white';
-    if (this.chessArray.board.isCheck(isWhiteTurn)) {
+    const isTurn = this.currentPlayer === 'white' ? true : false;
+    if (this.chessArray.board.isCheck(isTurn)) {
       console.log(`${this.currentPlayer} is in check`);
     }
-
-    const isBlackTurn = this.currentPlayer === 'black';
-    if (this.chessArray.board.isCheckmate(isBlackTurn)) {
+    if (this.chessArray.board.isCheckmate(isTurn)) {
       console.log(`${this.currentPlayer} wins by checkmate!`);
+      // Implement the reset game logic here or trigger the 'startNewGame'
     }
   }
 
-  selectedPiece.element.classList.remove("selected");
+  if (selectedPiece && selectedPiece.element) {
+    selectedPiece.element.classList.remove("selected");
+  }
 }
 
 
-handlePieceSelection(row, col) {
+// handlePieceSelection(row, col) {
+//   const selectedPiece = this.board[row][col];
+
+//   // If no piece is selected, or if the selected piece belongs to the opponent, do nothing
+//   if (!selectedPiece || selectedPiece.color !== this.currentPlayer) {
+//     return;
+//   }
+
+//   // If the selected piece is already the currently selected piece, deselect it
+//   if (this.currentlySelectedPiece === selectedPiece) {
+//     this.currentlySelectedPiece = null;
+//     this.unhighlightSquares();
+//   } else {
+//     // If a new piece is selected, update the currentlySelectedPiece and highlight the valid moves
+//     this.currentlySelectedPiece = selectedPiece;
+
+//     // Replace this block with the following line
+//     const validMoves = this.currentlySelectedPiece.calculateValidMoves(row, col, this.board);
+
+//     this.highlightSquares(validMoves);
+//   }
+// }
+ handlePieceSelection(row, col) {
+  if (!this.board) return;
+
   const selectedPiece = this.board[row][col];
 
-  // If no piece is selected, or if the selected piece belongs to the opponent, do nothing
   if (!selectedPiece || selectedPiece.color !== this.currentPlayer) {
     return;
   }
 
-  // If the selected piece is already the currently selected piece, deselect it
   if (this.currentlySelectedPiece === selectedPiece) {
     this.currentlySelectedPiece = null;
     this.unhighlightSquares();
   } else {
-    // If a new piece is selected, update the currentlySelectedPiece and highlight the valid moves
     this.currentlySelectedPiece = selectedPiece;
-
-    // Replace this block with the following line
     const validMoves = this.currentlySelectedPiece.calculateValidMoves(row, col, this.board);
-
     this.highlightSquares(validMoves);
   }
 }
- 
   
-startNewGame() 
-  {
-
-    chessBoard.setupEventListeners();
-      // If the game is already over, display a message and return
-    if (this.checkGameOver()) 
-    {
-      alert("The game is already over. Please start a new game.");
-      return;
-    }
-
-      // Reset the board to the starting position
-    this.pieceArray.createPieces();
-    this.pieceArray.addPiecesToBoard();
-    this.chessBoard = new ChessBoard();
-    this.chessBoard.placePieces();
-    this.whiteTurn = true;
-    this.selectedPiece = null;
-    this.checkGameOver = () => {};
-
-    squares.forEach(square => square.innerHTML = "");
-    this.chessBoard.placePieces();
-    const squares = document.querySelectorAll('.chess-square');
+startNewGame() {
+  if (this.checkGameOver()) {
+    alert("The game is already over. Please start a new game.");
+    return;
   }
+
+  this.pieceArray.createPieces();
+  this.pieceArray.addPiecesToBoard();
+  this.chessBoard = new ChessBoard();
+  this.chessBoard.placePieces();
+  this.whiteTurn = true;
+  this.selectedPiece = null;
+  this.legalMoves = [];  // Reset legal moves
+  this.currentPlayer = 'white';  // Reset current player
+
+  // Assuming you have some setupEventListeners method somewhere
+  this.chessBoard.setupEventListeners();
+}
+
   
    handleSquareClick(square) {
     // Check if a piece is already selected
@@ -263,28 +322,28 @@ startNewGame()
     }
   }
 
- 
-    getLegalMoves(piece) {
-    let legalMoves = [];
-    for (let row = 0; row < this.board.length; row++) {
-      for (let col = 0; col < this.board[0].length; col++) {
-        if (this.isLegalMove(pieceRow, pieceCol, row, col) && this.isClearPath(pieceRow, pieceCol, row, col)) {
-          legalMoves.push([row, col]);
-        }
+ getLegalMoves(piece) {
+  let legalMoves = [];
+  const pieceRow = piece.row;
+  const pieceCol = piece.col;
+
+  for (let row = 0; row < this.board.length; row++) {
+    for (let col = 0; col < this.board[0].length; col++) {
+      const newSquare = document.getElementById(`square-${row}-${col}`); // Assuming you use this ID pattern for squares
+      if (this.isLegalMove(piece, newSquare) && this.isClearPath(pieceRow, pieceCol, row, col)) {
+        legalMoves.push([row, col]);
       }
     }
-    return legalMoves;
   }
+  return legalMoves;
+}
   
 
   endTurn() {
     // Code to end the player's turn
   }
 
-deselectPiece(selectedPiece) {
-    selectedPiece.classList.remove("selected");
-    this.currentSquareElement = null;
-  }
+
 
 
   highlightSquare(squareElement) 
@@ -527,9 +586,11 @@ squares.forEach(square =>
   });
 });
 }
+
 endTurn() {
   this.isPlayerTurn = !this.isPlayerTurn;
 }
+
 isClearPath(chessBoard, currentRow, currentCol, newRow, newCol) 
     {
       // Check if the move is horizontal or vertical
@@ -587,7 +648,7 @@ isClearPath(chessBoard, currentRow, currentCol, newRow, newCol)
       }
     }
 
- checkGameOver() 
+checkGameOver() 
     {
         // check if either player has no pieces left
       if (getNumWhitePieces() == 0 || getNumBlackPieces() == 0) 
@@ -609,19 +670,21 @@ isClearPath(chessBoard, currentRow, currentCol, newRow, newCol)
       return false;
     }
 
-    checkGameStatus() {
-      if (checkGameOver()) {
-        // game is over
-        // do something here to end the game (e.g., display a message or redirect to a game over screen)
-      } else {
-          // game is not over
-          // continue playing the game as normal
-        }
-    }
+checkGameStatus() {
+  if (this.chessBoard.isCheckmate()) {
+    this.gameStatus = "checkmate";
+    this.chessBoard.announceWinner();
+    return;
+  }
 
-    
-    
+  // if (this.chessBoard.isStalemate()) {
+  //   this.gameStatus = "stalemate";
+  //   this.chessBoard.announceDraw();
+  //   return;
+  // }
+
+  // If none of the end-of-game conditions are met, the game continues
+  this.gameStatus = "ongoing";
 }
 
-
-
+}
