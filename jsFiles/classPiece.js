@@ -3,9 +3,10 @@ let pieces;
 let handleClick;
 
 
+
 async function initialize() 
 {
-  //const { default: ChessPiece } = await import('./classPiece.js');
+  const { default: ChessPiece } = await import('./classPiece.js');
   const { default: ChessBoard } = await import('./classBoard.js');
   const { default: ChessGame } = await import('./classGame.js');
   const { default: ChessArray } = await import('./classArray.js');
@@ -14,9 +15,10 @@ async function initialize()
   const chessArray = new ChessArray();
   const chessBoard = new ChessBoard();
   chessBoard.initializeBoard();
+
   //const game = new ChessGame(this.game.chessArray, this.game.chessBoard, () => this).bind(this);
-  //const game = new ChessGame(chessArray, chessBoard, () => this.bind(this));
   const game = new ChessGame(chessArray, chessBoard, this);
+  //const game = new ChessGame(chessArray, chessBoard, this);
   
  const pieces = [
 
@@ -61,13 +63,14 @@ async function initialize()
  
 for (const piece of pieces) 
 {
-    const chessPiece = new ChessPiece(piece.type, piece.color, piece.row, piece.col, piece.imagePath, piece.elementId, piece.game);
+    const chessPiece = new ChessPiece(piece.type, piece.color, piece.row, piece.col, piece.imagePath, piece.elementId, piece.game, chessBoard);
     const squareElement = document.getElementById(chessPiece.elementId);
     squareElement.innerHTML = `<div class="chess-piece ${chessPiece.color}-${chessPiece.type}"></div>`;
     squareElement.classList.add('has-piece');
     squareElement.querySelector('.chess-piece').style.backgroundImage = `url(${chessPiece.imagePath})`;
     squareElement.style.gridRow = chessPiece.row + 1;
     squareElement.style.gridColumn = chessPiece.col + 1;
+      game.board[piece.row][piece.col] = chessPiece;
     
 
   }
@@ -91,11 +94,11 @@ initialize().then(() => {
     console.log("Pieces have been initialized and instances have been created.");
 });
 
-const game = {
-  board: []
-};
+// const game = {
+//   board: []
+// };
 export default class ChessPiece {
-  constructor(type, color, row, col, imagePath, elementId, game) {
+  constructor(type, color, row, col, imagePath, elementId, game, chessBoard) {
     // debugger
     
    
@@ -122,7 +125,8 @@ export default class ChessPiece {
   default:
     throw new Error("Invalid piece type");
 }
-    this.board = chessboard;
+    this.board = chessBoard;
+    //this.chessBoard = new ChessBoard();
     this.color = color;
       console.log('Constructor color:', this.color);
     this.row = row;  
@@ -142,7 +146,7 @@ export default class ChessPiece {
         // Bind handleMove to the ChessPiece object
     //this.handleMove = this.handleMove.bind(this);
     this.boundHandleClick = this.handleClick.bind(this);
-      
+    this.activeClickListeners = {};
     this.element = document.getElementById(this.elementId);
     
     if (this.element) 
@@ -150,6 +154,7 @@ export default class ChessPiece {
       console.log('Adding event listener to:', this.element);
       this.element.removeEventListener('click', this.boundHandleClick);
       this.element.addEventListener('click', this.boundHandleClick);
+    
     } 
     else 
     {
@@ -265,266 +270,632 @@ export default class ChessPiece {
 
 }
 
-initialize() {
-    console.log('Initialization complete');
-  }
 
-// initSquares(board, game) {
-//   console.log("board", board);
+initSquares(board, game) {
+  // Debug Log
+  console.log("Initial board argument:", JSON.stringify(board, null, 2));
+  console.log("Initial game argument:", JSON.stringify(game, null, 2));
+
+//   // Initialize an empty squares array
 //   this.squares = [];
-//   this.squares.push(...document.querySelectorAll('.chess-square.has-piece'));
-//   for (let row = 0; row < 8; row++) {
-//     for (let col = 0; col < 8; col++) {
-//       const square = board[row][col];
-//       if (square) {
-//         this.squares.push(square);
-//         this.game.board[row][col] = square.querySelector('.chess-piece');
-//       } else {
-//         this.game.board[row][col] = null;
-//       }
-//     }
-//   }
-// }
 
+  // Loop through the board argument
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const square = board[row][col];
+      // Debug Log
+      console.log(`Processing square at row: ${row}, col: ${col}, value: ${square}`);
 
+      if (square) {
+        this.squares.push(square);
+        game.board[row][col] = square.querySelector('.chess-piece');
+      } else {
+        game.board[row][col] = null;
+      }
+    }
+  }
 
+//   // Debug Log
+  console.log("Final state of this.squares:", JSON.stringify(this.squares, null, 2));
+  console.log("Final state of game.board:", JSON.stringify(game.board, null, 2));
+ }
 
-handleClick = (event) => {
-  
-  console.log("Clicked element:", event.target);
-  
+handleClick = (event, chessBoard) => {
+  console.log("chessBoard in handleClick:", chessBoard);
   const clickedSquareElement = event.target.closest('.chess-square');
-  if (!clickedSquareElement) {
-    return;
-  }
-  console.log("Clicked square ID:", clickedSquareElement.id);
-  console.log("Before selecting piece element", this.game.board);
+  if (!clickedSquareElement || !this.game || !this.game.board) return;
+
   const clickedPieceElement = clickedSquareElement.querySelector('.chess-piece');
-  console.log("After selecting piece element", this.game.board);
-  console.log("clickedPieceElement:", clickedPieceElement);
-
   const clickedPiece = clickedPieceElement ? this.getPieceFromElement(clickedPieceElement) : null;
- console.log('getPieceFromElement result:', clickedPiece);
-  if (clickedPieceElement && !clickedPiece) {
-  console.log("Invalid piece selection!");
-  return;
-}
-  console.log("After clickedPieceElement check");
-  console.log("clickedPiece:", clickedPiece);
-
-  // If the clicked piece is the same as the selected piece, deselect it and return
-  if (this.selectedPiece && this.selectedPiece.element === clickedPieceElement) {
-    this.selectedPiece.element.classList.remove('selected-piece');
-    this.clearSelectedSquares(); // Clear the valid moves pattern
-    this.selectedPiece = null;
-    return;
-  }
-
-  if (!this.game || !this.game.board) {
-    console.log("Game is not defined or has no board property.");
-    return;
-  }
-
-  if (!clickedPieceElement && this.selectedPiece) {
-    const newRow = parseInt(clickedSquareElement.dataset.row);
-    const newCol = parseInt(clickedSquareElement.dataset.col);
-
-    // Check if the clicked square is a legal move for the selected piece
-    const validMoves = this.calculateValidMoves(clickedPiece.row, clickedPiece.col, this.game.board);
-
-    if (validMoves.some(move => move.row === newRow && move.col === newCol)) {
-  this.selectedPiece = {
-    row: this.selectedPiece.piece.row,
-    col: this.selectedPiece.piece.col,
-    element: this.selectedPiece.element,
-    piece: this.selectedPiece.piece,
-    validMoves: this.calculateValidMoves(this.selectedPiece.piece.row, this.selectedPiece.piece.col, this.game.board),
-      };
-  this.movePiece(clickedSquareElement);
-  this.deselectPiece(this.selectedPiece.element);
-  this.endTurn();
-} else {
-  console.log("Illegal move!");
-}
-    return;
-  }
-
-  if (!clickedPieceElement) {
-    console.log("No piece on clicked square.");
-    return;
-  }
-
-  if (clickedPiece.color !== this.game.currentPlayer) {
+  console.log("clickedPiece in handleclick:", clickedPiece);  // Debug line
+  
+  // Turn validation
+  if (clickedPiece && clickedPiece.color !== this.game.currentPlayer) {
     alert("It's not your turn!");
     return;
   }
 
-  if (!this.selectedPiece) {
-    clickedPieceElement.classList.add('selected-piece');
-    this.selectedPiece = {
-      row: clickedPiece.row,
-      col: clickedPiece.col,
-      element: clickedPieceElement,
-      piece: clickedPiece,
-      validMoves: clickedPiece.calculateValidMoves(clickedPiece.row, clickedPiece.col, this.game.board),
-    };
-
-    // Show the valid moves pattern for the selected piece
-    this.showValidMoves(this.selectedPiece);
-  } else {
-    // If a different piece is clicked, deselect the previous piece and select the new one
-    this.deselectPiece(this.selectedPiece.element);
-    this.selectedPiece = null;
-
-    clickedPieceElement.classList.add('selected-piece');
-    this.selectedPiece = {
-      row: clickedPiece.row,
-      col: clickedPiece.col,
-      element: clickedPieceElement,
-      piece: clickedPiece,
-      validMoves: this.calculateValidMoves(this.selectedPiece.row, this.selectedPiece.col, this.game.board),
-
-    };
-
-      // Show the valid moves pattern for the selected piece
-    this.showValidMoves(this.selectedPiece);
-
-      // Clear selected squares and piece
-    this.clearSelectedSquares();
-
+  // Handle Deselection
+  if (this.selectedPiece) {
+    if (this.shouldDeselect(clickedPiece, clickedSquareElement, clickedPieceElement)) {
+      this.deselectAndClear();
+      return;
+    }
   }
 
+  // Handle Movement
+  if (this.selectedPiece && clickedSquareElement.classList.contains('valid-move')) {
+    this.executeMove(clickedSquareElement, chessBoard);
+    return;
+  }
 
-const element = document.getElementById("id");
-element.addEventListener("click", handleClick);
+ // Handle New Selection
+  if (clickedPiece) {
+    this.selectNewPiece(clickedPiece, clickedPieceElement, chessBoard);
+  } else {
+    // Deselect if no new piece to select
+    this.deselectAndClear();
+  }
 };
+ // Helper function to check if the piece should be deselected
+ shouldDeselect(clickedPiece, clickedSquareElement, clickedPieceElement) 
+ {
+  const isSamePiece = this.selectedPiece.element === clickedPieceElement;
+  const isSameColor = clickedPiece && clickedPiece.color === this.selectedPiece.color;
+  const isInvalidMove = !clickedSquareElement.classList.contains('valid-move');
+  return isSamePiece || isSameColor || isInvalidMove;
+}
 
-showValidMoves(selectedPiece) {
-  console.log("showValidMoves called", selectedPiece);
+// Helper function to deselect a piece and clear valid moves
+// deselectAndClear() {
+//   this.deselectPiece(this.selectedPiece.element);
+//   this.clearValidMoves();
+//   this.selectedPiece = null;
+// }
+deselectAndClear() {
+  if (this.selectedPiece && this.selectedPiece.element) {
+    this.selectedPiece.element.classList.remove('selected-piece');
+  }
+  
+  this.clearValidMoves();
+  
+  // Clear the previous piece
+  if (this.previousPiece) {
+    if (this.previousPiece.element) {
+      this.previousPiece.element.classList.remove('selected-piece');
+    }
+    this.previousPiece = null;
+  }
+  
+  this.selectedPiece = null;
+}
 
-  // Clear previous valid moves
+// Helper function to execute the move
+executeMove(clickedSquareElement, chessBoard) {
+    console.log("chessBoard in executeMove:", chessBoard);  // Debug line
+  const newRow = parseInt(clickedSquareElement.dataset.row, 10);
+  const newCol = parseInt(clickedSquareElement.dataset.col, 10);
+      console.log("clickedSquareElement in executeMove:", clickedSquareElement);  // Debug line
+      console.log("this.game in executeMove:", this.game);  // Debug line
+      console.log("this.selectedPiece.element in executeMove:", this.selectedPiece.element);  // Debug line
+      console.log('newRow in executeMove:', newRow);
+      console.log('newCol in executeMove:', newCol);
+      
+  this.board.movePiece(clickedSquareElement, this.game, this.selectedPiece.element, newRow, newCol);
+  this.deselectAndClear();
+  this.endTurn();
+}
+
+// Helper function to select a new piece
+selectNewPiece(clickedPiece, clickedPieceElement, chessBoard) {
+  console.log("chessBoard in selectNewPiece:", chessBoard);
+  if (this.selectedPiece) {
+   
+    this.previousPiece = this.selectedPiece;
+     this.deselectAndClear();
+  }
+  
+  // Calculate the valid moves once.
+  
+  console.log("clickedPiece:", clickedPiece);  // Debug line
+  const validMoves = clickedPiece.calculateValidMoves(clickedPiece.row, clickedPiece.col, this.game.board);
+  
+  clickedPieceElement.classList.add('selected-piece');
+  this.selectedPiece = {
+    row: clickedPiece.row,
+    col: clickedPiece.col,
+    element: clickedPieceElement,
+    piece: clickedPiece,
+    validMoves: validMoves,
+  };
+  this.showValidMoves(this.selectedPiece, chessBoard, validMoves);  // Pass the valid moves
+}
+
+
+
+
+// handleClick = async(event, chessBoard) => 
+// {
+//   //const myChessBoard = new ChessBoard();
+
+//   console.log("HandleClick triggered. Current this.selectedPiece:", this.selectedPiece);
+//   console.log("Clicked element:", event.target);
+  
+//   const clickedSquareElement = event.target.closest('.chess-square');
+//   if (!clickedSquareElement || !this.game || !this.game.board) return;
+//   console.log("Clicked square ID:", clickedSquareElement.id);
+//   console.log("Before selecting piece element", this.game.board);
+
+//   const clickedPieceElement = clickedSquareElement.querySelector('.chess-piece');
+//   console.log("After selecting piece element", this.game.board);
+//   console.log("clickedPieceElement:", clickedPieceElement);
+//   const clickedPiece = clickedPieceElement ? this.getPieceFromElement(clickedPieceElement) : null;
+//   console.log('getPieceFromElement result:', clickedPiece);
+
+//  if (this.selectedPiece) {
+//     const isSamePiece = clickedPieceElement === this.selectedPiece.element;
+//     const isSameColor = clickedPiece && clickedPiece.color === this.selectedPiece.piece.color;
+//     const isValidMove = clickedSquareElement.classList.contains('valid-move');
+
+//     if (isSamePiece || isSameColor || !isValidMove) {
+//       this.deselectPiece(this.selectedPiece.element);
+//       this.clearValidMoves();
+//       this.selectedPiece = null;
+//       return;
+//     }
+//   }
+//   if (clickedPieceElement && !clickedPiece) 
+//   {
+//     console.log("Invalid piece selection!");
+//     return;
+//   }
+//    // If clicked square does not contain a piece, do nothing
+//   if (!clickedPieceElement) 
+//   {
+//     console.log("No piece on clicked square.");
+//     console.log("handleClick returned due to Square not containing piece .");
+//     return;
+//   }
+      
+//     // If it's not the player's turn, alert them
+//   if (clickedPiece && clickedPiece.color !== this.game.currentPlayer) 
+//   {
+//     alert("It's not your turn!");
+//     console.log("handleClick returned due to NOT UR TURN.");
+//     return;
+//   }
+  
+//   console.log("After clickedPieceElement check");
+//   console.log("clickedPiece:", clickedPiece);
+//   console.log('Currently selected piece:', this.selectedPiece);
+
+//                      // Phase 1: Deselection Block
+//   // Always check first if a piece is currently selected
+//     if (this.selectedPiece) {
+
+//           // Try to deselect if the same piece or another piece of the same color is clicked
+//         if (clickedPieceElement === this.selectedPiece.element || 
+//            (clickedPiece && clickedPiece.color === this.selectedPiece.piece.color)) {
+            
+//             this.clearValidMoves(this.selectedPiece.element);
+//             this.deselectPiece(this.selectedPiece.element);
+//             this.selectedPiece = null;
+//     console.log("this.selectedPiece set to null at [ClickdPiece same as selectedPiece]");
+//     console.log('Successfully deselected the piece.');
+//     console.log("clicked piece is the same as the selected piece!");
+//     console.log("handleClick returned due to Piece DEselected MOVE .");
+//     return;  // Exit as the player deselected a piece
+//         }
+//     } 
+
+//     // Additional Deselection Block for clicking outside of a 'valid move' square
+// if (this.selectedPiece) {
+//     const isClickedOnValidMove = clickedSquareElement.classList.contains('valid-move');
+//     const shouldDeselect = !isClickedOnValidMove;  // Adjust this condition as necessary
+
+//     if (shouldDeselect) 
+//     {
+//           console.log('Successfullyentered shouldDeselect.');
+
+      
+//       this.clearValidMoves(this.selectedPiece.element);
+//       this.deselectPiece(this.selectedPiece.element);
+//       this.selectedPiece = null;
+//     return;  // Exit as the piece was deselected
+//     }
+//   }
+//               // Phase 2: MOVEMENT BLOCK
+
+//   console.log("Value of clickedPieceElement before MOVEMENT BLOCK: ", clickedPieceElement);
+//   const hasPiece = clickedSquareElement.querySelector('.chess-piece') !== null;
+//   console.log('hasPiece', hasPiece);
+//   if (this.selectedPiece && !hasPiece)
+//   {
+//     console.log("Entered MOVEMENT BLOCK, attempting to move piece.");
+//     const newRow = parseInt(clickedSquareElement.dataset.row, 10);
+//     const newCol = parseInt(clickedSquareElement.dataset.col, 10);
+//     // Check if the clicked square is a legal move for the selected piece
+//     console.log(`Trying to move to row ${newRow}, col ${newCol}`);
+//     const validMoves = this.selectedPiece ? this.calculateValidMoves(this.selectedPiece.row, this.selectedPiece.col, this.game.board) : [];
+//     //const validMoves = this.calculateValidMoves(this.selectedPiece.row, this.selectedPiece.col, this.game.board);
+//     console.log('Valid moves are:', validMoves);
+
+//     if (this.selectedPiece && validMoves.some(move => move.row === newRow && move.col === newCol)) 
+//     {
+//       console.log("Move is valid. Performing the move.");
+//       const destinationElement = document.querySelector(`[data-row='${newRow}'][data-col='${newCol}']`);
+//       console.log("Trying to move piece:" );
+//       chessBoard.movePiece(clickedSquareElement, this.game, this.selectedPiece.element, destinationElement, validMoves);
+//       this.deselectPiece(this.selectedPiece.element);
+//       this.clearValidMoves(this.selectedPiece.element);
+//       this.selectedPiece = null;
+//       this.endTurn();
+//       console.log("attempt to move finished!");
+//       console.log("handleClick returned due to MOVED PIECE.");
+//       return;
+//     } 
+//     else 
+//     {
+//       console.log(`No valid move detected for the selected piece. newRow: ${newRow}, newCol: ${newCol}`);
+//       console.log("Illegal move!");
+//       console.log("handleClick returned due to ILLEGAL MOVE .");
+//       return;
+//     }
+//   }
+
+//   if (this.selectedPiece && this.selectedPiece.element === clickedPieceElement) 
+//   {
+//     console.log("Same piece clicked, deselecting.");
+  
+//     this.deselectPiece(this.selectedPiece.element);
+//     this.clearValidMoves(this.selectedPiece.element);
+//     this.selectedPiece = null;
+//     console.log("handleClick returned due to SAME PIECE CLICKED .")
+//     return;
+//   }
+
+ 
+// // Phase 3: NEW SELECTION
+//   // At this point, a different piece is selected
+//   // Deselect the previously selected piece, if any
+//   console.log("this.selectedPiece before deselecting previous piece:", this.selectedPiece);
+   
+//   if (this.selectedPiece) 
+//   {
+//     console.log('Current value of this.selectedPiece:', this.selectedPiece);
+//     console.log("Deselecting previous piece");
+//     this.deselectPiece(this.selectedPiece.element);
+//     this.clearValidMoves(this.selectedPiece.element);
+    
+//   }
+
+//   // Update the selected piece
+//   clickedPieceElement.classList.add('selected-piece');
+//   this.selectedPiece = 
+//   {
+//     row: clickedPiece.row,
+//     col: clickedPiece.col,
+//     element: clickedPieceElement,
+//     piece: clickedPiece,
+//     validMoves: clickedPiece.calculateValidMoves(clickedPiece.row, clickedPiece.col, this.game.board),
+//   };
+//   this.showValidMoves(this.selectedPiece, chessBoard);
+
+//   // Attach event listener to all valid move squares
+//   const validMoveSquares = document.querySelectorAll('.valid-move');
+//       console.log("Trying attaching event listeners to validmove.");
+
+//   validMoveSquares.forEach((square) => {
+//   square.addEventListener('click', async (event) => {  // Marking as async in case movePiece is an async function
+//     console.log("Successfully attached event listeners to validmove.");
+//     // Additional deselection code here
+//     const clickedElement = event.target.closest('.chess-square');
+//     const clickedPieceElement = clickedElement.querySelector('.chess-piece');
+//     const clickedPiece = clickedPieceElement ? this.getPieceFromElement(clickedPieceElement) : null;
+    
+//     if (this.selectedPiece && 
+//         (clickedPieceElement === this.selectedPiece.element || 
+//          (clickedPiece && clickedPiece.color === this.selectedPiece.piece.color))) {
+//       // Deselection logic
+     
+//       this.clearValidMoves(this.selectedPiece.element);
+//       this.deselectPiece(this.selectedPiece.element);
+//       this.selectedPiece = null;
+//       console.log("Successfully deselected the piece during valid move stage.");
+//       return;
+//     }
+
+//     try {
+//       // Assuming clickedSquareElement and destinationElement are the same as the clicked square
+//       const clickedSquareElement = square;  
+//       const destinationElement = square;
+
+//       if (this.selectedPiece) 
+//       {
+//         const validMoves = this.selectedPiece.piece.calculateValidMoves
+//         (
+//           this.selectedPiece.row, 
+//           this.selectedPiece.col, 
+//           this.game.board
+//         );
+
+//         console.log("clickedSquareElement before movePiece call in handleClick", clickedSquareElement);
+//         console.log("this.game before movePiece call in handleClick :", this.game);
+//         console.log("validMoves before movePiece call in handleClick :", validMoves);
+//         console.log("this.selectedPiece.element before movePiece call in handleClick :", this.selectedPiece.element);
+//         const moveResult = this.board.movePiece(clickedSquareElement, this.game, this.selectedPiece.element, destinationElement, validMoves);  
+      
+
+//         if (moveResult) {
+//           this.clearValidMoves();
+//           this.deselectPiece(this.selectedPiece.element);
+//           this.selectedPiece = null;
+//         }
+//       }
+//     } catch (error) {
+//       console.error("An error occurred while moving the piece:", error);
+//     }
+//   });
+// });
+
+
+  
+// };
+
+// clearValidMoveEventListeners = () => {
+//   const validMoveSquares = document.querySelectorAll('.valid-move');
+//   validMoveSquares.forEach((square) => {
+//     const clone = square.cloneNode(true);
+//     square.parentNode.replaceChild(clone, square);
+//   });
+// };
+
+deselectPiece(selectedPiece) 
+{
+  selectedPiece.classList.remove("selected-piece");
+  console.log("selectedPiece deselected", selectedPiece)
+  this.clearValidMoves(); // Assuming this clears valid moves for this.selectedPiece
+
+  const selectedSquare = document.querySelectorAll('.selected-piece');
+  selectedSquare.forEach(square => {
+        square.classList.remove('selected-piece');
+        square.innerHTML = '';
+    });
+  this.selectedPiece = null; // Important: Reset your state variable
+}
+
+showValidMoves(selectedPiece, chessBoard, validMoves) {
+  console.log("chessBoard in showValidMoves:", chessBoard);
+  // Clear previous valid moves and remove listeners
   const allSquares = document.querySelectorAll('.chess-square');
-
   allSquares.forEach(square => {
     square.classList.remove('valid-move');
     const pattern = square.querySelector('.pattern');
     if (pattern) {
       square.removeChild(pattern);
     }
+    
+    // Remove existing click event listeners
+    const squareId = `${square.dataset.row}-${square.dataset.col}`;
+    if (this.activeClickListeners[squareId]) {
+      square.removeEventListener('click', this.activeClickListeners[squareId]);
+      delete this.activeClickListeners[squareId];  // Remove the stored function reference
+    }
   });
-
-  console.log("selectedPiece", selectedPiece)
-  // Calculate new valid moves
-  const validMoves = selectedPiece.piece.calculateValidMoves(selectedPiece.row, selectedPiece.col, this.game.board);
 
   // Highlight new valid moves
   for (const move of validMoves) {
     const square = document.querySelector(`.chess-square[data-row="${move.row}"][data-col="${move.col}"]`);
-
-    // Add a green background to the valid move square
     square.classList.add('valid-move');
 
     // Create a pattern on the valid move square
     const pattern = document.createElement('div');
     pattern.classList.add('pattern');
     square.appendChild(pattern);
+
+    // Define the click event listener for this square
+    const clickListener = (event) => {
+      // Assuming executeMove is a method on the same class/object
+      // First argument is the clicked square, and second argument is the chessBoard instance
+      this.executeMove(square, this.chessBoard);
+
+      // After executing the move, you may also wish to clear selections and valid moves
+      this.deselectAndClear();
+    };
+
+    // Save this click event listener so we can remove it later
+    const squareId = `${move.row}-${move.col}`;
+    this.activeClickListeners[squareId] = clickListener;
+
+    // Attach the event listener
+    square.addEventListener('click', clickListener);
   }
 }
-//     clearValidMoves() 
-//     {
-//         for (const square of this.squares) 
-//         {
-//         square.classList.remove('valid-move');
-//         square.innerHTML = '';
-//         }
+
+
+// showValidMoves(selectedPiece, chessBoard, validMoves) {
+//   console.log("showValidMoves called", selectedPiece);
+//   console.log("Value of chessBoard in showValidMoves", chessBoard);
+
+//   // Clear previous valid moves and remove listeners
+//   const allSquares = document.querySelectorAll('.chess-square');
+
+//   allSquares.forEach(square => {
+//     square.classList.remove('valid-move');
+//     const pattern = square.querySelector('.pattern');
+//     if (pattern) {
+//       square.removeChild(pattern);
 //     }
-    
-    
-clearSelectedSquares = (game) => 
-{
-  if (!this.selectedPiece) {
-    return;
-  }
-    
-  this.selectedPiece.isValidMove(this.currentRow, this.currentCol, this.newRow, this.newCol).forEach(([row, col]) => {
+//     // Example click event listener
+//  const clickListener = (event) => {
+//   // Assuming executeMove is a method on the same class/object
+//   // The first argument is the selected piece, and the second argument is the new position from the validMove
+//   this.executeMove(square, move);
+//     console.log("Square clicked!");
+//   // After executing the move, you may also wish to clear selections and valid moves
+//   this.deselectAndClear();
+// };
 
-    const square = getSquare(row, col);
-    square.classList.remove('valid-move');
-  });
-    // check if this.game.validMoves is defined
-  //console.log('this.game.validMoves:', isValidMoves); 
-   let validMoves = [];
-  //let selectedPiece = null;
+//     // Explicitly remove click event listeners if they exist
+//     const squareId = `${square.dataset.row}-${square.dataset.col}`;
+//     if (this.activeClickListeners[squareId]) {
+//       square.removeEventListener('click', this.activeClickListeners[squareId]);
+//       delete this.activeClickListeners[squareId]; // Remove the stored function reference
+//     }
+//   });
 
-  const selectedPiece = document.querySelector('.selected-piece');
-  if (selectedPieceElement) 
-  {
-    selectedPiece.classList.remove('selected-piece');
-  }
-};
+//   console.log("selectedPiece", selectedPiece);
+
+//   // Highlight new valid moves
+//   for (const move of validMoves) {
+//     const square = document.querySelector(`.chess-square[data-row="${move.row}"][data-col="${move.col}"]`);
+//     square.classList.add('valid-move');
+
+//     // Create a pattern on the valid move square
+//     const pattern = document.createElement('div');
+//     pattern.classList.add('pattern');
+//     square.appendChild(pattern);
+
+//     // Example click event listener
+//     const clickListener = (event) => {
+//       // Handle the click event
+//     };
+
+//     // Save this click event listener so we can remove it later
+//     const squareId = `${move.row}-${move.col}`;
+//     this.activeClickListeners[squareId] = clickListener;
+
+//     // Attach the event listener
+//     square.addEventListener('click', clickListener);
+//   }
+// }
+
+
+
+// showValidMoves(selectedPiece, chessBoard) {
+//   console.log("showValidMoves called", selectedPiece);
+//   console.log("Value of chessBoard in showValidMoves" ,chessBoard); // Should log an instance of ChessBoard
+//   //console.log("Value of this.board.movePiece in showValidMoves", chessBoard.movePiece); // Should log a function
+
+//   // Clear previous valid moves
+//   const allSquares = document.querySelectorAll('.chess-square');
+
+//   allSquares.forEach(square => {
+//     square.classList.remove('valid-move');
+//     const pattern = square.querySelector('.pattern');
+//     if (pattern) {
+//       square.removeChild(pattern);
+//     }
+
+//     // Remove any existing click event listeners by replacing the element with its clone
+//     const clonedElement = square.cloneNode(true);
+//     square.parentNode.replaceChild(clonedElement, square);
+//   });
+
+//   console.log("selectedPiece", selectedPiece)
+//   // Calculate new valid moves
+//   const validMoves = selectedPiece.piece.calculateValidMoves(selectedPiece.row, selectedPiece.col, this.game.board);
+
+//   // Highlight new valid moves
+//   for (const move of validMoves) {
+//     const square = document.querySelector(`.chess-square[data-row="${move.row}"][data-col="${move.col}"]`);
+
+//     // Add a green background to the valid move square
+//     square.classList.add('valid-move');
+
+//     // Create a pattern on the valid move square
+//     const pattern = document.createElement('div');
+//     pattern.classList.add('pattern');
+//     square.appendChild(pattern);
+
     
-/*createElement() 
-{
-    this.element = document.createElement("img");
-    this.element.src = this.imagePath;
-    this.element.classList.add("chess-piece");
-    this.element.classList.add(`square-${this.color}-${this.type}`);
-    this.element.style.backgroundImage = `url(images/${this.color}${this.type.charAt(0).toUpperCase()}${this.type.slice(1)}.png)`;
-    this.element.addEventListener("click", (event) => 
-    {
-        console.log("Piece clicked!");
+//   }
+// }
+    clearValidMoves() {
+    const validMoveSquares = document.querySelectorAll('.valid-move');
+    validMoveSquares.forEach(square => {
+        square.classList.remove('valid-move');
+        square.innerHTML = '';
     });
 }
+    
+    
 
-getPieceFromElement(squareElement) {
-  const row = parseInt(squareElement.dataset.row);
-  const col = parseInt(squareElement.dataset.col);
-  console.log("row-col", row, col);
-  console.log("this.game.board", this.game.board);
+    
 
-  return this.game.board[row][col];
-}*/ 
-
- getPieceFromElement(pieceElement, board) {
-  let squareElement = pieceElement.parentElement;
+     getPieceFromElement(pieceElement, board) {
+  const squareElement = pieceElement.parentElement;
   console.log("squareElement", squareElement);
-  const row = squareElement.getAttribute('data-row');
-  const col = squareElement.getAttribute('data-col');
+
+  const row = parseInt(squareElement.getAttribute('data-row'));
+  const col = parseInt(squareElement.getAttribute('data-col'));
 
   console.log("row-col", row, col);
   console.log("this.game.board", this.game.board);
-  if (row !== null && col !== null) {
-    return this.board[row][col];
+
+  if (isNaN(row) || isNaN(col)) {
+    console.log("Row or col is not a number");
+    return null;
   }
 
-  return null;
+  if (row < 0 || row >= this.game.board.length) {
+    console.log("Row is out of bounds");
+    return null;
+  }
+
+  if (col < 0 || col >= this.game.board[row].length) {
+    console.log("Col is out of bounds");
+    return null;
+  }
+
+  const piece = this.game.board[row][col];
+  console.log("Retrieved piece:", piece);
+
+
+  return piece;
 }
 
+addChessPiece(type, color, row, col, imagePath, elementId, game, squares) {
+  // Check if the calculated index is valid
+  if (row < 0 || row > 7 || col < 0 || col > 7) {
+    console.error(`Invalid row ${row} or col ${col} for adding piece.`);
+    return;
+  }
 
-    addChessPiece(type, color, row, col, imagePath, elementId, game, squares) {
-  const squareElement = squares.item(row * 8 + col); // Get square element from NodeList
+  // Get square element from NodeList using the calculated index
+  const squareIndex = row * 8 + col;
+  const squareElement = squares.item(squareIndex);
+  
+  // Check if the square element exists
   if (!squareElement) {
     console.error(`Cannot add piece at row ${row}, col ${col}. Square does not exist.`);
     return;
   }
 
+  // Create the chess piece
   const chessPiece = new ChessPiece(type, color, row, col, imagePath, elementId, game);
   console.log("Adding piece: ", chessPiece);
   console.log(`Added piece color: ${chessPiece.color}, row: ${row}, col: ${col}`);
 
+  // Get the piece element from the created chess piece
   const pieceElement = chessPiece.element;
+
+  // Check if the piece element was successfully created
   if (!pieceElement) {
     console.error(`Failed to create piece element for ${color} ${type} at row ${row}, col ${col}.`);
     return;
   }
 
-  const existingPieceElement = squareElement.firstChild;
+  // Check if there's already a piece on the square
+  const existingPieceElement = squareElement.querySelector('.chess-piece');
   if (existingPieceElement) {
     squareElement.replaceChild(pieceElement, existingPieceElement);
   } else {
     squareElement.appendChild(pieceElement);
   }
- game.board[row][col] = chessPiece;
+
+  // Update the game board with the added chess piece
+ this.game.board[row][col] = chessPiece;
 }
 
 calculateValidMoves(row, col, board) {
@@ -537,12 +908,14 @@ calculateValidMoves(row, col, board) {
   console.log("Row:", row);
   console.log("Col:", col);
   console.log("Direction:", direction);
+  console.log("Board:", board);
 
     // Check for the forward move (one square)
   const newRow = row + direction;
   console.log("New row:", newRow);
   if (newRow >= 0 && newRow < 8) {
     const forwardSquare = this.game.board[newRow][col];
+    console.log("Checking board position for forward move: board[", newRow, "][", col, "] = ", forwardSquare);
     if (!forwardSquare) {
       validMoves.push({ row: newRow, col: col });
       console.log("Added forward move:", { row: newRow, col: col });
@@ -552,6 +925,7 @@ calculateValidMoves(row, col, board) {
       {
         const doubleMoveRow = newRow + direction;
         const doubleMoveSquare = this.game.board[doubleMoveRow][col];
+        console.log("Checking board position for double move: board[", doubleMoveRow, "][", col, "] = ", doubleMoveSquare);
         console.log("Double move square:", doubleMoveSquare);
         if (!doubleMoveSquare) 
         {
@@ -579,7 +953,8 @@ calculateValidMoves(row, col, board) {
       console.log("New row for capture:", newRowForCapture);
       console.log("Capture col:", captureCol);
       if (captureCol >= 0 && captureCol < 8) {
-        const captureSquare = board[newRowForCapture][captureCol];
+        const captureSquare = this.game.board[newRowForCapture][captureCol];
+        console.log("Checking board position for capture: board[", newRowForCapture, "][", captureCol, "] = ", captureSquare);
         console.log("Capture square:", captureSquare);
         if (captureSquare && captureSquare.color !== this.color) {
           validMoves.push({ row: newRowForCapture, col: captureCol });
@@ -596,6 +971,8 @@ calculateValidMoves(row, col, board) {
   }
 
   console.log("Valid moves in calculateValidMoves:", validMoves);
+  ///console.log('Comparing valid moves:', validMoves, 'with target:', {row: newRowForCapture, col: captureCol});
+
   return validMoves;
 }
 
@@ -668,10 +1045,13 @@ calculateValidMoves(row, col, board) {
             break;
         default:
             // if the piece is not recognized, return false
+          console.log("piece not recognized");
             return false;
     }
 
     // if the move is not valid, return false
+            console.log("unvalidmove");
+
     return false;
 }
     getType() {
