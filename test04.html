@@ -1,1 +1,597 @@
 
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<style>
+
+#chessboard {
+  display: grid;
+  grid-template-columns: repeat(8, 67.2px);
+  grid-template-rows: repeat(8, 67.2px);
+  width: 560px;
+   height: 560px;
+}
+
+#body
+{
+    background-color: lightslategrey;
+}
+
+.light
+{
+    background-color: lightskyblue;
+}
+
+.dark
+{
+    background-color: SteelBlue;   
+}
+
+/*.pattern {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  background-color: white;
+  box-shadow: 50 0 50 1px black;
+  background-color: thistle;
+}*/
+.pattern {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  background-image: url('img/WizardHat.png');
+  background-size: cover;
+}
+.selected-piece
+{
+  background-color: thistle;
+}
+.highlight 
+{
+  background-color: lightsalmon;
+  border: 2px solid blue;
+}
+.chess-square
+{
+   border: 0.05px solid black;
+   position : relative;
+   align-items: center;
+   display: flex;
+   justify-content: center;
+
+}
+
+.chess-piece
+{
+    
+    background-size: cover;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: 1;
+    overflow: hidden;
+
+}
+
+.white-pawn
+{
+    width: 66.2px;
+    height: 66.2px;
+   background-size: cover;
+   position: relative;
+   top: 0;
+   left: 0;
+   bottom: 0;
+   right: 0;
+
+    
+}
+.black-knight
+{
+    
+    width: 66.2px;
+    height: 66.2px;
+    background-size: cover;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+
+}
+.white-knight
+{
+    width: 67.2px;
+    height: 67.2px;
+    background-size: cover;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.black-pawn
+{
+    
+    width: 66.2px;
+    height: 66.2px;
+    background-size: cover;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: 1;
+    overflow: hidden;
+}
+.white-king
+{
+    
+    background-size: cover;
+    width: 66.2px;
+    height: 66.2px;
+}
+.black-king
+{
+    width: 66.2px;
+    height: 66.2px;
+    background-size: cover;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+}
+.black-queen
+{
+    background-image: url('images/blackQUEEN.png');
+    width: 66.2px;
+    height: 66.2px;
+    background-size: cover;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+}
+.white-queen
+{
+    background-image: url('images/whiteQUEEN.png');
+    background-size: cover;
+    width: 66.2px;
+    height: 66.2px;
+}
+.black-rook
+{
+    background-image: url('images/BlackROOK.png');
+    background-size: cover;
+    width: 67.2px;
+    height: 67.2px;
+}
+.white-rook
+{
+    background-image: url('images/WhiteROOK.png');
+    background-size: cover;
+    width: 67.2px;
+    height: 67.2px;
+}
+.white-bishop
+{
+    background-image: url('images/whiteBishop.png');
+    background-size: cover;
+     width: 67.2px;
+    height: 67.2px;
+    background-size: 67.2px;
+}
+.black-bishop
+{
+    background-image: url('images/blackBishop.png');
+   width: 67.2px;
+    height: 67.2px;
+}
+
+</style>
+</head>
+
+<body id="body">
+  
+  <div id="chessboard">
+
+    <div class="chess-square dark" data-row="0" data-col="0" id="square-0-0">
+        <div class="chess-piece">
+            <div class="white-rook" src="images/whiteROOK.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="0" data-col="1" id="square-0-1">
+        <div class="chess-piece">
+            <div class="white-knight" src="images/whiteKNIGHT.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square dark" data-row="0" data-col="2" id="square-0-2">
+        <div class="chess-piece">
+            <div class="white-bishop" src="images/whiteBISHOP.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="0" data-col="3" id="square-0-3">
+        <div class="chess-piece">
+            <div class="white-queen" src="images/whiteQUEEN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square dark" data-row="0" data-col="4" id="square-0-4">
+        <div class="chess-piece">
+            <div class="white-king" src="images/whiteKING.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="0" data-col="5" id="square-0-5">
+        <div class="chess-piece">
+            <div class="white-bishop" src="images/whiteBISHOP.png"></div>
+        </div>
+    </div>
+    
+    <div class="chess-square dark" data-row="0" data-col="6" id="square-0-6">
+        <div class="chess-piece">
+            <div class="white-knight" src="images/whiteKNIGHT.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="0" data-col="7" id="square-0-7">
+        <div class="chess-piece">
+            <div class="white-rook" src="images/whiteROOK.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="1" data-col="0" id="square-1-0">
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square dark" data-row="1" data-col="1" id="square-1-1">
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="1" data-col="2" id="square-1-2">
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
+    </div>
+    
+    <div class="chess-square dark" data-row="1" data-col="3" id="square-1-3">
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="1" data-col="4" id="square-1-4">
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
+    </div>
+    
+    <div class="chess-square dark" data-row="1" data-col="5" id="square-1-5">
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="1" data-col="6" id="square-1-6">
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square dark" data-row="1" data-col="7" id="square-1-7">
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square dark" data-row="2" data-col="0" id="square-2-0"></div>
+    <div class="chess-square light" data-row="2" data-col="1" id="square-2-1"></div>
+    <div class="chess-square dark" data-row="2" data-col="2" id="square-2-2"></div>
+    <div class="chess-square light" data-row="2" data-col="3" id="square-2-3"></div>
+    <div class="chess-square dark" data-row="2" data-col="4" id="square-2-4"></div>
+    <div class="chess-square light" data-row="2" data-col="5" id="square-2-5"></div>
+    <div class="chess-square dark" data-row="2" data-col="6" id="square-2-6"></div>
+    <div class="chess-square light" data-row="2" data-col="7" id="square-2-7"></div>
+    <div class="chess-square light" data-row="3" data-col="0" id="square-3-0"></div>
+    <div class="chess-square  dark" data-row="3" data-col="1" id="square-3-1"></div>
+    <div class="chess-square light" data-row="3" data-col="2" id="square-3-2"></div>
+    <div class="chess-square dark" data-row="3" data-col="3" id="square-3-3"></div>
+    <div class="chess-square light" data-row="3" data-col="4" id="square-3-4"></div>
+    <div class="chess-square dark" data-row="3" data-col="5" id="square-3-5"></div>
+    <div class="chess-square light" data-row="3" data-col="6" id="square-3-6"></div>
+    <div class="chess-square dark" data-row="3" data-col="7" id="square-3-7"></div>
+    <div class="chess-square dark" data-row="4" data-col="0" id="square-4-0"></div>
+    <div class="chess-square light" data-row="4" data-col="1" id="square-4-1"></div>
+    <div class="chess-square dark" data-row="4" data-col="2" id="square-4-2"></div>
+    <div class="chess-square light" data-row="4" data-col="3" id="square-4-3"></div>
+    <div class="chess-square dark" data-row="4" data-col="4" id="square-4-4"></div>
+    <div class="chess-square light" data-row="4" data-col="5" id="square-4-5"></div>
+    <div class="chess-square dark" data-row="4" data-col="6" id="square-4-6"></div>
+    <div class="chess-square light" data-row="4" data-col="7" id="square-4-7"></div>
+    <div class="chess-square light" data-row="5" data-col="0" id="square-5-0"></div>
+    <div class="chess-square dark" data-row="5" data-col="1" id="square-5-1"></div>
+    <div class="chess-square light" data-row="5" data-col="2" id="square-5-2"></div>
+    <div class="chess-square dark" data-row="5" data-col="3" id="square-5-3"></div>
+    <div class="chess-square light" data-row="5" data-col="4" id="square-5-4"></div>
+    <div class="chess-square dark" data-row="5" data-col="5" id="square-5-5"></div>
+    <div class="chess-square light" data-row="5" data-col="6" id="square-5-6"></div>
+    <div class="chess-square dark" data-row="5" data-col="7" id="square-5-7"></div>
+
+    <div class="chess-square dark" data-row="6" data-col="0" id="square-6-0">
+        <div class="chess-piece">
+            <div class="black-pawn" src="images/blackPAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="6" data-col="1" id="square-6-1">
+        <div class="chess-piece">
+            <div class="black-pawn" src="images/blackPAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square dark" data-row="6" data-col="2" id="square-6-2">
+        <div class="chess-piece">
+            <div class="black-pawn" src="images/blackPAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="6" data-col="3" id="square-6-3">
+        <div class="chess-piece">
+            <div class="black-pawn" src="images/blackPAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square dark" data-row="6" data-col="4" id="square-6-4">
+        <div class="chess-piece">
+            <div class="black-pawn" src="images/blackPAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="6" data-col="5" id="square-6-5">
+        <div class="chess-piece">
+            <div class="black-pawn" src="images/blackPAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square dark" data-row="6" data-col="6" id="square-6-6">
+        <div class="chess-piece">
+            <div class="black-pawn" src="images/blackPAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="6" data-col="7" id="square-6-7">
+        <div class="chess-piece">
+            <div class="black-pawn" src="images/blackPAWN.png"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" src="images/blackpawn.png" data-row="7" data-col="0" id="square-7-0">
+        <div class="chess-piece">
+            <div class="black-rook"></div>
+        </div>
+    </div>
+
+    <div class="chess-square dark" data-row="7" data-col="1" id="square-7-1">
+        <div class="chess-piece">
+            <div class="black-knight"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="7" data-col="2" id="square-7-2">
+        <div class="chess-piece">
+            <div class="black-bishop"></div>
+        </div>
+    </div>
+
+    <div class="chess-square dark" data-row="7" data-col="3" id="square-7-3">
+        <div class="chess-piece">
+            <div class="black-queen"></div>
+        </div>
+    </div>
+
+    <div class="chess-square light" data-row="7" data-col="4" id="square-7-4">
+        <div class="chess-piece">
+            <div class="black-king"></div>
+          </div>
+      </div>
+
+    <div class="chess-square dark" data-row="7" data-col="5" id="square-7-5">
+        <div class="chess-piece">
+            <div class="black-bishop"></div>
+        </div>
+    </div>
+    
+    <div class="chess-square light" data-row="7" data-col="6" id="square-7-6">
+        <div class="chess-piece">
+            <div class="black-knight"></div>
+        </div>
+    </div>
+    
+    <div class="chess-square dark" data-row="7" data-col="7" id="square-7-7">
+        <div class="chess-piece">
+            <div class="black-rook"></div>
+        </div>
+    </div>
+
+    </div>
+
+<div id='move-history'>
+    <h3>Move History:</h3>
+  <ul id="move-list"></ul>
+</div>
+  
+</div>
+<div id="game-info">
+  <div id="turn-display">
+    <p>Turn: <span id="turn-color">White</span></p>
+  </div>
+<div id="captured-pieces">
+  <h2>Captured Pieces</h2>
+  <div id="white-captured" class="captured-display"></div>
+  <div id="white-captured" class="captured-display"></div>
+  </div>
+</div>
+
+
+
+
+
+  <button id="newgamebutton">New Game</button>
+  
+
+  <script type=module>
+    let chessBoard;
+    let chessPiece;
+    let chessGame;
+    let chessArray;
+    let ChessGame;
+    let handlePieceSelection;
+    let game;
+    let type;
+    let row;
+    let col;
+    let imagePath;
+
+    document.addEventListener("DOMContentLoaded", function() 
+    {
+        const currentPiece = 
+        {
+            type: "pawn",
+            color: "black",
+            row: 6,
+            col: 1,
+            elementId: "square-6-1",
+            game: game
+        };
+        const imagePath = "images/blackpawn.png";
+        const elementId = `square-${currentPiece.row}-${currentPiece.col}`;
+
+        import('./jsFiles/classGame.js')
+        .then(module => {
+            ChessGame = module.default;
+            game = new ChessGame();
+
+            currentPiece.game = game; // set the game object on the current piece
+       
+    import('./jsFiles/classPiece.js').then(module => 
+    {
+        const type = currentPiece.type;
+        const color = currentPiece.color;
+        const row = currentPiece.row;
+        const col = currentPiece.col;
+        const game = currentPiece.game;
+        const squares = document.querySelectorAll('.square');
+        const board = currentPiece.game.board;
+
+
+        chessPiece = new module.default(type, color, row, col, imagePath, elementId, game, squares);
+            //console.log(chessPiece)
+       // consoleLogVariables();
+        chessPiece.addChessPiece(type, color, row, col, imagePath, elementId, game);
+        //chessPiece.initsquares(board, game);
+        //chessPiece.initSquares(board, game);
+
+        const squareElement = document.getElementById(chessPiece.elementId);
+        if (squareElement) 
+        {
+            console.log(squareElement);
+            squareElement.innerHTML = `<div class="chess-piece ${color}-${type}"></div>`;
+            squareElement.classList.add('has-piece');
+            squareElement.querySelector('.chess-piece').style.backgroundImage = `url(${imagePath})`;
+            squareElement.style.gridRow = row + 1;
+            squareElement.style.gridColumn = col + 1;
+        } 
+        else 
+        {
+            console.error(`No element found with ID "${elementId}"`);
+        }
+        
+
+        import('./jsFiles/classBoard.js').then(module => 
+        {
+            chessBoard = new module.default(game, chessPiece);
+                console.log(chessBoard);
+            chessBoard.generateBoardHTML();
+            chessBoard.displayBoard();
+            chessBoard.createBoardElements();
+            chessBoard.createPiece(type, color, row, col, imagePath, elementId, game);
+            chessBoard.placePieces();
+            consoleLogVariables();
+            console.log("Board in html", this.game.board);
+            console.log("Board in html", game.board);
+            console.log("Board in html", game);
+            import('./jsFiles/classArray.js')
+            .then(module => {
+                chessArray = new module.default(game);
+                    console.log(chessArray);
+                
+                chessArray.createPieces();
+                chessArray.addPiecesToBoard(chessBoard);
+                chessBoard.displayBoard();
+                
+                if (chessArray.pieces.length > 0) {
+                   let currentPiece = chessArray.pieces[0];
+
+                
+                    chessGame = new ChessGame(chessArray, chessBoard, handlePieceSelection);
+                        console.log(chessGame);
+                    //consoleLogVariables();
+                    chessGame.startNewGame();
+                    chessGame.handlemove(currentPiece, row, col);
+
+               
+                } else {
+                    console.error("The pieces array is empty.");
+                }
+            })
+            .catch(error => {
+                console.error("Error importing classArray.js:", error);
+            });
+        })
+        .catch(error => {
+            console.error("Error importing classBoard.js:", error);
+        });
+    })
+    .catch(error => 
+    {
+        console.error("Error importing classPiece.js:", error);
+    });
+})
+    .catch(error => {
+        console.error("Error importing classGame.js:", error);
+    });
+
+    function consoleLogVariables(){
+        console.log(chessBoard.constructor.name);
+    
+}
+    }, false);
+
+
+
+  </script>
+
+  
+  </body>
+</html>
