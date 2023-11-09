@@ -1,9 +1,26 @@
-
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-<style>
+    <script type="module" src="KeplrConnect.js" defer></script>
+    <!-- <script type="module" src="./graphql-server-example/graphqlTestKeplrConnect.js" defer></script>
+    <script type="module" src="./graphQl/clientSide.mjs" defer></script> -->
+    <script src="https://unpkg.com/@keplr-wallet/provider"></script>
+    <script src="./New/main.bundle.js"></script>
+
+    <!-- Import the Apollo Client library -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/apollo-client/3.3.21/umd/apollo-client.min.js"></script> -->
+
+    <!-- Your JavaScript code -->
+    <script>
+      // const apolloClient = new Apollo.ApolloClient({
+      //   uri: 'https://graphql.mainnet.stargaze-apis.com/graphql',
+      //   cache: new Apollo.InMemoryCache(),
+      // });
+      // Other JavaScript code that uses apolloClient
+    </script>
+    
+    <style>
 
 #chessboard {
   display: grid;
@@ -16,6 +33,34 @@
 #body
 {
     background-color: lightslategrey;
+}
+
+#spell-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px;
+}
+
+.spell-button {
+  padding: 20px;
+  font-size: 1.5em;
+  color: white;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+#defensive-spell-button {
+  background-color: #4CAF50; /* Green */
+}
+
+#offensive-spell-button {
+  background-color: #f44336; /* Red */
+}
+
+.spell-button:hover {
+  transform: scale(1.1);
 }
 
 .light
@@ -206,6 +251,219 @@
 </head>
 
 <body id="body">
+    <script>
+        // Function to create and display iframes for each NFT
+//         function displayNfts(nfts) {
+//   const container = document.getElementById('nfts-container'); // Container where iframes will be appended
+//   container.innerHTML = ''; // Clear the container
+
+//   nfts.forEach(nft => {
+//     const iframe = document.createElement('iframe');
+//     iframe.classList.add('nft-iframe');
+//     iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+//     iframe.allowFullscreen = true;
+//     iframe.height = '100%';
+//     iframe.sandbox = 'allow-scripts';
+//     iframe.width = '15%';
+//     iframe.style = 'min-height: 30px;';
+//     iframe.src = nft.media.url; // Set the src to the NFT's media URL
+//     iframe.title = nft.name;
+
+//     container.appendChild(iframe); // Add the iframe to the container
+//   });
+// }
+//        function displayNfts(nfts) {
+//   const container = document.getElementById('nfts-container');
+//   container.innerHTML = '';
+
+//   nfts.forEach(nft => {
+//     const nftBox = document.createElement('div');
+//     nftBox.classList.add('nft-box');
+//     nftBox.style = 'width: 15%;'; // Adjust styling as needed
+//     nftBox.setAttribute('data-url', nft.media.url);
+//     nftBox.setAttribute('data-name', nft.name);
+//     nftBox.setAttribute('data-tokenId', nft.tokenId);
+
+//     const iframe = document.createElement('iframe');
+//     iframe.classList.add('nft-iframe');
+//     iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+//     iframe.allowFullscreen = true;
+//     iframe.style = 'width: 100%; height: 100%; border: 1px;'; // Adjust as needed
+//     iframe.src = nft.media.url;
+//     iframe.title = nft.name;
+
+//     // Append the iframe to the clickable box
+//     nftBox.appendChild(iframe);
+//     container.appendChild(nftBox);
+
+//     // Add click event listener to the box
+//     nftBox.addEventListener('click', async function() {
+//       const url = this.getAttribute('data-url');
+//       const name = this.getAttribute('data-name');
+//       const tokenId = this.getAttribute('data-tokenId');
+
+//       // Here you can handle the click as desired
+//       console.log(`NFT clicked: ${name} with Token ID: ${tokenId}`);
+
+//       // You can also call fetchAndExtractClasses or any other function you need
+//       // For example:
+//       const className = await fetchAndExtractClasses(url, 'some-class');
+//       console.log(`Class name within some-class:`, className);
+
+//       // Perform further actions as needed
+//     });
+//   });
+// } 
+       // Function to create and display iframes for each NFT
+function displayNfts(nfts) {
+  const container = document.getElementById('nfts-container');
+  container.innerHTML = '';
+  container.style.display = 'flex'; // Use flexbox to layout children horizontally
+  container.style.flexWrap = 'wrap'; // Allow items to wrap as needed
+  container.style.gap = '10px'; // Add gap between items for better spacing
+
+  nfts.forEach(nft => {
+    const nftBox = document.createElement('div');
+    nftBox.classList.add('nft-box');
+    nftBox.style = 'min-width: 15%; position: relative;'; // Ensure minimum width and use relative positioning
+
+    const iframe = document.createElement('iframe');
+    iframe.classList.add('nft-iframe');
+    iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.style = 'width: 100%; height: 100%; border: none;';
+    iframe.src = nft.media.url;
+    iframe.title = nft.name;
+    iframe.style.pointerEvents = 'none';
+
+
+    nftBox.appendChild(iframe);
+    // Add a single click event listener to the container for event delegation
+  nftBox.addEventListener('click', function(event) {
+      console.log('Clicked element:', event.target);
+      const name = nft.name;
+      const tokenId = nft.tokenId;
+      console.log(`NFT clicked: ${name} with Token ID: ${tokenId}`);
+
+      // Call fetchAndExtractClasses with the URL of the clicked NFT
+      const htmlUrl = `https://ipfs-gw.stargaze-apis.com/ipfs/bafybeidwo4kicq35xnvmbaynl334uif26phmmk63sxncn76rhkyyo4ll6i/${tokenId}.html`;
+      
+      // Replace 'robe' with the actual class you want to extract
+      fetchAndExtractClasses(htmlUrl, 'robe').then(className => {
+        console.log('Class name within robe:', className);
+      });
+
+      fetchAndExtractClasses(htmlUrl, 'staff').then(className => {
+        console.log('Class name within staff:', className);
+      });
+
+      fetchAndExtractClasses(htmlUrl, 'hat').then(className => {
+        console.log('Class name within hat:', className);
+      });
+
+
+    });
+
+    container.appendChild(nftBox);
+  });
+
+  
+}
+
+
+  // This is the JavaScript code that you want to execute in the browser
+  async function fetchNFTs() {
+     try {
+        const chainId = 'stargaze-1';
+          await window.keplr.enable(chainId);
+
+   const offlineSigner = window.getOfflineSigner(chainId);
+    const accounts = await offlineSigner.getAccounts();
+    console.log("Connected wallet address:", accounts[0].address);
+
+    const query = {
+      query: `
+        query NFTs($ownerAddrOrName: String, $filterByCollectionAddrs: [String!], $limit: Int) {
+          tokens(ownerAddrOrName: $ownerAddrOrName, filterByCollectionAddrs: $filterByCollectionAddrs, limit: $limit) {
+
+            tokens {
+                rarityOrder
+                name
+                tokenId
+                media 
+                {
+                    format
+                    type
+                    url
+
+                }
+            }
+          }
+        }
+      `,
+      variables: { 
+        "ownerAddrOrName": accounts[0].address,
+        "filterByCollectionAddrs": ["stars18d7ver7mmjdt06mz6x0pz09862060kupju75kpka5j0r7huearcsq0gyg0"],
+        "limit": 100
+    }
+    };
+
+   const response = await fetch('https://graphql.mainnet.stargaze-apis.com/graphql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(query),
+    });
+    const data = await response.json();
+      //console.log(data);
+      const nfts = data.data.tokens.tokens;
+    displayNfts(nfts);
+      // Here you can update your HTML with the data received
+      // For example, if you have a <div id="nft-data"></div> in your HTML
+      // document.getElementById('nft-data').textContent = JSON.stringify(data, null, 2);
+     } catch (error) {
+    console.error('Error fetching NFTs:', error);
+  }
+}
+
+async function fetchAndExtractClasses(htmlUrl, parentClass) {
+  try {
+    const response = await fetch(htmlUrl);
+    const htmlText = await response.text();
+    const parser = new DOMParser();
+    const htmlDoc = parser.parseFromString(htmlText, 'text/html');
+
+    // Find the parent element with the given class
+    const parentElement = htmlDoc.querySelector(`g.${parentClass}`);
+    if (!parentElement) {
+      console.error(`No element with the class ${parentClass} found.`);
+      return null;
+    }
+
+    // Get the child element with a class that is a direct descendant of the parent
+    // This assumes that the child is directly inside and not nested deeper
+    let childWithClass = parentElement.querySelector('g[class]');
+    
+    return childWithClass ? childWithClass.getAttribute('class') : null;
+  } catch (error) {
+    console.error('Error fetching or parsing HTML for URL:', htmlUrl, error);
+    return null;
+  }
+}
+
+
+ 
+
+
+</script>
+<div id="spell-buttons">
+  <div id="defensive-spell-button" class="spell-button">
+    Cast Defensive Spell
+  </div>
+  <div id="offensive-spell-button" class="spell-button">
+    Cast Offensive Spell
+  </div>
+</div>
+
   
   <div id="chessboard">
 
@@ -386,7 +644,7 @@
         </div>
     </div>
 
-    <div class="chess-square light" src="images/blackpawn.png" data-row="7" data-col="0" id="square-7-0">
+    <div class="chess-square light" data-row="7" data-col="0" id="square-7-0">
         <div class="chess-piece">
             <div class="black-rook"></div>
         </div>
@@ -435,13 +693,27 @@
     </div>
 
     </div>
+<button id="fetch-nfts-button" onclick= "fetchNFTs()">Fetch NFT Data</button>
+<div id="nfts-container"></div>
+
+<div>
+<!-- Div to display the fetched data -->
+<div id="nft-data"></div>
+
+  <!-- Connect Wallet Button -->
+  <button id="connectWalletButton">Connect Wallet</button>
+    <!-- List NFTs owned by the user -->
+  <div id="nft-list"></div>
+  <!-- Display selected NFT traits and game options -->
+  <div id="nft-details"></div>
+</div>
 
 <div id='move-history'>
     <h3>Move History:</h3>
   <ul id="move-list"></ul>
 </div>
   
-</div>
+
 <div id="game-info">
   <div id="turn-display">
     <p>Turn: <span id="turn-color">White</span></p>
@@ -454,11 +726,9 @@
 </div>
 
 
-
-
-
   <button id="newgamebutton">New Game</button>
   
+
 
   <script type=module>
     let chessBoard;
