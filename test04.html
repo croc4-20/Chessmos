@@ -3,42 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <script type="module" src="KeplrConnect.js" defer></script>
-    <!-- <script type="module" src="./graphql-server-example/graphqlTestKeplrConnect.js" defer></script>
-    <script type="module" src="./graphQl/clientSide.mjs" defer></script> -->
     <script src="https://unpkg.com/@keplr-wallet/provider"></script>
     <script src="./New/main.bundle.js"></script>
-
-    <!-- Import the Apollo Client library -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/apollo-client/3.3.21/umd/apollo-client.min.js"></script> -->
-
-    <!-- Your JavaScript code -->
-    <script>
-      // const apolloClient = new Apollo.ApolloClient({
-      //   uri: 'https://graphql.mainnet.stargaze-apis.com/graphql',
-      //   cache: new Apollo.InMemoryCache(),
-      // });
-      // Other JavaScript code that uses apolloClient
-    </script>
-    
     <style>
+        #lightsaber 
+        {
+            display: none;
+            position: absolute;
+            height: 100%;
+            z-index: 10;
+            transition: left 0.5s ease-in-out; /* Smooth transition for horizontal movement */
+        }
 
-#chessboard {
-  display: grid;
-  grid-template-columns: repeat(8, 67.2px);
-  grid-template-rows: repeat(8, 67.2px);
-  width: 560px;
-   height: 560px;
+        #chessboard 
+        {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(8, 67.2px);
+            grid-template-rows: repeat(8, 67.2px);
+            width: 560px;
+            height: 560px;
+            overflow: hidden;
+            z-index: 2;
+        }
+        #body
+        {
+            background-color: lightslategrey;
+            /*    background-image: url('img/background.png');*/
+            background-size: cover;
+/*            overflow: hidden;*/
+            z-index: 2;
+        }
+        .rainbow-background {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+/*    background: radial-gradient(circle, red, yellow, lime, aqua, blue, fuchsia, red);*/
+    background-size: cover;
+    animation: colorChange 30s linear infinite;
+    z-index: -1;
 }
 
-#body
-{
-    background-color: lightslategrey;
+@keyframes colorChange {
+    0.0% { background-color: #ff0000; }
+    0.67% { background-color: #ff0a00; }
+    1.33% { background-color: #ff1400; }
+    2.0% { background-color: #ff1e00; }
+    2.67% { background-color: #ff2800; }
+    3.33% { background-color: #ff3200; }
+    4.0% { background-color: #ff3d00; }
+    4.67% { background-color: #ff4700; }
+    5.33% { background-color: #ff5100; }
+    6.0% { background-color: #ff5b00; }
+    6.67% { background-color: #ff6600; }
+    7.33% { background-color: #ff7000; }
+    8.0% { background-color: #ff7a00; }
+    8.67% { background-color: #ff8400; }
+    9.33% { background-color: #ff8e00; }
+    10.0% { background-color: #ff9900; }
+    10.67% { background-color: #ffa300; }
+    11.33% { background-color: #ffad00; }
+    12.0% { background-color: #ffb700; }
+    12.67% { background-color: #ffc100; }
+    13.33% { background-color: #ffcc00; }
+    14.0% { background-color: #ffd600; }
+    14.67% { background-color: #ffe000; }
+    15.33% { background-color: #ffea00; }
+    16.0% { background-color: #fff400; }
+    16.67% { background-color: #ffff00; }
+    17.33% { background-color: #f4ff00; }
+    18.0% { background-color: #eaff00; }
+    18.67% { background-color: #e0ff00; }
+    19.33% { background-color: #d6ff00; }
+    20.0% { background-color: #cbff00; }
+    20.67% { background-color: #c1ff00; }
+    21.33% { background-color: #b7ff00; }
+    22.0% { background-color: #adff00; }
+    22.67% { background-color: #a3ff00; }
+    23.33% { background-color: #99ff00; }
+    24.0% { background-color: #8eff00; }
+    24.67% { background-color: #84ff00; }
+    25.33% { background-color: #7aff00; }
+    26.0% { background-color: #70ff00; }
+    26.67% { background-color: #65ff00; }
+    27.33% { background-color: #5bff00; }
+    28.0% { background-color: #51ff00; }
+    28.67% { background-color: #47ff00; }
+    29.33% { background-color: #3dff00; }
+    30.0% { background-color: #33ff00; }
+    30.67% { background-color: #28ff00; }
+    31.33% { background-color: #1eff00; }
+    32.0% { background-color: #14ff00; }
+    32.67% { background-color: #0aff00; }
+    33.33% { background-color: #00ff00; }
+    34.0% { background-color: #00ff0a; }
+    34.67% { background-color: #00ff14; }
+    35.33% { background-color: #00ff1e; }
+    36.0% { background-color: #00ff28; }
+    36.67% { background-color: #00ff32; }
+    37.33% { background-color: #00ff3d; }
+    38.0% { background-color: #00ff47; }
+    38.67% { background-color: #00ff51; }
+    39.33% { background-color: #00ff5b; }
+    40.0% { background-color: #00ff66; }
+    40.67% { background-color: #00ff70; }
+    41.33% { background-color: #00ff7a; }
+    42.0% { background-color: #00ff84; }
+    42.67% { background-color: #00ff8e; }
+    43.33% { background-color: #00ff99; }
+    44.0% { background-color: #00ffa3; }
+    44.67% { background-color: #00ffad; }
+    45.33% { background-color: #00ffb7; }
+    46.0% { background-color: #00ffc1; }
+    46.67% { background-color: #00ffcb; }
+    47.33% { background-color: #00ffd6; }
+    48.0% { background-color: #00ffe0; }
+    48.67% { background-color: #00ffea; }
+    49.33% { background-color: #00fff4; }
+    50.0% { background-color: #00ffff; } /* cyan */
+    50.67% { background-color: #00f4ff; }
+    51.33% { background-color: #00eaff; }
+    52.0% { background-color: #00e0ff; }
+    52.67% { background-color: #00d6ff; }
+    53.33% { background-color: #00cbff; }
+    54.0% { background-color: #00c1ff; }
+    54.67% { background-color: #00b7ff; }
+    55.33% { background-color: #00adff; }
+    56.0% { background-color: #00a3ff; }
+    56.67% { background-color: #0099ff; }
+    57.33% { background-color: #008eff; }
+    58.0% { background-color: #0084ff; }
+    58.67% { background-color: #007aff; }
+    59.33% { background-color: #0070ff; }
+    60.0% { background-color: #0066ff; }
+    60.67% { background-color: #005bff; }
+    61.33% { background-color: #0051ff; }
+    62.0% { background-color: #0047ff; }
+    62.67% { background-color: #003dff; }
+    63.33% { background-color: #0033ff; }
+    64.0% { background-color: #0028ff; }
+    64.67% { background-color: #001eff; }
+    65.33% { background-color: #0014ff; }
+    66.0% { background-color: #000aff; }
+    66.67% { background-color: #0000ff; } /* blue */
+    67.33% { background-color: #0a00ff; }
+    68.0% { background-color: #1400ff; }
+    68.67% { background-color: #1e00ff; }
+    69.33% { background-color: #2800ff; }
+    70.0% { background-color: #3200ff; }
+    70.67% { background-color: #3d00ff; }
+    71.33% { background-color: #4700ff; }
+    72.0% { background-color: #5100ff; }
+    72.67% { background-color: #5b00ff; }
+    73.33% { background-color: #6500ff; }
+    74.0% { background-color: #7000ff; }
+    74.67% { background-color: #7a00ff; }
+    75.33% { background-color: #8400ff; }
+    76.0% { background-color: #8e00ff; }
+    76.67% { background-color: #9900ff; }
+    77.33% { background-color: #a300ff; }
+    78.0% { background-color: #ad00ff; }
+    78.67% { background-color: #b700ff; }
+    79.33% { background-color: #c100ff; }
+    80.0% { background-color: #cc00ff; }
+    80.67% { background-color: #d600ff; }
+    81.33% { background-color: #e000ff; }
+    82.0% { background-color: #ea00ff; }
+    82.67% { background-color: #f400ff; }
+    83.33% { background-color: #ff00ff; } /* magenta */
+    84.0% { background-color: #ff00f4; }
+    84.67% { background-color: #ff00ea; }
+    85.33% { background-color: #ff00e0; }
+    86.0% { background-color: #ff00d6; }
+    86.67% { background-color: #ff00cb; }
+    87.33% { background-color: #ff00c1; }
+    88.0% { background-color: #ff00b7; }
+    88.67% { background-color: #ff00ad; }
+    89.33% { background-color: #ff00a3; }
+    90.0% { background-color: #ff0098; }
+    90.67% { background-color: #ff008e; }
+    91.33% { background-color: #ff0084; }
+    92.0% { background-color: #ff007a; }
+    92.67% { background-color: #ff0070; }
+    93.33% { background-color: #ff0066; }
+    94.0% { background-color: #ff005b; }
+    94.67% { background-color: #ff0051; }
+    95.33% { background-color: #ff0047; }
+    96.0% { background-color: #ff003d; }
+    96.67% { background-color: #ff0033; }
+    97.33% { background-color: #ff0028; }
+    98.0% { background-color: #ff001e; }
+    98.67% { background-color: #ff0014; }
+    99.33% { background-color: #ff000a; }
+    100% { background-color: #FF0000; } 
+}
+        
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.particle {
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    background-color: rgba(255, 255, 255, var(--opacity));
+    border-radius: 50%;
+    animation: float var(--duration) linear infinite;
+}
+
+/* Different keyframes for variety in movement */
+@keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(calc(-1 * var(--distance)), calc(-1 * var(--distance))); }
+    50% { transform: translate(var(--distance), var(--distance)); }
+    75% { transform: translate(calc(-1 * var(--distance) / 2), var(--distance)); }
+}
+
+.background:hover .particle {
+    animation-duration: calc(var(--duration) / 2); /* Speeds up the animation */
 }
 
 #spell-buttons {
+    position: relative;
   display: flex;
   justify-content: space-around;
   margin: 20px;
+  z-index: 2;
+}
+/*CSS TIMER*/
+.turn-timer-display {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #444;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    width: 200px;
+    margin: 10px auto;
+}
+
+.extra-timer-display {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #555; /* Slightly different shade for distinction */
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    width: 200px;
+    margin: 10px auto;
+}
+
+.turn-count-display {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #666; /* Another shade for distinction */
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    width: 200px;
+    margin: 10px auto;
+}
+@keyframes blink {
+    0% { background-color: #444; }
+    50% { background-color: red; }
+    100% { background-color: #444; }
+}
+
+.blinking {
+    animation: blink 1s linear infinite;
+}
+/*CSS TIMER*/
+.chess-square.highlight {
+  border: 2px solid green; /* Example highlight style */
+}
+/*asking user to click on square css*/
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .spell-button {
@@ -49,7 +330,50 @@
   text-align: center;
   cursor: pointer;
   transition: transform 0.2s;
+  border: 2px solid #fff;
+  background-color: #444;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  width: 150px; /* Adjust the width as needed */
+  height: 150px; /* Adjust the height as needed */
 }
+
+.spell-button svg {
+    
+    margin: auto;
+    width: 100%;
+    height: auto; 
+    transform: translate(100px);
+    align-self: stretch;
+    display: block;
+}
+
+
+.spell-button .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: black;
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.5s;
+  font-size: 14px;
+}
+
+.spell-button:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
 
 #defensive-spell-button {
   background-color: #4CAF50; /* Green */
@@ -85,6 +409,15 @@
   box-shadow: 50 0 50 1px black;
   background-color: thistle;
 }*/
+.canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Ensures the canvas stays behind all other content */
+}
+
 .pattern {
   position: absolute;
   top: 50%;
@@ -146,14 +479,10 @@
     
     width: 66.2px;
     height: 66.2px;
+    background-image: url('img/blackBISHOP.png');
     background-size: cover;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
+    
+   
 
 }
 .white-knight
@@ -161,10 +490,7 @@
     width: 67.2px;
     height: 67.2px;
     background-size: cover;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    background-position: center;
 }
 
 .black-pawn
@@ -193,15 +519,12 @@
     width: 66.2px;
     height: 66.2px;
     background-size: cover;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
     position: absolute;
+    
 }
 .black-queen
 {
-    background-image: url('images/blackQUEEN.png');
+    background-image: url('testNewImages/BlackQUeenRevisited.png');
     width: 66.2px;
     height: 66.2px;
     background-size: cover;
@@ -220,7 +543,7 @@
 }
 .black-rook
 {
-    background-image: url('images/BlackROOK.png');
+    background-image: url('img/BlackROOK.png');
     background-size: cover;
     width: 67.2px;
     height: 67.2px;
@@ -234,11 +557,11 @@
 }
 .white-bishop
 {
-    background-image: url('images/whiteBishop.png');
+    background-image: url('img/whiteBISHOP.png');
     background-size: cover;
      width: 67.2px;
     height: 67.2px;
-    background-size: 67.2px;
+    
 }
 .black-bishop
 {
@@ -247,82 +570,230 @@
     height: 67.2px;
 }
 
+/* Style for frozen squares */
+.frozen-square {
+    background-color: rgba(173, 216, 230, 0.5); /* Light blue with some transparency */
+    border: 2px solid rgba(0, 191, 255, 0.7); /* Brighter blue border for a frosty look */
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.5); /* Soft glow to enhance the icy effect */
+}
+
+/* Style for frozen pieces */
+.frozen-piece {
+    filter: brightness(80%) saturate(0%) contrast(120%); /* Adjusts the color to give a cold feel */
+    opacity: 0.8; /* Adjust opacity to indicate frozen state */
+    transform: scale(1.05); /* Slightly enlarge the piece to suggest it's encased in ice */
+    box-shadow: 0 0 15px rgba(0, 191, 255, 0.8); /* Add a glowing ice effect */
+    transition: all 0.3s ease; /* Smooth transition for when the piece gets frozen/unfrozen */
+}
+.dagger {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    /* Adjust size as needed */
+    width: 20px;
+    height: 20px;
+    z-index: 10;
+}
+.rift {
+    background-image: radial-gradient(circle, rgba(255, 0, 0, 0.8) 10%, rgba(0, 0, 0, 0.8) 40%, transparent 60%);
+    background-size: cover;
+    color: white;
+    animation: riftPulse 2s infinite;
+    border-radius: 5px;
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
+}
+
+@keyframes riftPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.notification-box {
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.notification-box img {
+    width: 50px; /* Adjust as needed */
+    height: auto;
+}
+
+.game-ui{
+    position: center-left;
+}
+
+.pawn-container {
+    position: relative; /* Keeps the number box positioned relative to the pawn */
+    display: inline-block; /* Ensures layout doesn't shift */
+    /* Other styles as needed */
+}
+
+.number-box {
+    position: absolute;
+    transform: translateX(-50%); /* Adjust for centering */
+    width: 40px; /* Fixed width */
+    height: 40px; /* Fixed height */
+    background-color: white;
+    border: 1px solid black;
+    padding: 5px;
+    font-size: 14px;
+    font-weight: bold; /* Bold text */
+    text-align: center; /* Center the text */
+    color: white; /* Default text color, will be adjusted by JS */
+    box-sizing: border-box; /* Prevent size changes when border or padding is adjusted */
+}
+
+/* Positioning for top and bottom rows */
+.top-box {
+    top: -40px; /* Height of the box */
+}
+
+.bottom-box {
+    bottom: -40px; /* Height of the box */
+}
+
+.kings-number-display {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    color: #007bff; // Example color, adjust as needed
+    opacity: 1;
+    transition: opacity 2s; // Fade-out effect
+    z-index: 1000; // Ensure it's above other elements
+    /* Add more styling as per your design preference */
+}
+
+
+/* BEGIN OF ENCHANTED CARD SPELL  */
+.spell-popup {
+    position: fixed;
+    right: 10px; /* Adjust as needed */
+    top: 10px; /* Adjust as needed */
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    z-index: 100;
+    display: none;
+}
+
+.spell-popup.hidden {
+    display: none;
+}
+
+.spell-popup.visible {
+    display: block;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.enchanted-ground {
+    position: relative;
+    box-shadow: 0 0 10px 2px rgba(0, 150, 255, 0.7); /* Blue glow */
+    animation: pulse 2s infinite;
+}
+
+.enchanted-ground::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('path/to/sparkle.png'); /* Path to a sparkle image */
+    opacity: 0.7;
+    animation: sparkle 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes sparkle {
+    0% { background-position: 0 0; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0 0; }
+}
+#card-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.card {
+    width: 50px; /* Adjust size as needed */
+    height: 70px; /* Adjust size as needed */
+    background: url('img/card.png'); /* Adjust path as needed */
+    animation: shuffle 1s infinite;
+}
+
+@keyframes shuffle {
+    0% { transform: rotateY(0); }
+    50% { transform: rotateY(180deg); }
+    100% { transform: rotateY(0); }
+}
+/* END OF ENCHANTED CARD SPELL  */
+
+.dice-container {
+    /* Style as needed */
+    width: 50px; /* Adjust size as needed */
+    height: 70px;
+    display: none; /* Initially hidden */
+
+}
+/*FINAL STAND SPELL*/
+
+
+.mini-board-highlight {
+    border: 2px solid #f0e68c; /* Example: a gold border */
+    background-color: rgba(255, 215, 0, 0.3); /* Light yellow background */
+}
+
+.inactive-square {
+    filter: blur(2px); /* Slight blur effect */
+    pointer-events: none; /* Disable mouse interactions */
+}
+
+
+/*END OF FINAL STAND SPELL*/
+
 </style>
 </head>
 
 <body id="body">
+    <div id='background'></div>
+    
+<!-- END OF BCKGROUND CANVAS EFFECT --> 
+
+
+    <!-- NFT FETCHING -->
     <script>
-        // Function to create and display iframes for each NFT
-//         function displayNfts(nfts) {
-//   const container = document.getElementById('nfts-container'); // Container where iframes will be appended
-//   container.innerHTML = ''; // Clear the container
-
-//   nfts.forEach(nft => {
-//     const iframe = document.createElement('iframe');
-//     iframe.classList.add('nft-iframe');
-//     iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
-//     iframe.allowFullscreen = true;
-//     iframe.height = '100%';
-//     iframe.sandbox = 'allow-scripts';
-//     iframe.width = '15%';
-//     iframe.style = 'min-height: 30px;';
-//     iframe.src = nft.media.url; // Set the src to the NFT's media URL
-//     iframe.title = nft.name;
-
-//     container.appendChild(iframe); // Add the iframe to the container
-//   });
-// }
-//        function displayNfts(nfts) {
-//   const container = document.getElementById('nfts-container');
-//   container.innerHTML = '';
-
-//   nfts.forEach(nft => {
-//     const nftBox = document.createElement('div');
-//     nftBox.classList.add('nft-box');
-//     nftBox.style = 'width: 15%;'; // Adjust styling as needed
-//     nftBox.setAttribute('data-url', nft.media.url);
-//     nftBox.setAttribute('data-name', nft.name);
-//     nftBox.setAttribute('data-tokenId', nft.tokenId);
-
-//     const iframe = document.createElement('iframe');
-//     iframe.classList.add('nft-iframe');
-//     iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
-//     iframe.allowFullscreen = true;
-//     iframe.style = 'width: 100%; height: 100%; border: 1px;'; // Adjust as needed
-//     iframe.src = nft.media.url;
-//     iframe.title = nft.name;
-
-//     // Append the iframe to the clickable box
-//     nftBox.appendChild(iframe);
-//     container.appendChild(nftBox);
-
-//     // Add click event listener to the box
-//     nftBox.addEventListener('click', async function() {
-//       const url = this.getAttribute('data-url');
-//       const name = this.getAttribute('data-name');
-//       const tokenId = this.getAttribute('data-tokenId');
-
-//       // Here you can handle the click as desired
-//       console.log(`NFT clicked: ${name} with Token ID: ${tokenId}`);
-
-//       // You can also call fetchAndExtractClasses or any other function you need
-//       // For example:
-//       const className = await fetchAndExtractClasses(url, 'some-class');
-//       console.log(`Class name within some-class:`, className);
-
-//       // Perform further actions as needed
-//     });
-//   });
-// } 
        // Function to create and display iframes for each NFT
-function displayNfts(nfts) {
+function displayNfts(nfts, chessGame) 
+{
+    // console.log("chessGame in displayNfts function :", chessGame);
   const container = document.getElementById('nfts-container');
   container.innerHTML = '';
   container.style.display = 'flex'; // Use flexbox to layout children horizontally
   container.style.flexWrap = 'wrap'; // Allow items to wrap as needed
   container.style.gap = '10px'; // Add gap between items for better spacing
-
-  nfts.forEach(nft => {
+  // console.log("gameStarted", gameStarted);
+  nfts.forEach(nft => 
+  {
     const nftBox = document.createElement('div');
     nftBox.classList.add('nft-box');
     nftBox.style = 'min-width: 15%; position: relative;'; // Ensure minimum width and use relative positioning
@@ -339,35 +810,86 @@ function displayNfts(nfts) {
 
     nftBox.appendChild(iframe);
     // Add a single click event listener to the container for event delegation
-  nftBox.addEventListener('click', function(event) {
-      console.log('Clicked element:', event.target);
-      const name = nft.name;
-      const tokenId = nft.tokenId;
-      console.log(`NFT clicked: ${name} with Token ID: ${tokenId}`);
+    nftBox.addEventListener('click', async function(event)
+    {
+    //     if (gameStarted) {
+    //     console.log("Game has started, changing spells is disabled.");
+    //     return; // Exit the function early
+    // }
 
-      // Call fetchAndExtractClasses with the URL of the clicked NFT
-      const htmlUrl = `https://ipfs-gw.stargaze-apis.com/ipfs/bafybeidwo4kicq35xnvmbaynl334uif26phmmk63sxncn76rhkyyo4ll6i/${tokenId}.html`;
-      
-      // Replace 'robe' with the actual class you want to extract
-      fetchAndExtractClasses(htmlUrl, 'robe').then(className => {
-        console.log('Class name within robe:', className);
-      });
+    console.log('Clicked element:', event.target);
+        const name = nft.name;
+        const tokenId = nft.tokenId;
+        console.log(`NFT clicked: ${name} with Token ID: ${tokenId}`);
 
-      fetchAndExtractClasses(htmlUrl, 'staff').then(className => {
-        console.log('Class name within staff:', className);
-      });
+        // Call fetchAndExtractClasses with the URL of the clicked NFT
+        const htmlUrl = `https://ipfs-gw.stargaze-apis.com/ipfs/bafybeidwo4kicq35xnvmbaynl334uif26phmmk63sxncn76rhkyyo4ll6i/${tokenId}.html`;
+        const robeClassName = await fetchAndExtractClasses(htmlUrl, 'robe');
+        const staffClassName = await fetchAndExtractClasses(htmlUrl, 'staff');
+        const hatClassName = await fetchAndExtractClasses(htmlUrl, 'hat');
+        const beardName = await fetchAndExtractClasses(htmlUrl, 'beard')
+        console.log('beardName', beardName);
+        //BEARD BACKGROUND
+        if (beardName === 'rainbow-beard') {
+            console.log('rainbow-background activated');
+            document.body.classList.add('rainbow-background');
+        } else {
 
-      fetchAndExtractClasses(htmlUrl, 'hat').then(className => {
-        console.log('Class name within hat:', className);
-      });
+            console.log('You dont have a rainbox attribute');
+            body.classList.remove('rainbow-background');
+        }
 
+        // Now fetch the corresponding SVG code from spellsExplain.html
+        const robeSvg = await fetchSvgFromSpellsExplain('robe', robeClassName);
+        const staffSvg = await fetchSvgFromSpellsExplain('staff', staffClassName);
+        const hatSvg = await fetchSvgFromSpellsExplain('hat', hatClassName);
 
+        // console.log('Robe SVG:', robeSvg);
+        // console.log('Staff SVG:', staffSvg);
+        // console.log('Hat SVG:', hatSvg);
+
+        document.getElementById('robeSpell-button').innerHTML = robeSvg;
+         document.getElementById('robeSpell-button').setAttribute('data-spell', robeClassName);
+
+        document.getElementById('staffSpell-button').innerHTML = staffSvg;
+         document.getElementById('staffSpell-button').setAttribute('data-spell', staffClassName);
+    // const staffSpellButton = document.getElementById('staffSpell-button');
+    //       if (staffSpellButton) {
+    //         staffSpellButton.removeEventListener('click', chessPiece.castAdeptWandSpell); // Remove previous listener if any
+    //         staffSpellButton.addEventListener('click', chessGame.castAdeptWandSpell.bind(chessGame));
+    //     }
+
+        document.getElementById('hatSpell-button').innerHTML = hatSvg;
+         document.getElementById('hatSpell-button').setAttribute('data-spell', hatClassName);
+         
     });
 
     container.appendChild(nftBox);
   });
 
   
+}
+
+
+async function fetchSvgFromSpellsExplain(traitType, className) {
+    try {
+        const response = await fetch('./jsFiles/spellsExplain2.html');
+        const htmlText = await response.text();
+        const parser = new DOMParser();
+        const htmlDoc = parser.parseFromString(htmlText, 'text/html');
+
+        // Since each trait is wrapped in a <g> element with a specific class, target that directly
+        const svgContainer  = htmlDoc.querySelector(`g.${className}`);
+        if (!svgContainer ) {
+            console.error(`No SVG found for class ${className} and trait ${traitType}.`);
+            return '';
+        }
+        const svgElement = svgContainer.querySelector('svg');
+        return svgElement ? svgElement.outerHTML : '';
+            } catch (error) {
+        console.error('Error fetching SVG:', error);
+        return '';
+    }
 }
 
 
@@ -385,7 +907,6 @@ function displayNfts(nfts) {
       query: `
         query NFTs($ownerAddrOrName: String, $filterByCollectionAddrs: [String!], $limit: Int) {
           tokens(ownerAddrOrName: $ownerAddrOrName, filterByCollectionAddrs: $filterByCollectionAddrs, limit: $limit) {
-
             tokens {
                 rarityOrder
                 name
@@ -395,7 +916,6 @@ function displayNfts(nfts) {
                     format
                     type
                     url
-
                 }
             }
           }
@@ -404,7 +924,7 @@ function displayNfts(nfts) {
       variables: { 
         "ownerAddrOrName": accounts[0].address,
         "filterByCollectionAddrs": ["stars18d7ver7mmjdt06mz6x0pz09862060kupju75kpka5j0r7huearcsq0gyg0"],
-        "limit": 100
+        "limit": 100,
     }
     };
 
@@ -414,12 +934,12 @@ function displayNfts(nfts) {
       body: JSON.stringify(query),
     });
     const data = await response.json();
-      //console.log(data);
+       console.log(data);
       const nfts = data.data.tokens.tokens;
     displayNfts(nfts);
       // Here you can update your HTML with the data received
       // For example, if you have a <div id="nft-data"></div> in your HTML
-      // document.getElementById('nft-data').textContent = JSON.stringify(data, null, 2);
+       //document.getElementById('nft-data').textContent = JSON.stringify(data, null, 2);
      } catch (error) {
     console.error('Error fetching NFTs:', error);
   }
@@ -450,23 +970,88 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
   }
 }
 
-
- 
-
-
+// gameStarted = true;
 </script>
+<!-- END OF FETHCING NFT and SVG -->
+<!-- <div id="background"></div> -->
+
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+    
+<!-- <div id="turn-timer" class="turn-timer-display">Time Left: 60 seconds</div> -->
+<div id="extra-white-timer-display" class="extra-timer-display">Extra Time for BlackPlayer: 300 seconds</div>
+<div id="extra-black-timer-display" class="extra-timer-display">Extra Time for WhitePlayer 300 seconds</div>
+
+<div id="turn-count-display" class="turn-count-display">Turn: 0</div>
+<div id="turn-timer" class="turn-timer-display">Time Left: -- seconds</div>
+<a href="./jsFiles/spellsExplain2.html">INFORMATIONS ABOUT SPELLS</a>
+
 <div id="spell-buttons">
-  <div id="defensive-spell-button" class="spell-button">
-    Cast Defensive Spell
+
+  <div id="robeSpell-button" class="spell-button" data-spell="">
+    Cast Robe Spell
   </div>
-  <div id="offensive-spell-button" class="spell-button">
-    Cast Offensive Spell
+
+  <div id="hatSpell-button" class="spell-button" data-spell="">
+    Cast hat Spell
+  </div>
+
+
+<div id="staffSpell-button" class="spell-button" data-spell="">
+    Cast Staff Spell
+
   </div>
 </div>
 
-  
+<div id="select-square-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-button">&times;</span>
+    <p>Please select a square to place the pawn.</p>
+  </div>
+</div>
+  <img id="lightsaber" src="img/ligtsaber1.png" style="display: none; position: absolute; height: 100%;">
+<div id="game-ui">
+    <!-- Other game elements -->
+    <div id="spell-interaction" class="spell-popup hidden">
+    <div id="card-container">
+        <!-- Images or divs representing the cards -->
+    </div>
+    <h3 id="spell-name"></h3>
+    <p id="spell-description"></p>
+</div>
+
+<div id="dice-container" class="dice-container">
+    <img id="dice-image" src="path_to_default_dice_image.png" alt="Dice">
+</div>
+
+
+
+</div>
   <div id="chessboard">
 
+    
     <div class="chess-square dark" data-row="0" data-col="0" id="square-0-0">
         <div class="chess-piece">
             <div class="white-rook" src="images/whiteROOK.png"></div>
@@ -572,7 +1157,7 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
     <div class="chess-square dark" data-row="2" data-col="6" id="square-2-6"></div>
     <div class="chess-square light" data-row="2" data-col="7" id="square-2-7"></div>
     <div class="chess-square light" data-row="3" data-col="0" id="square-3-0"></div>
-    <div class="chess-square  dark" data-row="3" data-col="1" id="square-3-1"></div>
+    <div class="chess-square dark" data-row="3" data-col="1" id="square-3-1"></div>
     <div class="chess-square light" data-row="3" data-col="2" id="square-3-2"></div>
     <div class="chess-square dark" data-row="3" data-col="3" id="square-3-3"></div>
     <div class="chess-square light" data-row="3" data-col="4" id="square-3-4"></div>
@@ -693,6 +1278,18 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
     </div>
 
     </div>
+    <div id="mini-boards-container" style="display: none;">
+    <div id="topLeft-mini-board" class="mini-board">
+        <div class="chess-square dark" data-row="2" data-col="0" id="square-2-0"></div>
+        <div class="chess-square light" data-row="2" data-col="1" id="square-2-1"></div>
+        <div class="chess-square dark" data-row="2" data-col="2" id="square-2-2"></div>
+        <div class="chess-square light" data-row="2" data-col="3" id="square-2-3"></div>
+        <div class="chess-square dark" data-row="2" data-col="4" id="square-2-4"></div>
+    </div>
+    <div id="topRight-mini-board" class="mini-board"></div>
+    <div id="bottomLeft-mini-board" class="mini-board"></div>
+    <div id="bottomRight-mini-board" class="mini-board"></div>
+</div>
 <button id="fetch-nfts-button" onclick= "fetchNFTs()">Fetch NFT Data</button>
 <div id="nfts-container"></div>
 
@@ -807,6 +1404,7 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
             chessBoard.createBoardElements();
             chessBoard.createPiece(type, color, row, col, imagePath, elementId, game);
             chessBoard.placePieces();
+         
             consoleLogVariables();
             console.log("Board in html", this.game.board);
             console.log("Board in html", game.board);
@@ -858,6 +1456,176 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
 }
     }, false);
 
+document.getElementById('spell-buttons').addEventListener('click', function(event) {
+    console.log("Spell button clicked:", event.target.id);
+    if (event.target.classList.contains('spell-button')) {
+        const spellType = event.target.dataset.spell;
+            console.log("Spell type:", spellType);
+        if (spellType) {
+            castSpell(spellType);
+        }
+    }
+});
+
+function castSpell(spellType, board, chessBoard, chessGame) 
+{
+    switch (spellType) 
+    {
+            //STAFF SPELLS//
+    case 'staff-of-fire':
+    chessPiece.preparePawnCreation('FirePawn'); // Replace 'fireElementId' with the actual element ID
+    break;
+    
+    case 'staff-of-water':  
+    chessPiece.preparePawnCreation('WaterPawn');
+    console.log(" preparePawnCreation sucessfully called on WaterPawn");
+    break;
+    
+    case 'staff-of-air':  
+    // chessPiece.preparePawnCreation('AirPawn');
+        chessPiece.castTowerSpell()
+    break;
+
+    case 'staff-of-light':  
+   // chessPiece.preparePawnCreation('LightPawn');
+       
+        // chessPiece.castRealityShatterSpell(); SPELL NOT WORKING AT ALL
+
+        
+
+
+    break;
+
+    case 'staff-of-earth' : 
+    chessPiece.preparePawnCreation('Earthpawn');
+
+    break;
+
+    case 'ice':  
+        // chessPiece.castEnchantedGroundSpell();
+    break;
+
+    case 'novice-staff':
+           // chessPiece.applyGravitationalSpell();
+            
+
+    break;
+
+    case 'iced-out':  
+        chessPiece.castFrostGridSpell();
+    break;
+
+    case 'apprentice-wand':  
+        chessPiece.activateDaggerSpell();
+
+    break;
+
+    case 'lightsaber' :
+         chessPiece.castLightsaberSpell();
+
+    break;
+
+    case 'hourglass' :
+        chessPiece.startFinalStand();//ALMOST FINISHED JUST THE COLORING AND POSITIONNIG OF THE MINIBOARD HAS TO CONCURR TO THE PLAYER COLOR AND IT ISNT
+    break;
+    
+    case 'staff-of-chaos' :
+         chessPiece.chaosWarp(board);
+
+    break;
+
+    case 'staff-of-the-necromancer' :
+        chessPiece.castNecronomancerSpell();
+
+    break;
+
+    case 'apprentice-staff' :
+        chessPiece.castDigitzKingSpell();
+    break;
+    case 'apprentice-wand' :
+
+    break;
+    
+    case 'orbs-of-illusion' :
+              chessPiece.castChaosTheorySpell();
+
+
+    break;
+    
+    case 'adept-wand' :
+ chessPiece.castAdeptWandSpell(chessBoard, chessGame); //PROBLEME AVEC le changement de tours, concernant le nombre de tours qu'il reste pour le rift spell, et sa désimplemntation.
+
+    break;
+
+    case 'adept-staff' :
+
+    break;
+
+    case 'novice-staff' :
+
+    break;
+
+    case 'arcane-hands' :
+
+    break;
+
+    case 'staff-of-air' :
+
+    break;
+
+    case 'spoon' :
+
+    break;
+    
+    case 'excalibur' :
+
+    break;
+
+    case 'magician-wand' :
+
+    break;
+
+    case 'trident' :
+
+    break;
+
+    case 'reaper-scythe' :
+
+    break;
+
+    case 'rebel-sword' :
+
+    break;
+
+    case 'wooden-staff' :
+
+    break;
+
+    case 'broomstick' :
+
+    break;
+
+    case 'celestial-staff' :
+
+    break;
+
+    case 'cybermancer-staff' :
+
+    break;
+
+    case 'grand-master-staff' :
+
+    break;
+
+    case 'stick-of-the-forest' :
+
+    break;
+
+    case 'samba' :
+
+    break;
+  }
+}
 
 
   </script>
