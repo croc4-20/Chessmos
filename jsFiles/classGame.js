@@ -2,6 +2,7 @@ let chessArray;
 let handlePieceSelection;
 const initialize = async () => {
   
+  // const { default: ChessPiece } = await import('../savedFiles/classPiece.js');
   const { default: ChessPiece } = await import('./classPiece.js');
     console.log(ChessPiece);
     console.log(typeof ChessPiece);
@@ -65,7 +66,7 @@ export default class ChessGame
 {
   constructor(chessArray, chessBoard, handlePieceSelection, game) 
   {
-    
+    // this.castDigitzKingSpell = this.castDigitzKingSpell.bind(this);
     this.chessArray = chessArray;
     this.chessBoard = chessBoard;
     this.board = Array(8).fill(null).map(() => Array(8).fill(null));
@@ -77,7 +78,7 @@ export default class ChessGame
     this.blackCaptured = [];
     this.currentPlayer = 'white';
     this.squares = document.querySelectorAll('.chess-square');
-
+    this.checkGameStatus = 'ongoing';
     this.validMoves = [];
     this.game = {  
       board: this.board,
@@ -86,7 +87,19 @@ export default class ChessGame
       status : 'ongoing',
       turn: this.player1Id
     };
-
+    
+    this.turnCount = 0;
+    this.turnDuration = 60; // Duration of a turn in seconds
+    this.currentTurnTimeLeft = this.turnDuration;
+    this.turnTimer = null;
+    this.updateTurnDisplay();
+    this.extraTimeLimit = 5 * 60; // 5 minutes in seconds
+    this.extraTimer = null;
+    this.extraWhiteTimeLeft = this.extraTimeLimit;
+    this.extraBlackTimeLeft = this.extraTimeLimit;
+    this.extraWhiteTimer = null;
+    this.extraBlackTimer = null;
+    
         // Bind the context of this to the event listener function
     this.handlePieceSelection = this.handlePieceSelection.bind(this);
     this.handleMove = this.handleMove.bind(this);
@@ -95,7 +108,161 @@ export default class ChessGame
     //this.initializeBoard();
   }
 
- 
+ startTurn() {
+        console.log('startTurn function entered in classGame');
+
+        this.currentTurnTimeLeft = this.turnDuration;
+        this.updateTurnDisplay();
+        this.startTurnTimer();
+    }
+
+    startTurnTimer() {
+        if (this.turnTimer) {
+            clearInterval(this.turnTimer);
+        }
+        this.turnTimer = setInterval(() => {
+            if (this.currentTurnTimeLeft > 0) {
+                this.currentTurnTimeLeft--;
+                this.updateTurnDisplay();
+            } else {
+                this.endTurnMove();
+            }
+        }, 1000);
+    }
+
+    endTurnMove() {
+    console.log('endTurn function entered in classGame');
+    clearInterval(this.turnTimer);
+
+    // Determine which player's extra timer to handle
+    const player = this.currentPlayer;
+    if (this.currentTurnTimeLeft === 0) {
+        // If the current turn time runs out, start or continue the extra timer for the current player
+        if (!this.extraTimer) {
+            this.startExtraTimer(player);
+        }
+    } else {
+        // If the turn ended normally, switch players and start the next turn
+        // this.currentPlayer = player === 'white' ? 'black' : 'white';
+      console.log('chessPiece', chessPiece);
+        this.startTurn();
+        this.turnCount++;
+        this.updateTurnCountDisplay();
+    }
+}
+
+    startExtraTimer(player) {
+    if (player === 'white') {
+        if (this.extraWhiteTimer) clearInterval(this.extraWhiteTimer);
+        this.extraWhiteTimer = setInterval(() => {
+            if (this.extraWhiteTimeLeft > 0) {
+                this.extraWhiteTimeLeft--;
+                this.updateExtraTimerDisplay('white');
+            } else {
+                clearInterval(this.extraWhiteTimer);
+                this.endGame("White's time is up!");
+            }
+        }, 1000);
+    } else {
+        if (this.extraBlackTimer) clearInterval(this.extraBlackTimer);
+        this.extraBlackTimer = setInterval(() => {
+            if (this.extraBlackTimeLeft > 0) {
+                this.extraBlackTimeLeft--;
+                this.updateExtraTimerDisplay('black');
+            } else {
+                clearInterval(this.extraBlackTimer);
+                this.endGame("Black's time is up!");
+            }
+        }, 1000);
+    }
+}
+updateTurnCountDisplay() {
+    const turnCountDisplay = document.getElementById('turn-count-display');
+    if (turnCountDisplay) {
+        turnCountDisplay.textContent = `Turn: ${this.turnCount}`;
+    }
+}
+
+    updateTurnDisplay() {
+    const turnDisplay = document.getElementById('turn-timer');
+    if (turnDisplay) {
+        turnDisplay.textContent = `Time Left: ${this.currentTurnTimeLeft} seconds`;
+        if (this.currentTurnTimeLeft === 0) {
+            turnDisplay.classList.add('blinking');
+        } else {
+            turnDisplay.classList.remove('blinking');
+        }
+    }
+}
+    // Update the display based on current player
+updateExtraTimerDisplay(player) {
+    const extraTimerDisplay = player === 'white' 
+        ? document.getElementById('extra-white-timer-display') 
+        : document.getElementById('extra-black-timer-display');
+    if (extraTimerDisplay) {
+        const timeLeft = player === 'white' ? this.extraWhiteTimeLeft : this.extraBlackTimeLeft;
+        extraTimerDisplay.textContent = `Extra Time for ${player === 'white' ? 'White' : 'Black'} Player: ${timeLeft} seconds`;
+    }
+}
+
+
+// syncBoardState = () => {
+//     console.log("Synchronizing board state...");
+
+//     // Initialize the game board as a 2D array
+//     this.game.board = Array.from({ length: 8 }, () => Array(8).fill(null));
+
+//     // Find all chess squares on the board
+//     const squares = document.querySelectorAll('.chess-square');
+
+//     squares.forEach(square => {
+//         const row = parseInt(square.getAttribute('data-row'), 10);
+//         const col = parseInt(square.getAttribute('data-col'), 10);
+
+//         // Find the chess piece within the square
+//         const pieceElement = square.querySelector('.chess-piece');
+
+//         if (pieceElement) {
+//             // If a piece is found, extract its type and color
+//             const type = pieceElement.getAttribute('data-type');
+//             const color = pieceElement.getAttribute('data-color');
+
+//             this.game.board[row][col] = {
+//                 occupied: true,
+//                 type: type ? type : null,
+//                 color: color ? color : null,
+//             };
+//         } else {
+//             // If no piece is found, mark the square as unoccupied
+//             this.game.board[row][col] = { occupied: false };
+//         }
+//     });
+
+//     console.log("Board state synchronized:", this.game.board);
+// };
+syncBoardState = () => {
+    console.log("Synchronizing board state...");
+    // console.log('this.game.game.board in syncBoardState', this.game.game.board);
+    console.log('this.game.board in syncBoardState', this.game.board);
+
+    // this.game.game.board = Array.from({ length: 8 }, () => Array(8).fill(null));
+
+    const squares = document.querySelectorAll('.chess-square');
+    squares.forEach(square => {
+        const row = parseInt(square.dataset.row, 10);
+        const col = parseInt(square.dataset.col, 10);
+        const pieceElement = square.querySelector('.chess-piece > div');
+
+        if (pieceElement) {
+            const [color, type] = pieceElement.className.split('-');
+            this.game.board[row][col] = { type, color };
+        }
+    });
+
+    console.log("this.game.board state synchronized:", this.board);
+        console.log('this.game.game.board state synchronized', this.game.board);
+
+};
 
   startTimer(player) 
   {
@@ -286,8 +453,6 @@ startNewGame() {
   this.legalMoves = [];  // Reset legal moves
   this.currentPlayer = 'white';  // Reset current player
 
-  // Assuming you have some setupEventListeners method somewhere
-  this.chessBoard.setupEventListeners();
 }
 
   
@@ -339,9 +504,7 @@ startNewGame() {
 }
   
 
-  endTurn() {
-    // Code to end the player's turn
-  }
+  
 
 
 
@@ -381,9 +544,13 @@ clearSelectedSquares()
 
   isLegalMove(chessPiece, newSquare) 
     {
+      console.log("isLegalMove entered")
       // Get the piece's type (e.g. pawn, knight, etc.) and color
       const pieceType = piece.type;
       const pieceColor = piece.color;
+
+      console.log ("pieceType in isLegalMove", pieceType);
+      console.log ("pieceColor in isLegalMove", pieceColor);
       // Get the current and new square coordinates
       const currentRow = parseInt(chessPiece.row);
       const currentCol = parseInt(chessPiece.col);
@@ -587,9 +754,9 @@ squares.forEach(square =>
 });
 }
 
-endTurn() {
-  this.isPlayerTurn = !this.isPlayerTurn;
-}
+// endTurn() {
+//   this.isPlayerTurn = !this.isPlayerTurn;
+// }
 
 isClearPath(chessBoard, currentRow, currentCol, newRow, newCol) 
     {
@@ -663,6 +830,11 @@ checkGameOver()
 
         // check if the game is a draw (e.g., insufficient material to checkmate)
       if (isDraw()) {
+        return true;
+      }
+
+      // Check if the extra time has run out
+      if (this.extraTimeLeft === 0) {
         return true;
       }
 
