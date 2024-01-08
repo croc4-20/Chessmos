@@ -9,17 +9,19 @@ let destinationElement;
  const validPieceTypes = ["king", "queen", "rook", "bishop", "knight", "pawn"];
 
   
-  const { default: ChessPiece } = await import('./classPiece.js');
-
+//   const { default: ChessPiece } = await import('../savedFiles/classPiece.js');
+ const { default: ChessPiece } = await import('./classPiece.js');
   class ExtendedPiece extends ChessPiece {
     constructor(type, color, row, col, imagePath, elementId, game) {
       super(type, color, row, col, imagePath, elementId, game);
     }
+    
   }
 
   async function defineExtendedPiece() {
 
-  window.ChessPiece = ExtendedPiece;
+  window.chessPiece  = ExtendedPiece;
+  
   }
   
 
@@ -27,9 +29,9 @@ async function initialize(game, pieces)
 {
   
   
-  const { default: ChessBoard } = await import('./classBoard.js');
-  const { default: ChessGame } = await import('./classGame.js');
-  const { default: ChessArray } = await import('./classArray.js');
+  const { default: ChessGame } = await import('./classGame.js').default;
+  const { default: ChessBoard } = await import('./classBoard.js').default;
+  const { default: ChessArray } = await import('./classArray.js').default;
 
   console.log("Classes imported successfully");
 
@@ -43,15 +45,7 @@ async function initialize(game, pieces)
   console.log("Initialized chessGame in classBoard:", chessGame);
 
   const chessBoard = new ChessBoard(chessGame, ChessPiece, pieces, game);
-  await chessBoard.initialize();
- 
-  
-//   chessBoard.chessGame = chessGame;
-//     console.log("chessBoard.chessGame:", chessBoard.chessGame);
-//     console.log("chessGame:", chessGame);
-//   chessGame.chessBoard = chessBoard;
-//     console.log("chessGame.chessBoard:", chessGame.chessBoard);
-//     console.log("chessGame:", chessGame);
+   await chessBoard.initialize();
 
 //Call initializeBoard after the assignments
 try {
@@ -63,7 +57,7 @@ try {
 
       // Attach event listeners
    chessBoard.squareElements.forEach((square) => {
-    square.addEventListener("click", chessBoard.handleSquareClick);
+    square.addEventListener("click", ExtendedPiece.handleClick);
   });
    console.log("Square event listeners attached."); // Add this line
    console.log("Initialization in classBoard completed.");
@@ -81,21 +75,27 @@ export default class ChessBoard
     this.moveHistory = [];
     this.currentPlayer = "white";
     this.gameStatus = "active";
-    this.game = chessGame;
+     this.game = game;
     console.log('this.Game', this.game);
     // this.game.board = [];
 
     this.boardElement = document.getElementById('chessboard'); // Set boardElement here
     this.pieces = pieces;
     this.currentlySelectedPiece = null;
-    //this.defineExtendedPiece = this.defineExtendedPiece.bind(this); // Binding this
+   defineExtendedPiece = defineExtendedPiece; // Binding this
     this.initializeBoard = this.initializeBoard.bind(this);
-    this.board = Array(8).fill(null).map(() => Array(8).fill(null));
+     this.board = Array(8).fill(null).map(() => Array(8).fill(null));
+  // this.board = this.initializeBoard();
     this.board.length = 8;
     this.ChessPiece = ChessPiece;
     this.initialize();
     this.blackPieces = [];
     this.whitePieces = [];
+     this.selectedPieceElement = null;
+     this.movePiece = this.movePiece.bind(this);
+
+    // this.populateBoardWithPieces = this.populateBoardWithPieces.bind(this);
+    // this.chaosWarp();
     //this.setupInitialPosition(pieces);
     //this.createBoard();
     //this.handleSquareClick = this.handleSquareClick.bind(this);
@@ -128,7 +128,8 @@ export default class ChessBoard
 
    async initializeBoard() {
     try {
-      console.log("Current context (this):", this);
+      console.log("Current context (this.game):", this.game);
+
       console.log("Current context (this.game):", this.game);
       if (!this.game) {
         throw new Error("Game not initialized");
@@ -137,123 +138,108 @@ export default class ChessBoard
       console.log("this.chessGame:", this.chessGame);
       this.initializeEmptyBoard();
       await this.populateBoardWithPieces();
-      await this.defineExtendedPiece();
-      this.renderBoard(this.game.board);
-      this.registerSquareClickHandlers();
+       defineExtendedPiece();
+      // renderBoard(this.game.board);
+      console.log("ExtendedPiece", ExtendedPiece);
+      // this.registerPieceClickHandlers();
     } catch (error) 
     {
       console.error("Failed to initialize board:", error);
       throw error;
     }
   }
+  async populateBoardWithPieces() {
+    // ... existing code to create pieces ...
+    // Loop through each piece and place it on the board
+    this.pieces.forEach(piece => {
+      const chessPiece = new ChessPiece(piece.type, piece.color, piece.row, piece.col, piece.imagePath, piece.elementId, this.game);
+      this.board[piece.row][piece.col] = chessPiece;
+      this.chessPieces.push(chessPiece);
 
-populateBoardWithPieces() {
-  this.game.board = [];
-  console.log("this.game.board:", this.game.board);
+      // Update the DOM for the chess piece
+      const squareElement = document.getElementById(`square-${piece.row}-${piece.col}`);
+      squareElement.innerHTML = `<div class="chess-piece ${piece.color}-${piece.type}" style="background-image: url('${piece.imagePath}')"></div>`;
+    });
+
+    console.log("Board populated with pieces:", this.board);
+  }
+
+// async populateBoardWithPieces(chessPiece) {
+//   this.game.board = [];
+//   console.log("this.game.board:", this.game.board);
     
-    // create a 2D array to represent the board
-    for (let row = 0; row < 8; row++) {
-      this.game.board[row] = [];
-      for (let col = 0; col < 8; col++) {
-        this.game.board[row][col] = null;
-      }
+//     // create a 2D array to represent the board
+//     for (let row = 0; row < 8; row++) {
+//       this.game.board[row] = [];
+//       for (let col = 0; col < 8; col++) {
+//         this.game.board[row][col] = null;
+//       }
 
-     }
-      //this.defineExtendedPiece();
+//      }
+//       //this.defineExtendedPiece();
 
-    // Add black pieces
-  this.game.board[7][0] = new window.ChessPiece("rook", "black", 7, 0, "images/blackROOK.png", "square-7-0", this);
-  console.log('this.game.board[7][0]]', this.game.board[7][0]);
-  this.game.board[7][1] = new window.ChessPiece("knight", "black", 7, 1, "images/blackKNIGHT.png", "square-7-1", this);
-  this.game.board[7][2] = new window.ChessPiece("bishop", "black", 7, 2, "images/blackBISHOP.png", "square-7-2", this);
-  this.game.board[7][3] = new window.ChessPiece("queen", "black", 7, 3, "images/blackQUEEN.png", "square-7-3", this);
-  this.game.board[7][4] = new window.ChessPiece("king", "black", 7, 4, "images/blackKING.png", "square-7-4", this);
-  this.game.board[7][5] = new window.ChessPiece("bishop", "black", 7, 5, "images/blackBISHOP.png", "square-7-5", this);
-  this.game.board[7][6] = new window.ChessPiece("knight", "black", 7, 6, "images/blackKNIGHT.png", "square-7-6", this);
-  this.game.board[7][7] = new window.ChessPiece("rook", "black", 7, 7, "images/blackROOK.png", "square-7-7", this);
+//     // Add black pieces
+//   this.game.board[7][0] = new ExtendedPiece("rook", "black", 7, 0, "img/blackROOK.png", "square-7-0", this);
+//   console.log('this.game.board[7][0]]', this.game.board[7][0]);
+//   this.game.board[7][1] = new ExtendedPiece("knight", "black", 7, 1, "img/blackKNIGHT.png", "square-7-1", this);
+//   this.game.board[7][2] = new ExtendedPiece("bishop", "black", 7, 2, "img/blackBISHOP.png", "square-7-2", this);
+//   this.game.board[7][3] = new ExtendedPiece("queen", "black", 7, 3, "img/BlackQUEEN.png", "square-7-3", this);
+//   this.game.board[7][4] = new ExtendedPiece("king", "black", 7, 4, "img/BlackKING.png", "square-7-4", this);
+//   this.game.board[7][5] = new ExtendedPiece("bishop", "black", 7, 5, "img/BlackBISHOP.png", "square-7-5", this);
+//   this.game.board[7][6] = new ExtendedPiece("knight", "black", 7, 6, "img/BlackKNIGHT.png", "square-7-6", this);
+//   this.game.board[7][7] = new ExtendedPiece("rook", "black", 7, 7, "img/BlackROOK.png", "square-7-7", this);
   
-    //Add Black PAWNS
+//     //Add Black PAWNS
 
-  this.game.board[6][0] = new window.ChessPiece("pawn", "black", 6, 0, "images/blackPAWN.png", "square-6-0", this);
-  this.game.board[6][1] = new window.ChessPiece("pawn", "black", 6, 1, "images/blackPAWN.png", "square-6-1", this);
-  this.game.board[6][2] = new window.ChessPiece("pawn", "black", 6, 2, "images/blackPAWN.png", "square-6-2", this);
-  this.game.board[6][3] = new window.ChessPiece("pawn", "black", 6, 3, "images/blackPAWN.png", "square-6-3", this);
-  this.game.board[6][4] = new window.ChessPiece("pawn", "black", 6, 4, "images/blackPAWN.png", "square-6-4", this);
-  this.game.board[6][5] = new window.ChessPiece("pawn", "black", 6, 5, "images/blackPAWN.png", "square-6-5", this);
-  this.game.board[6][6] = new window.ChessPiece("pawn", "black", 6, 6, "images/blackPAWN.png", "square-6-6", this);
-  this.game.board[6][7] = new window.ChessPiece("pawn", "black", 6, 7, "images/blackPAWN.png", "square-6-7", this);
+//   this.game.board[6][0] = new ExtendedPiece("pawn", "black", 6, 0, "images/blackPAWN.png", "square-6-0", this);
+//   this.game.board[6][1] = new ExtendedPiece("pawn", "black", 6, 1, "images/blackPAWN.png", "square-6-1", this);
+//   this.game.board[6][2] = new ExtendedPiece("pawn", "black", 6, 2, "images/blackPAWN.png", "square-6-2", this);
+//   this.game.board[6][3] = new ExtendedPiece("pawn", "black", 6, 3, "images/blackPAWN.png", "square-6-3", this);
+//   this.game.board[6][4] = new ExtendedPiece("pawn", "black", 6, 4, "images/blackPAWN.png", "square-6-4", this);
+//   this.game.board[6][5] = new ExtendedPiece("pawn", "black", 6, 5, "images/blackPAWN.png", "square-6-5", this);
+//   this.game.board[6][6] = new ExtendedPiece("pawn", "black", 6, 6, "images/blackPAWN.png", "square-6-6", this);
+//   this.game.board[6][7] = new ExtendedPiece("pawn", "black", 6, 7, "images/blackPAWN.png", "square-6-7", this);
   
-    // Add WHITE pieces
-  this.game.board[0][0] = new window.ChessPiece("rook", "white", 0, 0, "images/whiteROOK.png", "square-0-0", this);
-  this.game.board[0][1] = new window.ChessPiece("knight", "white", 0, 1, "images/whiteKNIGHT.png", "square-0-1", this);
-  this.game.board[0][2] = new window.ChessPiece("bishop", "white", 0, 2, "images/whiteBISHOP.png", "square-0-2", this);
-  this.game.board[0][3] = new window.ChessPiece("queen", "white", 0, 3, "images/whiteQUEEN.png", "square-0-3", this);
-  this.game.board[0][4] = new window.ChessPiece("king", "white", 0, 4, "images/whiteKING.png", "square-0-4", this);
-  this.game.board[0][5] = new window.ChessPiece("bishop", "white", 0, 5, "images/whiteBISHOP.png", "square-0-5", this);
-  this.game.board[0][6] = new window.ChessPiece("knight", "white", 0, 6, "images/whiteKNIGHT.png", "square-0-6", this);
-  this.game.board[0][7] = new window.ChessPiece("rook", "white", 0, 7, "images/whiteROOK.png", "square-0-7", this);
+//     // Add WHITE pieces
+//   this.game.board[0][0] = new ExtendedPiece("rook", "white", 0, 0, "images/whiteROOK.png", "square-0-0", this);
+//   this.game.board[0][1] = new ExtendedPiece("knight", "white", 0, 1, "img/whiteKNIGHT.png", "square-0-1", this);
+//   this.game.board[0][2] = new ExtendedPiece("bishop", "white", 0, 2, "img/whiteBISHOP.png", "square-0-2", this);
+//   this.game.board[0][3] = new ExtendedPiece("queen", "white", 0, 3, "images/whiteQUEEN.png", "square-0-3", this);
+//   this.game.board[0][4] = new ExtendedPiece("king", "white", 0, 4, "images/whiteKING.png", "square-0-4", this);
+//   this.game.board[0][5] = new ExtendedPiece("bishop", "white", 0, 5, "img/whiteBISHOP.png", "square-0-5", this);
+//   this.game.board[0][6] = new ExtendedPiece("knight", "white", 0, 6, "img/whiteKNIGHT.png", "square-0-6", this);
+//   this.game.board[0][7] = new ExtendedPiece("rook", "white", 0, 7, "images/whiteROOK.png", "square-0-7", this);
   
-      //Add white pawns
-  this.game.board[1][0] = new window.ChessPiece("pawn", "white", 1, 0, "images/whitePAWN.png", "square-1-0", this);
-  this.game.board[1][1] = new window.ChessPiece("pawn", "white", 1, 1, "images/whitePAWN.png", "square-1-1", this);
-  this.game.board[1][2] = new window.ChessPiece("pawn", "white", 1, 2, "images/whitePAWN.png", "square-1-2", this);
-  this.game.board[1][3] = new window.ChessPiece("pawn", "white", 1, 3, "images/whitePAWN.png", "square-1-3", this);
-  this.game.board[1][4] = new window.ChessPiece("pawn", "white", 1, 4, "images/whitePAWN.png", "square-1-4", this);
-  this.game.board[1][5] = new window.ChessPiece("pawn", "white", 1, 5, "images/whitePAWN.png", "square-1-5", this);
-  this.game.board[1][6] = new window.ChessPiece("pawn", "white", 1, 6, "images/whitePAWN.png", "square-1-6", this);
-  this.game.board[1][7] = new window.ChessPiece("pawn", "white", 1, 7, "images/whitePAWN.png", "square-1-7", this);
+//       //Add white pawns
+//   this.game.board[1][0] = new ExtendedPiece("pawn", "white", 1, 0, "images/whitePAWN.png", "square-1-0", this);
+//   this.game.board[1][1] = new ExtendedPiece("pawn", "white", 1, 1, "images/whitePAWN.png", "square-1-1", this);
+//   this.game.board[1][2] = new ExtendedPiece("pawn", "white", 1, 2, "images/whitePAWN.png", "square-1-2", this);
+//   this.game.board[1][3] = new ExtendedPiece("pawn", "white", 1, 3, "images/whitePAWN.png", "square-1-3", this);
+//   this.game.board[1][4] = new ExtendedPiece("pawn", "white", 1, 4, "images/whitePAWN.png", "square-1-4", this);
+//   this.game.board[1][5] = new ExtendedPiece("pawn", "white", 1, 5, "images/whitePAWN.png", "square-1-5", this);
+//   this.game.board[1][6] = new ExtendedPiece("pawn", "white", 1, 6, "images/whitePAWN.png", "square-1-6", this);
+//   this.game.board[1][7] = new ExtendedPiece("pawn", "white", 1, 7, "images/whitePAWN.png", "square-1-7", this);
   
-  console.log("Initializing the board...");
-  console.log("Initial board state:", this.game.board);
- // this.renderBoard(this.game.board);
-  this.squareElements = document.querySelectorAll(".chess-square");
-  this.registerSquareClickHandlers();
+//   console.log("Initializing the board...");
+//   console.log("Initial board state:", this.game.board);
+//  // this.renderBoard(this.game.board);
+//   this.squareElements = document.querySelectorAll(".chess-square");
+//   console.log("chesspiece in populateBoardWithPieces", ExtendedPiece);
+//   // this.registerPieceClickHandlers();
 
-  // await this.defineExtendedPiece();
-  console.log("Board initialization completed.");
-  return Promise.resolve();
-}
+//   // await this.defineExtendedPiece();
+//   console.log("Board initialization completed.");
+//   return Promise.resolve();
+// }
 
 initializeEmptyBoard() {
   this.game.board = Array.from({ length: 8 }, () => Array(8).fill(null));
 }
 
-// renderBoard(board) {
-//   console.log("Rendering the board...");
-//   console.log("Game board:", board);
-//   const boardContainer = document.getElementById("chessboard");
-//   boardContainer.innerHTML = "";
-
-//   for (let row = 0; row < 8; row++) {
-//     for (let col = 0; col < 8; col++) {
-//       const square = document.createElement("div");
-//       square.classList.add("chess-square");
-//       square.id = `square-${row}-${col}`;
-//       square.dataset.row = row;
-//       square.dataset.col = col;
-
-//       if ((row + col) % 2 === 0) {
-//         square.classList.add("light");
-//       } else {
-//         square.classList.add("dark");
-//       }
-
-//       if (board[row][col] !== null) {
-//         const piece = document.createElement("img");
-//         piece.src = board[row][col].imagePath;
-//         piece.classList.add("chess-piece");
-//         square.appendChild(piece);
-//       }
-
-//       boardContainer.appendChild(square);
-//     }
-//   }
-//   console.log("Board rendering completed.");
-// }
 
 async runChessGame() {
   try {
-    await this.defineExtendedPiece();
+    this.defineExtendedPiece();
     const { chessArray, chessBoard, chessGame } = await this.initialize(game, this.pieces);
     
     this.chessArray = chessArray;
@@ -271,16 +257,16 @@ async runChessGame() {
     console.error("Failed to run the chess game:", error);
   }
 }
-
-registerSquareClickHandlers() {
-  const self = this; // Store the reference to 'this' for later use
-
-  this.squareElements.forEach((squareElement) => {
-    squareElement.addEventListener("click", function(event) {
-      self.handleSquareClick(event); // Pass the event object to handleSquareClick
+registerPieceClickHandlers() {
+    this.chessPieces.forEach((piece) => {
+        const pieceElement = piece.getDOMElement(); // Assuming getDOMElement() returns the DOM element of the piece
+        pieceElement.addEventListener("click", (event) => {
+            piece.handleClick(event);
+            
+        }, { once: true });
     });
-  });
 }
+
 
 setupInitialPosition(pieces, chessBoard, game, chessArray) {
   pieces.forEach((piece) => {
@@ -497,16 +483,19 @@ resetBoardColors() {
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
       const square = document.getElementById(`square-${col}-${row}`);
-      square.classList.remove("light", "dark");
-      if ((row + col) % 2 === 0) {
-        square.classList.add("light");
+      if (square) {  // Make sure the square exists
+        square.classList.remove("light", "dark");
+        if ((row + col) % 2 === 0) {
+          square.classList.add("dark");
+        } else {
+          square.classList.add("light");
+        }
       } else {
-        square.classList.add("dark");
+        console.error(`Square at ${col}-${row} not found.`);
       }
     }
   }
 }
-
 
   
   removePiece(row, col) {
@@ -530,163 +519,573 @@ resetBoardColors() {
 
 
 getPiece(row, col) {
+  console.log('getPiece function called');
     if (row < 0 || row > 7 || col < 0 || col > 7) {
-      return null;
+        return null;
     }
-    for(let i = 0; i < this.chessPieces.length; i++) {
-        const piece = this.chessPieces[i];
-        if(piece.row === row && piece.col === col) {
-            return this.board[row][col];
+    return this.game.board[row][col];
+}
+
+
+    movePiece(targetSquare, game, pieceElement, destinationElement) {
+      console.log('Target Square:', targetSquare);
+      console.log('Game:', game);
+      console.log('Destination Element:', destinationElement)
+      pieceElement = document.querySelector(".selected-piece");
+      console.log('Piece Element in movePiece:', pieceElement);
+      console.log("Current context of this in movePiece:", this);
+      console.log("game in in movePiece", game);
+      console.log("game.game.board in movePiece", game.game.board);
+
+
+        if (!this.validateMoveInputs(targetSquare, game, pieceElement, destinationElement)) {
+            return false;
         }
-    }
-    return null;
-  }
+         this.selectPiece(pieceElement);
+
+        const targetCoords = this.getSquareCoords(targetSquare);
+        console.log("targetCoords in movePiece :", targetCoords);
+        if (!this.validateCoords(targetCoords, game)) {
+            return false;
+        }
+
+       const selectedElement = this.getSelectedPieceElement();
+       const parentElement = this.selectedPieceParent; // Use the stored parent
+        console.log("Parent element in movePiece :", parentElement);
+
+        console.log('selectedElement', selectedElement);
+        if (!selectedElement) {
+            console.log("Selected piece not found.");
+            return false;
+        }
 
 
 
-  movePiece(targetSquare, game, pieceElement, destinationElement) {
-    console.log("movePiece function in classBoard.js called"); 
-    console.log("game in movePiece:", game);
-    console.log("this.game in movePiece:", this.game);
-    
-    console.log("targetSquare in movePiece:", targetSquare);
-    console.log("pieceElement in movePiece:", pieceElement);
-    console.log("destinationElement in movePiece:", destinationElement);
+        if (!parentElement) {
+            console.log("Parent element not found.");
+            return false;
+        }
 
-    if (!targetSquare || !game || !pieceElement || !destinationElement) 
-    {
-      console.error('Invalid arguments.');
-      return false;
-    }
-
-    const targetRow = parseInt(targetSquare.dataset.row, 10);
-    const targetCol = parseInt(targetSquare.dataset.col, 10);
-    this.setGame(game);
-    console.log("game set", this.setGame(game));
-
-    if (isNaN(targetRow) || isNaN(targetCol)) 
-    {
-      console.error('Invalid target row or column.');
-      return false;
-    }
-
-    // Check if a piece is selected and find it on the board
-    const selectedElement = document.querySelector('.selected-piece');
-    if (selectedElement) 
-    {
-      const parentElement = selectedElement.closest('.chess-square');
-       if (parentElement) {
-      console.log('pieceFound', selectedElement);
-      console.log('squareFound', parentElement);
-      console.log('Dataset row:', parentElement.dataset.row);
-      console.log('Dataset col:', parentElement.dataset.col);
-      const row = parseInt(parentElement.dataset.row, 10);
-      const col = parseInt(parentElement.dataset.col, 10);
-
-      console.log('row from parseInt:', row);
-      console.log('col from parseInt:', col);
-      
-      console.log("Is row >= 0?", row >= 0);
-      console.log("Is col >= 0?", col >= 0);
-      console.log("Board length:", this.board.length);
-      console.log("Board :", this.board);
-      console.log("this.boardElement :", this.boardElement);
+        const originalCoords = this.getSquareCoords(parentElement);
+        if (!this.validateCoords(originalCoords)) {
+          console.log('false corords');
+            return false;
+        }
 
 
-      console.log("Is row < this.board.length?", row < this.board.length);
-      console.log("Is col < this.board[0].length?", col < this.game.board[0].length);
-      console.log("Board dimensions:", this.board.length, this.game.board[0].length);
-      
-      if (row >= 0 && col >= 0 && row < this.game.board.length && col < this.game.board[0].length) 
-      {
-        console.log(`Board piece at [${row}][${col}]:`, this.game.board[row][col]);
-        this.currentlySelectedPiece = this.game.board[row][col];
+        if (targetSquare.classList.contains('valid-move')) {
+          console.log('validmove entered trying to call executemove');
+          this.executeMove(originalCoords, targetCoords, selectedElement, parentElement, game);
+          
+          console.log('selectedElement.row', selectedElement.row);
+          const chessPiece = this.getPiece(selectedElement.row, selectedElement.col);
+          console.log('chessPiece right after executeMovecalled in movepiece.');
+          // Check and handle the rift after executing the move
+            if (chessPiece) {
+              console.log("trying to call postMoveActions");
+               // Call postMoveActions on the ChessPiece instance
+            chessPiece.postMoveActions(targetCoords);
         } else {
-          console.log("Row and/or Col are out of bounds.");
+            console.error("ChessPiece instance not found for the selected element.");
         }
-      } else {
-        console.log("Parent element not found.");
-      }
-    } else {
-      console.log("Selected piece not found.");
+
+
+            console.log('this context in removePiece before calling updateGameStateInMovePiece', this);
+            this.updateGameStateInMovePiece(targetSquare, destinationElement, game);
+            return true;
+        }
+        
+        console.log("Invalid move attempted.");
+        return false;
+    }
+    isPieceInRift(targetCoords, game) {
+      console.log('isPieceInRift function called');
+    const riftArea = game.getRiftArea();
+    console.log("Rift Area:", riftArea);
+    console.log("Target Coordinates:", targetCoords);
+
+    return riftArea.some(([riftRow, riftCol]) => {
+        console.log(`Checking rift position: (${riftRow}, ${riftCol}) against target position: (${targetCoords.row}, ${targetCoords.col})`);
+        return riftRow === targetCoords.row && riftCol === targetCoords.col;
+    });
+}
+
+    // Helper Functions
+    validateMoveInputs(targetSquare, game, pieceElement, destinationElement) {
+    if (!targetSquare || !game || !pieceElement || !destinationElement) {
+        console.error('Invalid arguments.', "targetSquare", targetSquare, "game", game, "pieceElement", pieceElement, "destinationElement", destinationElement);
+        return false;
+    }
+    return true;
+}
+
+
+    getSquareCoords(square) {
+    return {
+        row: parseInt(square.dataset.row, 10),
+        col: parseInt(square.dataset.col, 10)
+    };
+}
+validateCoords({ row, col }) {
+    const isRowValid = row >= 0 && row < 8; // Board size is hardcoded to 8x8
+    const isColValid = col >= 0 && col < 8;
+
+    if (!isRowValid || !isColValid) {
+        console.error('Invalid target row or column.');
+        return false;
+    }
+    return true;
+}
+
+//     validateCoords({ row, col }, game) {
+//     console.log("Current context of this in validateCoords:", this);
+//     // console.log("game.game in validateCoords", this.game.game);
+    
+//     // console.log("this.game in validateCoords", this.game);
+//     console.log("game.game.board in validateCoords", game.game.board);
+//     console.log("game.game.board in validateCoords.length", game.game.board.length);
+//     const lengthRow = game.game.board.length;
+//     const lengthCol = game.game.board[0].length;
+//     console.log("lengthRow", lengthRow);
+//     console.log("lengthCol", lengthCol);
+//     const isRowValid = row >= 0 && row < lengthRow;
+//     console.log("isRowValid in validateCoords", isRowValid);
+
+//     const isColValid = col >= 0 && col < lengthCol;
+//     console.log("isColValid in validateCoords", isColValid);
+
+//     if (!isRowValid || !isColValid) {
+//         console.error('Invalid target row or column.');
+//         return false;
+//     }
+//     console.log('end of validateCoords funtion');
+//     return true;
+// }
+
+    selectPiece(pieceElement) {
+      console.log("pieceElement in selecPiece function :", pieceElement);
+        if (pieceElement && pieceElement instanceof Element) {
+            this.selectedPieceElement = pieceElement;
+            this.selectedPieceParent = pieceElement.parentNode;
+            console.log("this.selectedPieceParent in selectPiece :", this.selectedPieceParent);
+
+
+            pieceElement.classList.add('selected-piece');
+        } else {
+            console.error('Invalid piece element selected:', pieceElement);
+        }
     }
 
-    if (!this.currentlySelectedPiece) 
-      {
-        console.error('No piece is currently selected. Returned movePiece in classBoard.js');
-        return;
-      }
-      
-      // Calculate valid moves
-      const validMoves = this.currentlySelectedPiece.calculateValidMoves
-      (
-        this.currentlySelectedPiece.row,
-        this.currentlySelectedPiece.col,
-        this.board
-        );
-
-      console.log(validMoves);
-      console.log("Target Row:before invalidmove statement:", targetRow);
-      console.log("Target Col:before invalidmove statement:", targetCol);
-     // console.log("Board before move:", JSON.stringify(this.game.board));
-
-      if (!validMoves.some(move => move.row === targetRow && move.col === targetCol)) 
-      {
-        alert("Invalid move");
-        return;
-      }
-
-      // Perform the actual move
-      const originalRow = this.currentlySelectedPiece.row;
-      const originalCol = this.currentlySelectedPiece.col;
-      this.game.board[originalRow][originalCol] = null;
-      this.game.board[targetRow][targetCol] = this.currentlySelectedPiece;
-      this.currentlySelectedPiece.row = targetRow;
-      this.currentlySelectedPiece.col = targetCol;
-
-      Array.from(destinationElement.children).forEach(child => 
-      {
-        if (child.classList.contains("pattern")) 
-        {
-          destinationElement.removeChild(child);
+    deselectPiece() {
+        if (this.selectedPieceElement) {
+            this.selectedPieceElement.classList.remove('selected-piece');
+            this.selectedPieceElement = null;
         }
-      });
+    }
 
-      this.resetBoardColors();
+    getSelectedPieceElement() {
+        return this.selectedPieceElement;
+    }
 
-      //const pieceElement = document.getElementById(`square-${originalRow}-${originalCol}`);
-      pieceElement.classList.remove("selected-piece", "has-piece");
+    executeMove(originalCoords, targetCoords, selectedElement, oldSquare, game) {
+      console.log("this context in executeMove in classBoard", this);
+      console.log("game context in executeMove in classBoard", game);
+      console.log("game.board in executeMove in classBoard", game.game.board);
+      console.log("oldSquare in executeMove in classBoard", oldSquare);
 
-      // this.currentlySelectedPiece.row = targetRow;
-      // this.currentlySelectedPiece.col = targetCol;
-          console.log("destinationElement right before Updategamestatecall in movePiece:", destinationElement);
 
-      this.updateGameState(event, pieceElement, destinationElement, game);
+      const { row: originalRow, col: originalCol } = originalCoords;
+      const { row: targetRow, col: targetCol } = targetCoords;
 
-      this.currentlySelectedPiece.element.style.gridRow = targetRow + 1;
-      this.currentlySelectedPiece.element.style.gridColumn = targetCol + 1;
+      // Update the board data
+      game.game.board[originalRow][originalCol] = null;
+      game.game.board[targetRow][targetCol] = this.currentlySelectedPiece;
 
-      this.currentPlayer = this.currentPlayer === "white" ? "black" : "white";
-      this.game.currentPlayer = this.currentPlayer;
-      this.game.checkGameStatus();
-      //this.clearValidMoves();
+      // Move the piece element on the UI
+      const newSquare = document.querySelector(`#square-${targetRow}-${targetCol}`);
+      console.log("newSquare in executeMove in classBoard", newSquare);
+      console.log("selectedElement in executeMove in classBoard", selectedElement);
+      oldSquare.removeChild(selectedElement);
+      newSquare.appendChild(selectedElement);
 
-      this.moveHistory.push
-      ({
-        piece: this.currentlySelectedPiece,
-        from: { row: originalRow, col: originalCol },
-        to: {row: targetRow, col: targetCol }
-      });
+      // Update UI and piece position
+      selectedElement.style.gridRow = targetRow + 1;
+      selectedElement.style.gridColumn = targetCol + 1;
+      selectedElement.classList.remove("selected-piece");
 
-      this.currentlySelectedPiece.element.classList.remove("selected-piece");
       this.currentlySelectedPiece = null;
-      console.log('this.game.board', this.game.board);
-      // console.log("Board after move:", JSON.stringify(this.game.board));
-      
-      console.log("piecemoved");
-      return true;
-    }
+      this.resetBoardColors();
+      // Post-move actions specific to the chess piece
+    // const chessPiece = this.getPiece(targetCoords.row, targetCoords.col);
+    // console.log('testest chessPiece', chessPiece);
+    // if (chessPiece) {
+    //     chessPiece.postMoveActions(targetCoords);
+    // } else {
+    //     console.error("ChessPiece instance not found after move.");
+    // }
 
+    // // Update the game state, including handling active spells and turn changes
+    // this.updateGameStateInMovePiece();
+
+    // console.log("Ending executeMove");
+  }
+   
+
+
+//   movePiece(targetSquare, game, pieceElement, destinationElement) {
+//     console.log("movePiece function in classBoard.js called"); 
+//     console.log("game in movePiece:", game);
+//     console.log("this.game in movePiece:", this.game);
+//     console.log('this.game.board at the beginning of movePiece function', this.game.board);
+
+//     console.log("targetSquare in movePiece:", targetSquare);
+//     console.log("pieceElement in movePiece:", pieceElement);
+//     console.log("destinationElement in movePiece:", destinationElement);
+//         console.log("this.selectedPiece in movePiece:", this.selectedPiece);
+
+
+//     if (!targetSquare || !game || !pieceElement || !destinationElement) 
+//     {
+//       console.error('Invalid arguments.');
+//       return false;
+//     }
+
+//     const targetRow = parseInt(targetSquare.dataset.row, 10);
+//     const targetCol = parseInt(targetSquare.dataset.col, 10);
+//     this.setGame(game);
+//     console.log("game set", this.setGame(game));
+
+//     if (isNaN(targetRow) || isNaN(targetCol)) 
+//     {
+//       console.error('Invalid target row or column.');
+//       return false;
+//     }
+
+//     // Check if a piece is selected and find it on the board
+//     const selectedElement = document.querySelector('.selected-piece');
+//     if (selectedElement) 
+//     {
+//       const parentElement = selectedElement.closest('.chess-square');
+//        if (parentElement) {
+//       console.log('pieceFound, aka selectedElement', selectedElement);
+//       console.log('squareFound', parentElement);
+//       console.log('Dataset row:', parentElement.dataset.row);
+//       console.log('Dataset col:', parentElement.dataset.col);
+//       const row = parseInt(parentElement.dataset.row, 10);
+//       const col = parseInt(parentElement.dataset.col, 10);
+
+//       console.log('row from parseInt:', row);
+//       console.log('col from parseInt:', col);
+      
+//       console.log("Is row >= 0?", row >= 0);
+//       console.log("Is col >= 0?", col >= 0);
+//       console.log("Board length:", this.board.length);
+//       console.log("this.game.board :", this.game.board);
+//       console.log("this.boardElement :", this.boardElement);
+
+
+//       console.log("Is row < this.board.length?", row < this.board.length);
+//       console.log("Is col < this.board[0].length?", col < this.game.board[0].length);
+//       console.log("Board dimensions:", this.game.board.length, this.game.board[0].length);
+      
+//       if (row >= 0 && col >= 0 && row < this.game.board.length && col < this.game.board[0].length) 
+//       {
+//         console.log(`Board piece at [${row}][${col}]:`, this.game.board[row][col]);
+//         // console.log("this.game.board:", JSON.parse(JSON.stringify(this.game.board)));
+//         this.currentlySelectedPiece = this.game.board[row][col];
+//                  console.log("this.currentlySelectedPiece right after its initialization :", this.currentlySelectedPiece);
+
+//         } else {
+//           console.log("Row and/or Col are out of bounds.");
+//         }
+//       } else {
+//         console.log("Parent element not found.");
+//       }
+//     } else {
+//       console.log("Selected piece not found.");
+//     }
+
+//        // console.log(validMoves);
+//       console.log("Target Row:before invalidmove statement:", targetRow);
+//       console.log("Target Col:before invalidmove statement:", targetCol);
+//      // console.log("Board before move:", JSON.stringify(this.game.board));
+
+//       if (targetSquare.classList.contains('valid-move')) {
+      
+// const parentElement = selectedElement.closest('.chess-square');
+// console.log("parentElement", parentElement);
+//       // Perform the actual move
+//       const originalRow = parseInt(parentElement.dataset.row, 10);
+//       const originalCol = parseInt(parentElement.dataset.col, 10);
+//       console.log("originalCol", originalCol);
+//             console.log("originalRow", originalRow);
+
+//       this.game.board[originalRow][originalCol] = null;
+//       this.game.board[targetRow][targetCol] = this.currentlySelectedPiece;
+      
+      
+
+//       // Get the parent (square) of the piece that needs to be moved
+//       const oldSquare = parentElement.closest('.chess-square');
+//        console.log("this.currentlySelectedPiece.element :", this.currentlySelectedPiece.element);
+//       console.log("this.currentlySelectedPiece :", this.currentlySelectedPiece);
+//       console.log("oldSquare before attempting to remove child:", oldSquare);
+
+//       // Get the new square where the piece should go
+//       const newSquare = document.querySelector(`#square-${targetRow}-${targetCol}`);
+      
+//       console.log("targetRow :", targetRow);
+//       console.log("targetCol :", targetCol);
+//       const actualPieceElement = oldSquare.querySelector('.chess-piece');
+//       console.log('actualPieceElement', actualPieceElement);
+
+//     // Remove the original piece from oldSquare
+//      if (oldSquare && actualPieceElement) 
+//      {
+//       console.log('Properties before removal:', actualPieceElement.classList, actualPieceElement.style);
+//       console.log('actualPieceElement', actualPieceElement);
+//       console.log("newSquare :", newSquare);
+      
+//       window.requestAnimationFrame(() => {
+//         oldSquare.removeChild(actualPieceElement);
+//         newSquare.appendChild(actualPieceElement);
+
+//         if (!oldSquare.querySelector('.chess-piece')) {
+//         oldSquare.removeAttribute("data-color");
+//         oldSquare.removeAttribute("data-type");
+//         oldSquare.classList.remove("has-piece");
+//             oldSquare.style.backgroundImage = '';
+      
+//       // Assuming the piece type and color are stored in the class of actualPieceElement
+//     const pieceType = actualPieceElement.className.split(' ')[1]; // e.g., "white-pawn"
+//     const [pieceColor, pieceName] = pieceType.split('-'); // Split into "white" and "pawn"
+
+       
+//         newSquare.setAttribute("data-type", pieceType);
+//         newSquare.setAttribute("data-color", pieceColor);
+//         newSquare.classList.add("has-piece");
+
+// }
+//       });
+//           // Update the piece's DOM properties
+//       actualPieceElement.style.gridRow = targetRow + 1;
+//       actualPieceElement.style.gridColumn = targetCol + 1;
+//       actualPieceElement.classList.remove("selected-piece");
+      
+//       // Deselect the piece after moving
+      
+//       console.log('Properties after removal:', actualPieceElement.classList, actualPieceElement.style);
+     
+//       this.currentlySelectedPiece = null;
+     
+//       newSquare.offsetHeight; // no need to store this anywhere, just access it
+//       const gridRow = targetRow + 1; // CSS grid lines start at 1, not 0
+//       const gridColumn = targetCol + 1;
+//         // Set the grid-area style on the new square to place it correctly
+//       newSquare.style.gridArea = `${gridRow} / ${gridColumn}`;
+
+//       // Append the actual piece to the wrapper
+//       console.log('Actual Piece Element before appendChild method:', actualPieceElement);
+      
+           
+//       console.log('Actual Piece Element after appendChild method:', actualPieceElement);
+       
+//       console.log("newSquare.outerHTML", newSquare.outerHTML);
+//       console.log("newSquare.innerHTML", newSquare.innerHTML);
+    
+//     }
+      
+//     //this.currentlySelectedPiece.element = actualPieceElement;
+
+
+//       console.log("destinationElement: ", destinationElement);
+//       console.log("destinationElement children: ", destinationElement.children);
+
+
+// //       Array.from(oldSquare.children).forEach(child => {
+// //     console.log("Iterating child: ", child);
+// //     if (child && child.classList && child.classList.contains("pattern")) {
+// //         console.log("Removing child: ", child);
+// //         destinationElement.removeChild(child);
+// //     }
+// // });
+
+
+//       this.resetBoardColors();
+//           console.log("destinationElement right before Updategamestatecall in movePiece:", destinationElement);
+
+     
+//       // this.currentlySelectedPiece.element.style.gridRow = targetRow + 1;
+//       // this.currentlySelectedPiece.element.style.gridColumn = targetCol + 1;
+
+//       this.currentPlayer = this.currentPlayer === "white" ? "black" : "white";
+//       this.game.currentPlayer = this.currentPlayer;
+//       this.game.checkGameStatus();
+//       this.clearValidMoves();
+//       // oldSquare.clearValidMoves();
+
+//       this.moveHistory.push
+//       ({
+//         piece: this.currentlySelectedPiece,
+//         from: { row: originalRow, col: originalCol },
+//         to: {row: targetRow, col: targetCol }
+//       });
+//       actualPieceElement.classList.remove("selected-piece");
+//         this.currentlySelectedPiece = null;
+//       //this.currentlySelectedPiece.element.classList.remove("selected-piece");
+//       // oldSquare.removeChild(this.currentlySelectedPiece.element);
+      
+//       // this.currentlySelectedPiece = null;
+//       console.log('this.game.board at the end of movePiece function', this.game.board);
+//       // console.log("Board after move:", JSON.stringify(this.game.board));
+//        this.updateGameState(event, actualPieceElement, destinationElement, game);
+//       console.log("piecemoved");
+//       console.log("newSquare", newSquare);
+//       console.log("actualPieceElement", actualPieceElement);
+     
+//       return true;
+// }
+    // }
+//   movePiece(targetSquare, game, pieceElement, destinationElement) {
+//   if (!this.isValidMove(targetSquare, game, pieceElement, destinationElement)) {
+//     return false;
+//   }
+  
+//   const targetRow = parseInt(targetSquare.dataset.row, 10);
+//   const targetCol = parseInt(targetSquare.dataset.col, 10);
+//   this.setGame(game);
+//   const selectedPieceElement = this.getSelectedPieceElement();
+//   const oldSquare = this.findSquareOfSelectedPiece(selectedPieceElement);
+//   const originalPosition = this.getPiecePosition(oldSquare);
+  
+//   this.updateBoardState(originalPosition, targetRow, targetCol);
+//   this.movePieceOnBoard(selectedPieceElement, oldSquare, destinationElement, targetCol, targetRow);
+//   this.updatePieceDOMProperties(selectedPieceElement, targetRow, targetCol);
+//   this.deselectPiece(selectedPieceElement);
+  
+//   this.currentPlayer = this.togglePlayerTurn();
+//   this.game.checkGameStatus();
+//   this.clearValidMoves();
+  
+//   this.addToMoveHistory(selectedPieceElement, originalPosition, targetRow, targetCol);
+//   this.updateGameState(event, selectedPieceElement, destinationElement, game);
+  
+//   return true;
+// }
+
+// isValidMove(targetSquare, game, pieceElement, destinationElement) {
+//   if (!targetSquare || !game || !pieceElement || !destinationElement) {
+//     console.error('Invalid arguments.');
+//     return false;
+//   }
+
+//   const targetRow = parseInt(targetSquare.dataset.row, 10);
+//   const targetCol = parseInt(targetSquare.dataset.col, 10);
+//   this.setGame(game);
+
+//   if (isNaN(targetRow) || isNaN(targetCol)) {
+//     console.error('Invalid target row or column.');
+//     return false;
+//   }
+
+//   const selectedPieceElement = this.getSelectedPieceElement();
+//   if (!selectedPieceElement) {
+//     console.log("Selected piece not found.");
+//     return false;
+//   }
+
+//   const oldSquare = this.findSquareOfSelectedPiece(selectedPieceElement);
+//   if (!oldSquare) {
+//     console.log("Parent element not found.");
+//     return false;
+//   }
+
+//   return true;
+// }
+
+// getSelectedPieceElement() {
+//   return document.querySelector('.selected-piece');
+// }
+
+// findSquareOfSelectedPiece(selectedPieceElement) {
+//   return selectedPieceElement.closest('.chess-square');
+// }
+
+// getPiecePosition(square) {
+//   return {
+//     row: parseInt(square.dataset.row, 10),
+//     col: parseInt(square.dataset.col, 10)
+//   };
+// }
+
+// updateBoardState(originalPosition, targetRow, targetCol) {
+//   this.game.board[originalPosition.row][originalPosition.col] = null;
+//   this.game.board[targetRow][targetCol] = this.currentlySelectedPiece;
+// }
+
+// movePieceOnBoard(selectedPieceElement, oldSquare, destinationElement, targetCol, targetRow) {
+//   const actualPieceElement = this.getActualPieceElement(selectedPieceElement, oldSquare);
+//   const newSquare = this.getNewSquare(targetRow, targetCol);
+
+//   if (actualPieceElement && newSquare) {
+//     oldSquare.removeChild(actualPieceElement);
+//     const clonedPieceElement = actualPieceElement.cloneNode(true); // Clone the actual piece element
+//     newSquare.appendChild(clonedPieceElement); // Append the cloned piece element to the new square
+
+//     if (!oldSquare.querySelector('.chess-piece')) {
+//       this.clearSquareData(oldSquare);
+//     }
+//   }
+// }
+// getActualPieceElement(selectedPieceElement, oldSquare) {
+//   const actualPieceElement = oldSquare.querySelector('.chess-piece');
+//   return actualPieceElement;
+// }
+
+// getNewSquare(targetRow, targetCol) {
+//   console.log("targetCol", targetCol);
+//   console.log("targetRow", targetRow);
+
+//   return document.getElementById(`square-${targetRow}-${targetCol}`);
+// }
+
+// clearSquareData(square) {
+//   square.removeAttribute("data-color");
+//   square.removeAttribute("data-type");
+//   square.classList.remove("has-piece");
+//   square.style.backgroundImage = '';
+// }
+
+// updatePieceDOMProperties(selectedPieceElement, targetRow, targetCol) {
+//   selectedPieceElement.style.gridRow = targetRow + 1;
+//   selectedPieceElement.style.gridColumn = targetCol + 1;
+// }
+
+// deselectPiece(selectedPieceElement) {
+//   selectedPieceElement.classList.remove("selected-piece");
+//   this.currentlySelectedPiece = null;
+// }
+
+// togglePlayerTurn() {
+//   return this.currentPlayer === "white" ? "black" : "white";
+// }
+
+// addToMoveHistory(selectedPieceElement, originalPosition, targetRow, targetCol) {
+//   this.moveHistory.push({
+//     piece: this.currentlySelectedPiece,
+//     from: { row: originalPosition.row, col: originalPosition.col },
+//     to: { row: targetRow, col: targetCol }
+//   });
+// }
+// clearValidMoves() {
+//     const validMoveSquares = document.querySelectorAll('.valid-move');
+//     validMoveSquares.forEach(square => {
+//         square.classList.remove('valid-move');
+//         square.innerHTML = '';
+//     });
+// }
+    
+   
 
   createBoardElements() 
   {
@@ -776,7 +1175,7 @@ getNumPieces(color) {
   return boardHTML;
 }
 
-  
+ 
 
 getPieceAtPosition(row, col) {
   return this.chessPieces.find(piece => piece.row === row && piece.col === col);
@@ -797,7 +1196,7 @@ getPieceAtPosition(row, col) {
 
 
 endTurn() {
-  this.isPlayerTurn = !isPlayerTurn;
+  this.isPlayerTurn = !this.isPlayerTurn;
     this.selectedPiece = null;
 }
 
@@ -825,32 +1224,36 @@ removeHighlightFromAllSquares() {
 
  
 updateGameState(event, pieceElement, destinationElement, game) {
-  console.log("updateGameState called");  // To check if the function itself is called
+  console.log("updateGameState called");
   console.log("Event:", event);
   console.log("Piece Element:", pieceElement);
   console.log("Destination Element:", destinationElement);
   console.log("Game:", game);
-  const targetSquare = event.target; // Assuming the event object is accessible here
 
-  // Call movePiece method to handle the move logic
- // this.movePiece(targetSquare, game, pieceElement, destinationElement);
+  // The actual target square should be the destinationElement
+  // If event.target is not reliable, use destinationElement directly
+  const targetSquare = destinationElement; 
 
   // Update the history of moves
   this.moveHistory.push({
-    piece: pieceElement ? pieceElement.dataset.piece : null, // Check if pieceElement is defined
+    piece: pieceElement ? pieceElement.dataset.piece : null,
     from: {
-      row: pieceElement ? Math.floor(pieceElement.dataset.row / 8) : null,
-      col: pieceElement ? pieceElement.dataset.col % 8 : null
+      row: pieceElement ? parseInt(pieceElement.dataset.row, 10) : null,
+      col: pieceElement ? parseInt(pieceElement.dataset.col, 10) : null
     },
     to: {
-      row: Math.floor(destinationElement.dataset.row / 8),
-      col: destinationElement.dataset.col % 8
+      row: parseInt(destinationElement.dataset.row, 10),
+      col: parseInt(destinationElement.dataset.col, 10)
     },
-    captured: destinationElement.firstElementChild
-      ? destinationElement.firstElementChild.dataset.piece
+    captured: destinationElement.querySelector('.chess-piece')
+      ? destinationElement.querySelector('.chess-piece').dataset.piece
       : null,
   });
-  console.log("Move History:", JSON.stringify(this.moveHistory));
+
+  // Additional game state updates can go here
+}
+
+  //console.log("Move History:", JSON.stringify(this.moveHistory));
 
   // // Check if the game is over (e.g., checkmate, stalemate, etc.)
   // if (this.isCheckmate()) {
@@ -867,7 +1270,7 @@ updateGameState(event, pieceElement, destinationElement, game) {
 
   //   return;
   // }
-}
+
 announceWinner() {
   const message = `Checkmate! ${this.currentPlayer} wins!`;
   alert(message);
