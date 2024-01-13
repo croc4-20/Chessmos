@@ -52,7 +52,7 @@ async function initialize()
 { type: 'rook', color: 'black', row: 7, col: 0, imagePath: 'img/blackROOK.png', elementId: 'square-7-0', game: game },
 { type: 'knight', color: 'black', row: 7, col: 1, imagePath: 'img/blackKNIGHT.png', elementId: 'square-7-1', game: game },
 { type: 'bishop', color: 'black', row: 7, col: 2, imagePath: 'img/BlackBISHOP.png', elementId: 'square-7-2', game: game },
-{ type: 'queen', color: 'black', row: 7, col: 3, imagePath: 'testNewImages/blackQueen.png', elementId: 'square-7-3', game: game },
+{ type: 'queen', color: 'black', row: 7, col: 3, imagePath: 'testNewImages/BlackQueen.png', elementId: 'square-7-3', game: game },
 { type: 'king', color: 'black', row: 7, col: 4, imagePath: 'images/blackKING.png', elementId: 'square-7-4', game: game },
 { type: 'bishop', color: 'black', row: 7, col: 5, imagePath: 'img/BlackBISHOP.png', elementId: 'square-7-5', game: game },
 { type: 'knight', color: 'black', row: 7, col: 6, imagePath: 'img/blackKNIGHT.png', elementId: 'square-7-6', game: game },
@@ -222,6 +222,8 @@ export default class ChessPiece {
 
     //FINALSTAND SPELL BEGINNING
     this.isFinalStandActive = false;
+    this.miniBoardArea = { x1: 4, y1: 4, x2: 7, y2: 7 }; // Example coordinates for a 4x4 area
+       
     this.finalStandTurnCount = 0;
     this.finalStandScore = { white: 0, black: 0 };
     this.pointThreshold = 5;
@@ -235,7 +237,9 @@ export default class ChessPiece {
     this.miniGameScore = 0;
     this.pointThreshold = 5;
     this.miniGameMoveCount = 0;
-    
+
+    this.towers = [];
+    this.towerOfPowerActivated = false;
 
     this.chaosTheoryStartEvent = new Event('chaosTheoryStart');
     this.chaosTheoryEndEvent = new Event('chaosTheoryEnd');
@@ -652,6 +656,11 @@ console.log("Flag before requestAnimationFrame in executeMove:", this.hasMovedDu
     //     // Exit early as the piece has already been moved
     //     return;
     // }
+    console.log('this.towerOfPowerActivated', this.towerOfPowerActivated);
+    if(this.towerOfPowerActivated){
+      this.checkAndPlaceTowerEachTurn(turnCount);
+    this.checkTowerCountAndActivateBeam();
+    }
 
     if (this.hasMovedDueToRift) {
         console.log('Piece already moved by rift effect, skipping normal move logic.');
@@ -801,7 +810,8 @@ deselectPiece(selectedPiece)
 }
 
 showValidMoves(selectedPiece, board, validMoves) {
-  
+    console.log('this.towerOfPowerActivated ', this.towerOfPowerActivated);
+
   console.log('this.isChaosTheoryActive', this.isChaosTheoryActive);
 
   // Check if the piece has already been moved due to the rift
@@ -837,6 +847,16 @@ console.log("game.game.board in showValidMoves:", this.game.game.board);
   for (const move of validMoves) {
     const square = document.querySelector(`.chess-square[data-row="${move.row}"][data-col="${move.col}"]`);
     square.classList.add('valid-move');
+
+    // Check if the current piece is a pawn on the mini-board
+    const currentSquare = document.querySelector(`.chess-square[data-row="${selectedPiece.row}"][data-col="${selectedPiece.col}"]`);
+    const isPawnOnMiniBoard = selectedPiece.type === 'Pawn' && currentSquare && currentSquare.classList.contains('mini-board');
+
+        // If the piece is a pawn and it's on the mini-board, add a special highlight
+        if (isPawnOnMiniBoard) {
+          console.log('pawn on miniboard');
+            square.classList.add('special-pawn-move'); // This class should be styled differently in your CSS
+        }
 
     // Create a pattern on the valid move square
     const pattern = document.createElement('div');
@@ -875,10 +895,11 @@ console.log("game.game.board in showValidMoves:", this.game.game.board);
             }
         } else {
       this.executeMove(this.chessBoard, clickedSquareElement, square);
-}
-      // After executing the move, you may also wish to clear selections and valid moves
-      this.deselectAndClear();
-    };
+      this.checkMiniBoardAndEndFinalStand();
+    }
+    // After executing the move, you may also wish to clear selections and valid moves
+    this.deselectAndClear();
+  };
 
     // Save this click event listener so we can remove it later
     const squareId = `${move.row}-${move.col}`;
@@ -970,6 +991,8 @@ addChessPiece(type, color, row, col, imagePath, elementId, game, squares) {
     console.error(`Invalid row ${row} or col ${col} for adding piece.`);
     return;
   }
+  squares = document.querySelectorAll('.chess-square');
+    console.log(" ssquares: ", squares);
 
   // Get square element from NodeList using the calculated index
   const squareIndex = row * 8 + col;
@@ -1342,16 +1365,43 @@ refreshPieceEventListeners(enableListeners) {
 calculateValidMoves(row, col, board, type, color, game) {
   console.log("calculateValidMoves called for", row, col);
   console.log("Board state in calculateValidMoves:", board);
-   console.log("this.game.board state at the beginnign of calculateValidMoves", this.game.game.board);
+  console.log("this.game.board state at the beginnign of calculateValidMoves", this.game.game.board);
   console.log("Piece type in calculateValidMoves:", type, "Color:", color);
 
   const validMoves = [];
   const enemyColor = this.color === "white" ? "black" : "white";
   const currentRow = parseInt(row, 10);
   const currentCol = parseInt(col, 10);
-game = this.game
+  game = this.game
   switch (type) {
     case 'pawn':
+      const pawnSquare = document.querySelector(`.chess-square[data-row="${currentRow}"][data-col="${currentCol}"]`);
+      console.log('pawnSquare', pawnSquare);
+      console.log('pawnSquare class list:', pawnSquare.classList);
+      const isPawnOnMiniBoard = pawnSquare.classList.contains('mini-board-highlight');
+      console.log('isPawnOnMiniBoard', isPawnOnMiniBoard);
+
+      if (isPawnOnMiniBoard)
+      {
+        console.log("Processing pawn In MINIBOARD SPELL");
+        // King-like moves for pawn on mini-board
+        const pawnKingMoves = [
+      { row: currentRow - 1, col: currentCol - 1 }, { row: currentRow - 1, col: currentCol }, { row: currentRow - 1, col: currentCol + 1 },
+      { row: currentRow, col: currentCol - 1 },                             { row: currentRow, col: currentCol + 1 },
+      { row: currentRow + 1, col: currentCol - 1 }, { row: currentRow + 1, col: currentCol }, { row: currentRow + 1, col: currentCol + 1 }
+    ];
+
+    pawnKingMoves.forEach(move => {
+        console.log(`Checking move: row=${move.row}, col=${move.col}`);
+      if (move.row >= 0 && move.row < 8 && move.col >= 0 && move.col < 8) {
+            console.log(`Board state at [${move.row}][${move.col}]:`, this.game.game.board[move.row][move.col]);
+        const targetSquare = this.game.game.board[move.row][move.col];
+        if (!targetSquare || targetSquare.color === enemyColor) {
+          validMoves.push(move);
+        }
+      }
+    });
+  } else {
        console.log("Processing pawn");
   let direction = this.color === "white" ? 1 : -1; // Adjusted for the board setup
   console.log('direction', direction); 
@@ -1389,6 +1439,7 @@ game = this.game
         validMoves.push({ row: newRow, col: captureCol });
       }
     }
+  }
   }
   break;
 
@@ -1542,12 +1593,19 @@ return validMoves;
 
     // check if the move is within the board boundaries
     if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) {
+      console.log('move outside of board boundaries');
         return false;
     }
-
+     const currentSquare = document.querySelector(`.chess-square[data-row="${currentRow}"][data-col="${currentCol}"]`);
+    const onMiniBoard = currentSquare && currentSquare.classList.contains('mini-board');
+    console.log('currentSquare0', currentSquare, 'onMiniBoard', onMiniBoard);
     // check if the piece can move to the new square based on its type and the rules of chess
     switch (currentPiece.type) {
         case 'pawn':
+           if (onMiniBoard) {
+            console.log('pawn is on miniboard upgrading');
+                return Math.abs(newRow - currentRow) <= 1 && Math.abs(newCol - currentCol) <= 1;
+            }
             // pawns can move forward one square, or forward two squares on their first move
             if (currentPiece.color == 'white') {
                 if (newRow == currentRow - 1 && newCol == currentCol && !board[newRow][newCol]) {
@@ -1760,54 +1818,7 @@ updateInternalBoardStateFromDOM() {
   console.log("Updated internal board state:", this.game.board);
 }
 
-// // updateInternalBoardStateFromDOM() {
-//   console.log("updateInternalBoardStateFromDOM called");
-//   // Initialize an empty board state
-//   const newBoardState = Array(8).fill(null).map(() => Array(8).fill(null));
 
-//   // Query all the chess square elements from the DOM
-//   const squares = document.querySelectorAll('.chess-square');
-//   squares.forEach(square => {
-//     const row = parseInt(square.getAttribute('data-row'), 10);
-//     const col = parseInt(square.getAttribute('data-col'), 10);
-//     const pieceElement = square.querySelector('.chess-piece');
-//     console.log("pieceElement", pieceElement);
-//     if (pieceElement) {
-//       const type = pieceElement.classList[1]; // Assuming second class denotes the piece type, e.g., "white-pawn"
-//       console.log("type in updateInternalBoardStateFromDOM:", type);
-//       const color = type.split('-')[0]; // Assuming the color is the first part of the class, e.g., "white"
-//       const imagePath = pieceElement.style.backgroundImage.slice(5, -2); // Remove 'url("' and '")'
-      
-//       console.log("color in updateInternalBoardStateFromDOM :", color);
-//       console.log("imagePath in updateInternalBoardStateFromDOM :", imagePath);
-
-//       // Update the new board state
-//       newBoardState[row][col] = { type, color, imagePath };
-//     }
-//   });
-
-//   // Replace the old board state with the new one
-//   this.game.board = newBoardState;
-//   console.log("this.game.board", this.game.board);
-//   // Optional: If you need to update visuals again or trigger any other updates
-//   // updateBoardVisuals();
-//   // otherUpdates();
-// }
-// updateInternalBoardStateFromDOM() {
-//     const squares = document.querySelectorAll('.chess-square');
-//     squares.forEach(square => {
-//         const row = parseInt(square.getAttribute('data-row'), 10);
-//         const col = parseInt(square.getAttribute('data-col'), 10);
-//         const type = square.getAttribute('data-type');
-//         const color = square.getAttribute('data-color');
-
-//         if (type && color) {
-//             this.game.board[row][col] = this.retrieveOrCreatePiece(type, color, row, col,/* imagePath *//* elementId */ this.game, this.chessBoard);
-//         } else {
-//             this.game.board[row][col] = null; // No piece at this square
-//         }
-//     });
-// }
 // Helper function to check if the placement of a piece is valid
  isValidPlacement(row, col, piece, gameBoard) {
     // Implement rules for valid placement (e.g., kings not in check)
@@ -2165,79 +2176,511 @@ updateRiftDurationOnPlayerChange() {
   // END OF RIFT SPELL AKA ADEPTWANDSPELL
         //STILL NOT FUNCITONNNAL\\
 //BEGINNING OF FINAL STAND SPELL
- startFinalStand() {
-        this.isFinalStandActive = true;
-        this.finalStandTurnCount = 0;
-        this.finalStandScore = { white: 0, black: 0 };
-        // Additional setup for the mini-game
-        // For example, selecting pieces, setting up a mini-board, etc.
+  startFinalStand() 
+  {
+    this.isFinalStandActive = true;
+    // this.createMiniBoardContainer();
+    this.setupMiniBoard();
+    this.clearMiniBoard();
+    // this.positionMiniBoard();
+    // this.selectPiecesForMiniGame();
+    // Notify players about the start of the mini-game
+  }
+
+      setupMiniBoard() {
+    console.log('Current player color:', this.playerColor || this.game?.currentPlayer);        if (this.playerColor === 'white') {
+        // Bottom right for white
+        this.miniBoardArea = { x1: 6, y1: 6, x2: 7, y2: 7 };
+    } else if (this.playerColor === 'black') {
+        // Top left for black
+        this.miniBoardArea = { x1: 0, y1: 0, x2: 1, y2: 1 };
     }
+        this.highlightMiniBoardArea();
+        // Visually distinguish the mini-board area (CSS changes)
+        // Disable interactions for pieces outside the mini-board
+        const allSquares = document.querySelectorAll('.chess-square');
+        console.log('allSquares', allSquares);
+        allSquares.forEach(square => {
+            const row = parseInt(square.getAttribute('data-row'));
+            const col = parseInt(square.getAttribute('data-col'));
+            if (!this.isWithinMiniBoard(row, col)) {
+                square.classList.add('inactive-square');
+            }
+        });
+
+        // Gray out or blur other pieces and board squares
+        // Example: Adding a CSS class to gray out pieces
+        const allPieces = document.querySelectorAll('.chess-piece');
+        allPieces.forEach(piece => {
+            const row = parseInt(piece.parentNode.getAttribute('data-row'));
+            const col = parseInt(piece.parentNode.getAttribute('data-col'));
+            if (!this.isWithinMiniBoard(row, col)) {
+                piece.classList.add('grayed-out');
+            }
+        });
+    }
+
+    clearMiniBoard() {
+      console.log('clearMiniBoard function entered');
+      console.log('this.miniBoardArea.x1', this.miniBoardArea.x1, 'this.miniBoardArea.y1', this.miniBoardArea.y1, 'this.miniBoardArea.y2', this.miniBoardArea.y2, 'this.miniBoardArea.x2', this.miniBoardArea.x2);
+      const unoccupiedSquares = Array.from(document.querySelectorAll('.chess-square:not(.has-piece)'))
+      .filter(square => !this.isWithinMiniBoard(
+        parseInt(square.getAttribute('data-row')),
+        parseInt(square.getAttribute('data-col'))
+        ));
+
+      for (let row = this.miniBoardArea.y1; row <= this.miniBoardArea.y2; row++) {
+        for (let col = this.miniBoardArea.x1; col <= this.miniBoardArea.x2; col++) {
+            const square = document.querySelector(`.chess-square[data-row="${row}"][data-col="${col}"]`);
+            if (!square) {
+                console.error(`Square not found at row ${row}, col ${col}`);
+                continue;
+            }
+            console.log('Clearing square:', square);
+            const piece = square.querySelector('.chess-piece');
+            if (piece) {
+                // Randomly select an unoccupied square and move the piece there
+                if (unoccupiedSquares.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * unoccupiedSquares.length);
+                    const targetSquare = unoccupiedSquares[randomIndex];
+                    unoccupiedSquares.splice(randomIndex, 1); // Remove the square from the array
+
+                    this.forceMovePieceToSquare(piece, targetSquare);
+                    // square.classList.remove('has-piece');
+                } else {
+                    console.error('No unoccupied squares available to move the piece');
+                }
+            }
+        }
+    }
+
+    // Rest of your code for placing pawns and prompting for piece selection
+    this.handlePieceSelection();
+}
+
+    highlightMiniBoardArea() {
+    console.log('highlightMiniBoardArea function called');
+    
+    // Create the mini-board container
+    const chessboard = document.getElementById('chessboard'); // Main chessboard container ID
+    const miniBoardContainer = document.createElement('div');
+    miniBoardContainer.className = 'mini-board-container';
+    chessboard.appendChild(miniBoardContainer);
+
+    let topLeftSquare, bottomRightSquare;
+
+    // Find the top-left and bottom-right squares of the mini-board
+    for (let row = this.miniBoardArea.y1; row <= this.miniBoardArea.y2; row++) {
+        for (let col = this.miniBoardArea.x1; col <= this.miniBoardArea.x2; col++) {
+            const square = document.querySelector(`.chess-square[data-row="${row}"][data-col="${col}"]`);
+            square.classList.add('mini-board-highlight');
+            if (!topLeftSquare) topLeftSquare = square;
+            bottomRightSquare = square;
+        }
+    }
+
+    // Calculate the position and size for the mini-board container
+    const topLeftRect = topLeftSquare.getBoundingClientRect();
+    const bottomRightRect = bottomRightSquare.getBoundingClientRect();
+
+    // Set the position and size of the mini-board container
+    miniBoardContainer.style.position = 'absolute';
+    miniBoardContainer.style.left = `${topLeftRect.left}px`;
+    miniBoardContainer.style.top = `${topLeftRect.top}px`;
+    miniBoardContainer.style.width = `${bottomRightRect.right - topLeftRect.left}px`;
+    miniBoardContainer.style.height = `${bottomRightRect.bottom - topLeftRect.top}px`;
+
+
+    // Highlight the mini-board area and set up piece event listeners
+    for (let row = this.miniBoardArea.y1; row <= this.miniBoardArea.y2; row++) {
+        for (let col = this.miniBoardArea.x1; col <= this.miniBoardArea.x2; col++) {
+            const square = document.querySelector(`.chess-square[data-row="${row}"][data-col="${col}"]`);
+            square.classList.add('mini-board-highlight');
+            square.addEventListener('click', this.handleSquareClick);
+        }
+    }
+
+    // Gray out or blur other pieces and board squares
+    const allSquares = document.querySelectorAll('.chess-square');
+    allSquares.forEach(square => {
+        const row = parseInt(square.getAttribute('data-row'));
+        const col = parseInt(square.getAttribute('data-col'));
+        if (!this.isWithinMiniBoard(row, col)) {
+            square.classList.add('inactive-square');
+            const piece = square.querySelector('.chess-piece');
+            if (piece) {
+                piece.classList.add('grayed-out');
+            }
+        }
+    });
+}
+     setupPieceEventListeners() {
+        const allSquares = document.querySelectorAll('.chess-square');
+        allSquares.forEach(square => {
+            const row = parseInt(square.getAttribute('data-row'), 10);
+            const col = parseInt(square.getAttribute('data-col'), 10);
+
+            if (this.isWithinMiniBoard(row, col)) {
+                // Attach event listeners as usual
+                square.addEventListener('click', this.handleSquareClick);
+            } else {
+                // Optionally, visually indicate that the square is inactive
+                square.classList.add('inactive-square');
+            }
+        });
+    }
+
+    isWithinMiniBoard(row, col) {
+      console.log('isWithinMiniBoard function called');
+        return row >= this.miniBoardArea.y1 && row <= this.miniBoardArea.y2 &&
+               col >= this.miniBoardArea.x1 && col <= this.miniBoardArea.x2;
+    }
+    isMoveValid(piece, targetRow, targetCol) 
+    {
+        if (this.isFinalStandActive) 
+        {
+            return this.isWithinMiniBoard(targetRow, targetCol);
+                   /* Add other standard move validation checks here */
+        } else {
+            // Existing move validation logic
+        }
+    }
+    checkMiniBoardAndEndFinalStand() {
+  console.log('checkMiniBoardAndEndFinalStand function called');
+
+  const miniBoardWhitePieces = document.querySelectorAll('.mini-board-highlight .chess-piece.white');
+  const miniBoardBlackPieces = document.querySelectorAll('.mini-board-highlight .chess-piece.black');
+  console.log('miniBoardWhitePieces', miniBoardWhitePieces.length, 'miniBoardBlackPieces', miniBoardBlackPieces.length);
+
+  if (miniBoardWhitePieces.length <= 1 || miniBoardBlackPieces.length <= 1) {
+    this.endFinalStand();
+  }
+}
 
     // Method to end the Final Stand spell
-    endFinalStand() {
-        this.isFinalStandActive = false;
-        this.applyFinalStandOutcome();
-        // Transition back to the main game
-    }
+//     endFinalStand() {
+//   const whitePiecesCount = document.querySelectorAll('.mini-board-highlight .chess-square:has(.chess-piece.white)').length;
+//   const blackPiecesCount = document.querySelectorAll('.mini-board-highlight .chess-square:has(.chess-piece.black)').length;
 
+//   // Check if either player has 0 or 1 pieces left
+//   if (whitePiecesCount <= 1 || blackPiecesCount <= 1) {
+//     console.log('whitePieceCount or blackPieceCount inferior to one, cancelling the finalstandspell');
+//     // Re-enable interactions for all pieces
+//     document.querySelectorAll('.chess-square').forEach(square => square.classList.remove('inactive'));
+//     document.querySelectorAll('.chess-piece').forEach(piece => piece.classList.remove('grayed-out'));
+
+//     // Remove visual distinctions of the mini-board
+//     // ... (Resetting CSS changes as needed)
+//     const outsidePieces = document.querySelectorAll('.chess-square:not(.mini-board-highlight) .chess-piece');
+//     outsidePieces.forEach(piece => {
+//     this.attachEventListenersToPiece(piece); // Attach event listeners
+//   });
+//     this.isFinalStandActive = false;
+//     this.applyFinalStandOutcome();
+//     // Additional logic for the outcome of the mini-game
+//   }
+// }
+endFinalStand() {
+  const whitePiecesCount = document.querySelectorAll('.mini-board-highlight .chess-square:has(.chess-piece.white)').length;
+  const blackPiecesCount = document.querySelectorAll('.mini-board-highlight .chess-square:has(.chess-piece.black)').length;
+
+  console.log('White pieces count:', whitePiecesCount, 'Black pieces count:', blackPiecesCount);
+
+  if (whitePiecesCount <= 1 || blackPiecesCount <= 1) {
+    console.log('Ending Final Stand Spell');
+
+    document.querySelectorAll('.chess-square').forEach(square => {
+      console.log('Removing inactive from:', square);
+      square.classList.remove('inactive-square');
+      square.classList.remove('mini-board-highlight');
+    });
+
+    document.querySelectorAll('.chess-piece').forEach(piece => {
+      console.log('Removing grayed-out from:', piece);
+      piece.classList.remove('grayed-out');
+    });
+
+    const outsidePieces = document.querySelectorAll('.chess-square:not(.mini-board-highlight) .chess-piece');
+    outsidePieces.forEach(piece => {
+      console.log('Reattaching event listeners to:', piece);
+      this.attachEventListenersToPiece(piece);
+    });
+
+    this.isFinalStandActive = false;
+    this.applyFinalStandOutcome();
+  } else {
+    console.log('Final Stand Spell continues');
+  }
+}
+attachEventListenersToPiece(piece) {
+  // Logic to attach the necessary event listeners to the piece
+  // For example:
+  piece.addEventListener('click', this.boundHandleClick);
+  // ... other event listeners as needed
+}
     // Method to handle the outcome of Final Stand
     applyFinalStandOutcome() {
         // Apply effects based on the finalStandScore
         // E.g., revive a piece, grant an extra move, etc.
     }
+    
 
-    // Override or extend your existing move method
-    movePiece(piece, newPosition) {
-        if (this.isFinalStandActive) {
-            this.handleFinalStandMove(piece, newPosition);
-        } else {
-            // ... existing move logic ...
-        }
+    handlePieceSelection(pieceType) 
+    {
+    // Get the current player's color
+    const playerColor = this.currentPlayer; // Adjust this based on your game state
+
+    // Directly create a new piece of the chosen type and color
+    this.finalStandPlayerPieces = this.queryAlliedMiniBoardPieces(playerColor);
+
+    // Hide the selection UI
+    const selectionContainer = document.getElementById('piece-selection-container');
+    if (selectionContainer) {
+        selectionContainer.style.display = 'none';
     }
 
-    // Handle moves specifically for Final Stand
-    handleFinalStandMove(piece, newPosition) {
-        // Implement the special rules for moves in Final Stand
-        // E.g., no captures in the first few turns, special abilities, etc.
-        this.finalStandTurnCount++;
+    // Continue with the setup
+    this.selectOpponentPiece();
+     this.setupMiniBoard();
+}
+    selectOpponentPiece() {
+      const opponentColor = this.currentPlayer === 'white' ? 'black' : 'white';
+      // Select two or three pawns and one upgraded piece for the opponent
+      this.finalStandOpponentPieces = this.queryOponentMiniBoardPieces(opponentColor);
 
-        if (this.shouldCapture(piece, newPosition)) {
-            this.capturePiece(piece, newPosition);
-            this.updateFinalStandScore(piece);
-        } else {
-            // Regular move
-        }
+      // Place pieces on the mini-board
+      this.placePiecesOnMiniBoard(this.finalStandPlayerPieces, this.finalStandOpponentPieces);
 
-        if (this.checkFinalStandEndCondition()) {
-            this.endFinalStand();
-        }
     }
 
-    // Check if a capture should occur during Final Stand
-    shouldCapture(piece, newPosition) {
-        // Implement logic based on Final Stand rules
-        // E.g., no capture in the first four moves
-        return this.finalStandTurnCount > 4;
+queryOponentMiniBoardPieces(color) {
+  const opponentColor = this.currentPlayer === 'white' ? 'black' : 'white';
+  const opponentPawn = Array.from(document.querySelectorAll(`.chess-piece.${opponentColor}-pawn`))
+  const opponentUpgradedPiece = Array.from(document.querySelectorAll(`.chess-piece.${opponentColor}-rook, 
+                                                                       .chess-piece.${opponentColor}-bishop, 
+                                                                       .chess-piece.${opponentColor}-knight`));
+  const selectedPawns = this.randomlySelectPieces(opponentPawn, 2);
+  // Randomly select one upgraded piece
+  const selectedUpgradedPiece = this.randomlySelectPieces(opponentUpgradedPiece, 1);
+
+  return selectedPawns.concat(selectedUpgradedPiece);
+
+    // Your logic to randomly select two or three pawns and one upgraded piece (rook, bishop, or knight)
+    // Return an array of these pieces
+}
+queryAlliedMiniBoardPieces(color) {
+  const alliedColor = this.currentPlayer;
+
+  const alliedPawn = Array.from(document.querySelectorAll(`.chess-piece.${alliedColor}-pawn`));
+  const selectedPawns = this.randomlySelectPieces(alliedPawn, 2);
+
+  // Fetch upgraded pieces excluding the ones already selected as pawns
+  const upgradedPieceSelector = `.chess-piece.${alliedColor}-rook, .chess-piece.${alliedColor}-bishop, .chess-piece.${alliedColor}-knight`;
+  const alliedUpgradedPiece = Array.from(document.querySelectorAll(upgradedPieceSelector))
+                                   .filter(piece => !selectedPawns.includes(piece));
+
+  const selectedUpgradedPiece = this.randomlySelectPieces(alliedUpgradedPiece, 1);
+
+  console.log('Selected pawns:', selectedPawns, 'Selected upgraded piece:', selectedUpgradedPiece);
+
+  return selectedPawns.concat(selectedUpgradedPiece);
+}
+
+randomlySelectPieces(pieces, count) {
+  const shuffledPieces = pieces.sort(() => 0.5 - Math.random());
+  const selectedPieces = [];
+
+  for (let i = 0; i < count && i < shuffledPieces.length; i++) {
+    selectedPieces.push(shuffledPieces[i]);
+  }
+
+  return selectedPieces;
+}
+
+placePiecesOnMiniBoard(playerPieces, opponentPieces) {
+  // Shuffle and combine the pieces array
+  const allPieces = playerPieces.concat(opponentPieces).sort(() => 0.5 - Math.random());
+
+  allPieces.forEach(piece => {
+    // Get and shuffle the current list of empty squares
+    const emptySquares = Array.from(document.querySelectorAll('.mini-board .chess-square:not(.has-piece)'))
+                              .sort(() => 0.5 - Math.random());
+
+    if (emptySquares.length > 0) {
+      const targetSquare = emptySquares[0]; // Select the first square from the shuffled array
+      this.forceMovePieceInsideMiniBoard(piece, targetSquare);
+    } else {
+      console.error('No unoccupied squares available to place the piece');
+    }
+  });
+}
+forceMovePieceToSquare(piece, targetSquare) {
+  console.log('forceMovePieceToSquare function entered with piece', piece);
+
+  if (!targetSquare) {
+    console.error('No target square provided');
+    return;
+  }
+
+  const fromRow = parseInt(piece.parentNode.getAttribute('data-row'));
+  const fromCol = parseInt(piece.parentNode.getAttribute('data-col'));
+  const toRow = parseInt(targetSquare.getAttribute('data-row'));
+  const toCol = parseInt(targetSquare.getAttribute('data-col'));
+
+  console.log('fromRow', fromRow, 'fromCol', fromCol, 'toRow', toRow, 'toCol', toCol);
+
+  // Call the forceMove function with the target position
+  this.forceMove(piece, fromRow, fromCol, toRow, toCol);
+}
+
+forceMovePieceInsideMiniBoard(piece, miniBoardArea) {
+  console.log('forceMovePieceInsideMiniBoard function entered with piece', piece);
+  console.log('this.miniBoardArea.y2', this.miniBoardArea.y2);
+  console.log('this.miniBoardArea.y1', this.miniBoardArea.y1);
+  console.log('this.miniBoardArea.x2', this.miniBoardArea.x2);
+  console.log('this.miniBoardArea.x1', this.miniBoardArea.x1);
+  const fromRow = parseInt(piece.parentNode.getAttribute('data-row'));
+  const fromCol = parseInt(piece.parentNode.getAttribute('data-col'));
+
+  let toRow, toCol, attempts = 0;
+
+   do {
+    if (attempts++ > 15) { // Prevent infinite loop
+      console.error('Unable to find an empty square after 50 attempts.');
+      return;
     }
 
-    // Update the score for Final Stand
-    updateFinalStandScore(capturedPiece) {
-        let points = capturedPiece.type === 'Pawn' ? 1 : 3;
-        this.finalStandScore[capturedPiece.color] += points;
-    }
+    toRow = Math.floor(Math.random() * (this.miniBoardArea.y2 - this.miniBoardArea.y1 + 1)) + this.miniBoardArea.y1;
+    toCol = Math.floor(Math.random() * (this.miniBoardArea.x2 - this.miniBoardArea.x1 + 1)) + this.miniBoardArea.x1;
+
+    console.log('Attempt', attempts, ': trying row', toRow, 'col', toCol);
+  } while (this.isSquareEmpty(toRow, toCol) === false);
+
+  console.log('Moving piece from', fromRow, fromCol, 'to', toRow, toCol);
+  this.forceMove(piece, fromRow, fromCol, toRow, toCol);
+}
+isSquareEmpty(row, col) {
+  console.log('row', row, 'col', col);
+  // Select the square using data attributes for row and column
+  const squareSelector = `.chess-square[data-row='${row}'][data-col='${col}']`;
+  const square = document.querySelector(squareSelector);
+  console.log('squareSelector', squareSelector);
+  // If the square is not found, return false (as we can't determine if it's empty)
+  if (!square) {
+    console.error(`Square at row ${row} and column ${col} not found.`);
+    return false;
+  }
+
+  // A square is empty if it has no child nodes
+  return !square.hasChildNodes();
+}
+
+
+   
 
     // Check if Final Stand should end
     checkFinalStandEndCondition() {
         // Check if any player reached the point threshold
-        return this.finalStandScore.white >= this.pointThreshold || this.finalStandScore.black >= this.pointThreshold;
     }
 
-    // Capture logic for Final Stand
-    capturePiece(piece, newPosition) {
-        // Implement capture logic specific to Final Stand
-        // This might involve removing the captured piece and updating the board
-    }
+    
 //END OF FINAL STAND SPELL
+
+    //BEGIN OF STICK OF THE FOREST SPELL
+    castStickOfTheForestSpell()
+    {
+      
+    }
+     assignRandomElement(seedElements) {
+        const randomIndex = Math.floor(Math.random() * seedElements.length);
+        this.seedElement = seedElements[randomIndex];
+    }
+    growSeed() {
+        if (this.seedStage > 0 && this.seedStage < MAX_GROWTH_STAGE) {
+            this.seedStage++;
+        }
+    }
+    activateTreeAbility(board) {
+        if (this.seedStage === MAX_GROWTH_STAGE) {
+            // Example: Activate ability based on element
+            switch(this.seedElement) {
+                case 'Fire':
+                  this.castFirePlantSpell();
+                    // Fire ability logic
+                    break;
+                case 'Frost':
+                  this.castFirePlantSpell();
+                  // Frost ability logic
+                    break;
+                case 'Stone':
+                  this.castStonePlantSpell();
+                    // Fire ability logic
+                    break;
+                case 'Light':
+                  this.castLightPlantSpell();
+                    // Fire ability logic
+                    break;
+                case 'Mystic':
+                    // Fire ability logic
+                  this.castMysticPlantSpell();
+                    break;
+                case 'Aqua':
+                  this.castWaterPlantSpell();
+                    // Fire ability logic
+                    break;
+                case 'Earth':
+                  this.castEarthPlantSpell();
+                    // Fire ability logic
+                    break;
+                case 'Whirlwind':
+                  this.castWindPlantSpell();
+                    // Fire ability logic
+                    break;
+                case 'Quake':
+                  this.castQuakePlantSpell();
+                    // Fire ability logic
+                    break;
+                // ... other cases for different elements
+            }
+            this.seedStage = 0; // Reset the seed stage after activation
+        }
+    }
+    
+    checkAndTriggerCombo() {
+    const boardElements = this.getBoardElements();
+    const randomElement = this.getRandomElement(boardElements);
+
+    const comboTriggers = {
+      'FireWater': this.triggerInfernoWave(),
+      'EarthAir': this.triggerSandstormDance(),
+      'LightShadow': this.triggerEclipseMirage(),
+      'FrostFire': this.triggerThermalShock(),
+      'MysticNature': this.triggerVerdantResurgence(),
+      'WaterAir': this.triggerHurricaneSurge(),
+      'ShadowFire': this.triggerDarkFlame(),
+      'NatureFrost': this.triggerIcyBloom(),
+      'MysticLight': this.triggerArcaneIllumination(),
+      'AirShadow': this.triggerWhisperingShadows(),
+      'WaterMystic': this.triggerReflectionPool(),
+      'EarthFrost': this.triggerFrozenGround(),
+      'FireNature': this.triggerWildfireGrowth(),
+      'LightAir': this.triggerRadiantWind(),
+      'ShadowEarth': this.triggerTerrifyingQuake(),
+      'MysticAir': this.triggerEtherealBreeze(),
+
+        // ... other combos
+    };
+
+    const comboKey = this.element + randomElement;
+    const triggerFunction = comboTriggers[comboKey];
+
+    if (triggerFunction) {
+        triggerFunction.call(this);
+    }
+}
+
+    
+    //END OF STICK OF THE FOREST SPELL
 
 //BEGINNING OF castDigitzKingSpell FUNCTION\\
 
@@ -3088,29 +3531,117 @@ applyGravitationalField(selectedPiece, currentRow, currentCol) {
 //         }
 //     }
 // }
-
-forceRandomMove(piece) {
+forceRandomMove(piece, excludeMiniBoardArea = false) {
     console.log('forceRandomMove called for:', piece);
+    const parent = piece.parentNode;
+    const fromRow = parseInt(parent.getAttribute('data-row'));
+    const fromCol = parseInt(parent.getAttribute('data-col'));
+
+    
+    console.log('fromRow', fromRow, 'fromCol', fromCol);
+
     // Assuming your board is an 8x8 grid
     const totalRows = 8;
     const totalCols = 8;
 
-    // Generate random destination coordinates
-    let toRow = Math.floor(Math.random() * totalRows);
-    let toCol = Math.floor(Math.random() * totalCols);
+    let toRow, toCol;
 
-    // Ensure the random destination is different from the current position
-    while (this.game.board[toRow][toCol] !== null || (toRow === piece.row && toCol === piece.col)) {
+    do {
         toRow = Math.floor(Math.random() * totalRows);
         toCol = Math.floor(Math.random() * totalCols);
-    }
 
-    // Call the existing forceMove function with the random destination
-    this.forceMove(piece, toRow, toCol);
+        // If excluding mini-board area, ensure the destination is outside this area
+        if (excludeMiniBoardArea) {
+            // Check if the coordinates fall outside the mini-board
+            if (!this.isOutsideMiniBoard(toRow, toCol)) {
+              toRow = Math.floor(Math.random() * totalRows);
+              toCol = Math.floor(Math.random() * totalCols);
+                // continue; // Skip if inside mini-board, and generate new coordinates
+            }
+        }
+    } while (this.game.board[toRow][toCol] !== null || (toRow === fromRow && toCol === fromCol));
+
+    this.forceMove(piece, fromRow, fromCol, toRow, toCol);
 }
+isOutsideMiniBoard(row, col) {
+    return row < this.miniBoardArea.y1 || row > this.miniBoardArea.y2 ||
+           col < this.miniBoardArea.x1 || col > this.miniBoardArea.x2;
+}
+
 // END OF CASTENCHANTEDGROUNDSPELL\\
 
+//BEGIN OF TOWERACTIVATIONSPELL
+placeTower() {
+    const unOccupiedSquares = document.querySelectorAll('.chess-square:not(.has-piece)');
+    if (unOccupiedSquares.length > 0) {
+        const randomIndex = Math.floor(Math.random() * unOccupiedSquares.length);
+        const chosenSquare = unOccupiedSquares[randomIndex];
+        // Code to place the tower on chosenSquare
+        chosenSquare.classList.add('TOWER');
+        chosenSquare.innerHTML = '<img src="path/to/tower-icon.png" alt="Tower">';
+        const squareId = chosenSquare.getAttribute('id');
+        const coords = squareId.split('-').slice(1).map(Number); // Assuming IDs like 'square-3-4'
+        this.towers.push({ x: coords[0], y: coords[1] });
+        // Additional code to update game state, if necessary
+    } else {
+        console.log("No unoccupied squares available.");
+    }
+}
+castTowerSpell(currentTurn) {
+    this.towerOfPowerActivated = true;
+    this.activationTurn = currentTurn;
+    this.placeTower();
+    // this.createBeamAndApplyEffects();
+}
+checkTowerCountAndActivateBeam() {
+    if (this.towers.length === 4) {
+        this.activateBeamOfLight();
+    }
+}
 
+checkAndPlaceTowerEachTurn(currentTurn) {
+  // const currentTurn = document.querySelector('.turn-count-display');
+    if (this.towerOfPowerActivated && ((currentTurn - this.activationTurn) % 2 === 0)) {
+        this.placeTower();
+    }
+}
+
+createBeamAndApplyEffects() {
+    this.towers.forEach((tower, index) => {
+        // Assuming a method to draw a beam between towers
+        if (index < this.towers.length - 1) {
+            const nextTower = this.towers[index + 1];
+            this.drawBeam(tower, nextTower);
+        }
+
+        // Check and apply effects to pieces along the beam1111111111111111111111
+        this.checkAndApplyBeamEffects(tower);
+    });
+}
+
+drawBeam(tower1, tower2) {
+    // Implement logic to visually draw a beam between tower1 and tower2
+}
+
+checkAndApplyBeamEffects(tower) {
+    // Logic to apply a 50% chance effect on enemy pieces along the beam
+    // This will depend on the layout of your board and how pieces are managed
+}
+ updateTurnCount(newTurnCount) {
+    console.log('Updating turn count to', newTurnCount); // Added for debugging
+    document.getElementById('turn-count-display').textContent = `Turn: ${newTurnCount}`;
+    
+    // Ensure the event is being created and dispatched correctly
+    try {
+        const turnChangeEvent = new CustomEvent('turnChanged', { detail: { turnCount: newTurnCount } });
+        document.dispatchEvent(turnChangeEvent);
+    } catch (e) {
+        console.error('Error dispatching turnChanged event:', e);
+    }
+}
+
+
+//END OF TOWERACTIVATIONSPELL
 //BEGIN OF REALITYSHATTERSPELL 
 castRealityShatterSpell(chessBoard, game) {
         this.isRealityShattered = true;
@@ -3507,7 +4038,7 @@ removePiece(row, col) {
 }
 
 //END OF GRAVITATIONNAL SPELL
-
+//BEGIN OF NECROMANCER SPELL
 castNecronomancerSpell() {
     console.log('Casting Chronomancer Spell');
     const playerColor = this.currentPlayer; // Assuming this is 'white' or 'black'
@@ -3701,7 +4232,7 @@ forceMove(piece, fromRow, fromCol, toRow, toCol, isRiftMove = false) {
     }
 }
 
-
+//END OF NECROMANCER SPELL
 
 castLightsaberSpell() {
     // Play lightsaber animation and sound across the columns
@@ -3890,4 +4421,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // this.hideSelectSquarePrompt();
     });
   }
+});
+document.addEventListener('turnChanged', (e) => {
+  console.log('turn changed');
+    chessPiece.placeTower()
+    chessPiece.checkTowerCountAndActivateBeam();
 });
