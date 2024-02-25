@@ -233,6 +233,12 @@ export default class ChessPiece {
     this.isRealityShattered = false;
     this.spellDeck = ['staff-of-fire', 'staff-of-water', 'staff-of-air', 'staff-of-light', 'staff-of-earth', 'ice', 'novice-staff', 'iced-out', 'apprentice-wand', 'apprentice-staff', 'lightsaber', 'hourglass', 'staff-of-chaos', 'staff-of-the-necromancer', 'orbs-of-illusion', 'adept-wand', 'novice-staff', 'arcane-hands', 'spoon', 'excalibur', 'magician-wand', 'trident', 'reaper-scythe', 'rebel-sword', 'wooden-staff', 'broomstick', 'celestial-staff', 'cybermancer-staff', 'stick-of-the-forest', 'grand-master-staff', 'samba'];
     //RANDOMSPELL
+    //RANDOM PAWN MOVE AKA WINDSPELL
+    this.isWindOfChangeActive = false;
+    this.movesLeftWithSpell = 0;
+    this.directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
+    this.currentDirection = 'forward'; // Default direction
+    //END OF RANDOMPAWNMOVE AKA WINDSPEL
     this.isMiniGameActive = false;
     this.miniGameScore = 0;
     this.pointThreshold = 5;
@@ -491,7 +497,7 @@ handleClick = (event, chessBoard, game) => {
 
     console.log('this.game.board in handleclick before syncBoardState', this.game.game.board);  
     console.log('this.game.board in handleclick before syncBoardState', this.game.board); 
-     this.syncBoardState();
+     this.game.syncBoardState();
     console.log('this.game.game.board in handleclick after syncBoardState', this.game.game.board);
     console.log('this.game.board in handleclick after syncBoardState', this.game.board);  
       console.log("Active Spells in handleclick:", this.activeSpells);
@@ -508,6 +514,22 @@ handleClick = (event, chessBoard, game) => {
         console.log('This piece is frozen and cannot move.');
         return; // Exit the function, preventing selection/movement
     }
+
+    // Allow capturing enemy pieces if a piece is already selected
+    console.log('check for values before trying to capture, this.selectedPiece', this.currentlySelectedPiece, 'clickedPiece', clickedPiece, 'clickedPiece.color', clickedPiece.color);
+    if (this.selectedPiece && clickedPiece && clickedPiece.color !== this.game.currentPlayer) {
+        if (clickedSquareElement.classList.contains('valid-move')) {
+            // It's a valid capture, proceed with the move
+          console.log('CHECK FOR MOVEMADE ')
+            this.executeMove(game.board, clickedSquareElement, chessBoard);
+            return;
+        } else {
+            // Invalid move, not a capture
+            alert("Invalid move!");
+            return;
+        }
+    }
+
     // Turn validation
     if (clickedPiece && clickedPiece.color !== this.game.currentPlayer) {
         alert("It's not your turn!");
@@ -564,27 +586,42 @@ handleClick = (event, chessBoard, game) => {
 }
 syncBoardState = () => {
     console.log("Synchronizing board state...");
-    console.log('this.game.game.board in syncBoardState', this.game.game.board);
-    console.log('this.game.board in syncBoardState', this.game.board);
-
-    // this.game.game.board = Array.from({ length: 8 }, () => Array(8).fill(null));
 
     const squares = document.querySelectorAll('.chess-square');
     squares.forEach(square => {
         const row = parseInt(square.dataset.row, 10);
         const col = parseInt(square.dataset.col, 10);
-        const pieceElement = square.querySelector('.chess-piece > div');
+        const pieceElement = square.querySelector('.chess-piece');
 
         if (pieceElement) {
-            const [color, type] = pieceElement.className.split('-');
-            this.game.game.board[row][col] = { type, color };
+            const parent = pieceElement.parentNode;
+            const type = parent.getAttribute('data-type');
+             // col = parent.getAttribute('data-col');
+             // row = parent.getAttribute('data-row');
+            const color = parent.getAttribute('data-color');
+            // Assuming you have a constructor or factory method for ChessPiece
+            this.game.game.board[row][col] = new ChessPiece(type, color, row, col, this.imagePath, this.elementId, this.game, this.game.board);
+            // or if you have existing instances, find and reference them
+        } else {
+            this.game.game.board[row][col] = null;
         }
     });
 
     console.log("this.game.board state synchronized:", this.game.board);
-        console.log('this.game.game.board state synchronized', this.game.game.board);
-
 };
+
+// Helper function to extract piece info based on your piece element structure
+extractPieceInfo(pieceElement) {
+    // Modify this logic based on how your piece's color and type are represented
+    // For example, if you use class names like 'white-king', 'black-pawn', etc.
+    const classNames = pieceElement.className.split(' ');
+    const pieceClass = classNames.find(cls => cls.includes('-'));
+    if (pieceClass) {
+        return pieceClass.split('-');
+    }
+    return [null, null];
+}
+
 
 deselectAndClear() {
   if (this.selectedPiece && this.selectedPiece.element) {
@@ -596,20 +633,37 @@ deselectAndClear() {
 
 
 executeMove(board, clickedSquareElement, chessBoard, activeSpells) {
-        console.log(`Chaos Theory activated for ${this.chaosTheoryTurnsLeft} turns.`);
-  if (this.hasMovedDueToRift) {
-        console.log('Piece already moved by rift effect, skipping normal move logic.');
+  const oldPiece = document.querySelector(".selected-piece");
+  const oldSquare = oldPiece.parentNode;
+  const oldColor = oldSquare.getAttribute('data-color');
+  
+  console.log(`oldPiece`, oldPiece);
 
-        // Reset the flag
-        this.hasMovedDueToRift = false;
+  console.log(`Chaos Theory activated for ${this.chaosTheoryTurnsLeft} turns.`);
+  if (this.hasMovedDueToRift) 
+  {
+    console.log('Piece already moved by rift effect, skipping normal move logic.');
+    // Reset the flag
+    this.hasMovedDueToRift = false;
 
-        // Exit early as the piece has already been moved
-        return;
+    // Exit early as the piece has already been moved
+    return;
+  }
+
+
+  if (oldPiece.classList.contains('petrified')) {
+    
+        this.clearPetrification(oldPiece);
+
+        // 70% chance to transfer petrification
+       
+          console.log("attempt to propagate petrification for oldColor :", oldColor);
+            this.attemptToTransferPetrification(oldColor);
+        
     }
-  console.log("Executingggg move for piece:", this.selectedPiece);
-  console.log("clickedSquareElement in executeMove:", clickedSquareElement);
-  console.log("Board state before move:", this.game.game.board);
-  console.log('this.hasMovedDueToRift', this.hasMovedDueToRift);
+
+    // Update petrification status for all pieces
+    this.updatePetrifiedPieces();
 
   
 
@@ -617,14 +671,42 @@ executeMove(board, clickedSquareElement, chessBoard, activeSpells) {
   const clickedRow = parseInt(clickedSquareElement.getAttribute('data-row'), 10);
   const clickedCol = parseInt(clickedSquareElement.getAttribute('data-col'), 10);
 
+  const oldRow = parseInt(oldSquare.getAttribute('data-row'), 10);
+  const oldCol = parseInt(oldSquare.getAttribute('data-col'), 10);
+  console.log('OLD ROW IN EECUTEMOVE', oldRow, 'OLD COL N EECUTEMOVE', oldCol);
+
   const newRow = parseInt(clickedSquareElement.getAttribute('data-row'), 10);
   const newCol = parseInt(clickedSquareElement.getAttribute('data-col'), 10);
   const destinationElement = document.getElementById(`square-${newRow}-${newCol}`);
+  const destinationSquare = this.game.game.board[newRow][newCol];
+  console.log('destinationElement', destinationElement);
+  
 
-  const oldPiece = document.querySelector(".selected-piece");
-  const oldSquare = oldPiece.parentNode;
+if (destinationElement.classList.contains('hole-square')) {
+    // Logic for when destination is a hole
+    this.forceRandomMove(oldPiece, chessBoard, event, this.excludeMiniBoardArea = false);
+    this.game.endTurnMove();
+          this.game.startTurn();
+          this.game.currentPlayer = this.game.currentPlayer === "white" ? "black" : "white";
+    return;
+} else if (destinationElement.classList.contains('magma-square')) {
+    // Logic for when destination is a magma square
+  this.forceRemove(oldRow, oldCol);
+  this.game.endTurnMove();
+  this.game.currentPlayer = this.game.currentPlayer === "white" ? "black" : "white";
+          this.game.startTurn();
+  return;
+    // Implement specific logic for magma square
+} else if (destinationElement.classList.contains('rock-square')) {
+  return;
+    // Logic for when destination is a rock square
+    // Implement specific logic for rock square
+}
+
+  
+  
   const oldType = this.selectedPiece.piece.type;
-  const oldColor = this.selectedPiece.piece.color;
+  // const oldColor = this.selectedPiece.piece.color;
   
    // Move logic
   const movingPiece = this.game.game.board[this.selectedPiece.row][this.selectedPiece.col]; // Get the full piece object
@@ -725,7 +807,11 @@ console.log("Flag before requestAnimationFrame in executeMove:", this.hasMovedDu
           //   } else {
           //     console.error("ChessPiece instance not found for the selected element.");
           //   }
-            console.log("Board state after move:", this.game.board);
+            console.log('this context', this);
+            console.log("Board state after move and before syncBoardState:", this.game.board);
+            this.game.syncBoardState();
+            console.log("Board state after move&&syncBoardState:", this.game.board);
+
 
           }
 
@@ -793,8 +879,40 @@ selectNewPiece(clickedPiece, clickedPieceElement, chessBoard, game) {
     console.log('this.game.board in selectedPiece', this.game.board);
   this.showValidMoves(this.selectedPiece, chessBoard, validMoves);  // Pass the valid moves
 }
+ addCapturedPiece(piece, color) {
+  console.log("addcapturedPieces function called");
+  const capturedContainer = document.getElementById(color + '-captured');
+  const pieceElement = document.createElement('div');
+  pieceElement.classList.add('dead-piece');
+  pieceElement.style.fontSize = '35px'; // Adjust size as needed
+  pieceElement.style.width = '35px'; // Ensure the width is the same as font size for square aspect ratio
+  pieceElement.style.height = '35px'; // Ensure the height is the same as font size for square aspect ratio
+  pieceElement.style.display = 'inline-block'; // Ensure that the div behaves like an inline element for layout
+  pieceElement.style.textAlign = 'center';
+  pieceElement.innerHTML = piece; // Replace with the appropriate emoji or image
+  capturedContainer.appendChild(pieceElement);
+}
+mapPieceToEmoji(type, color) {
+    const whitePieceEmojiMap = {
+        'pawn': '♙',
+        'rook': '♖',
+        'knight': '♘',
+        'bishop': '♗',
+        'queen': '♕',
+        'king': '♔'
+    };
 
+    const blackPieceEmojiMap = {
+        'pawn': '♟',
+        'rook': '♜',
+        'knight': '♞',
+        'bishop': '♝',
+        'queen': '♛',
+        'king': '♚'
+    };
 
+    return color === 'white' ? whitePieceEmojiMap[type] : blackPieceEmojiMap[type];
+}
 deselectPiece(selectedPiece) 
 {
   selectedPiece.classList.remove("selected-piece");
@@ -1369,18 +1487,20 @@ calculateValidMoves(row, col, board, type, color, game) {
   console.log("Piece type in calculateValidMoves:", type, "Color:", color);
 
   const validMoves = [];
-  const enemyColor = this.color === "white" ? "black" : "white";
+  const enemyColor = color === "white" ? "black" : "white";
   const currentRow = parseInt(row, 10);
   const currentCol = parseInt(col, 10);
   game = this.game
   switch (type) {
     case 'pawn':
       const pawnSquare = document.querySelector(`.chess-square[data-row="${currentRow}"][data-col="${currentCol}"]`);
+      const pawnElement = pawnSquare.firstElementChild;
       console.log('pawnSquare', pawnSquare);
       console.log('pawnSquare class list:', pawnSquare.classList);
       const isPawnOnMiniBoard = pawnSquare.classList.contains('mini-board-highlight');
+      const isWindOfChangeActive = pawnElement.classList.contains('pawn-random-move');
       console.log('isPawnOnMiniBoard', isPawnOnMiniBoard);
-
+     
       if (isPawnOnMiniBoard)
       {
         console.log("Processing pawn In MINIBOARD SPELL");
@@ -1401,9 +1521,41 @@ calculateValidMoves(row, col, board, type, color, game) {
         }
       }
     });
+
+    } else if (type === 'pawn' && isWindOfChangeActive) {
+  console.log('Pawn under Wind of Change spell', this);
+  // Directly use the board state to check move validity instead of relying on an external method
+  // This approach considers both the boundaries and occupancy directly
+
+  // Movement logic when the 'left' or 'right' class is active
+  if (pawnElement.classList.contains('left')) {
+    // Calculate left moves, ensuring we're not at the left edge of the board
+    if (col > 0 && !board[row][col - 1]) {
+      validMoves.push({ row, col: col - 1 });
+    }
+  } else if (pawnElement.classList.contains('right')) {
+    // Calculate right moves, ensuring we're not at the right edge of the board
+    if (col < 7 && !board[row][col + 1]) {
+      validMoves.push({ row, col: col + 1 });
+    }
+  }
+
+  // Movement logic when a 'diagonal' class is active
+  if (pawnElement.classList.contains('diagonalLeft')) {
+    // Calculate diagonal left moves, checking for board boundaries and enemy presence
+    if (row + moveForward >= 0 && row + moveForward < 8 && col - 1 >= 0 && board[row + moveForward][col - 1] && board[row + moveForward][col - 1].color === enemyColor) {
+      validMoves.push({ row: row + moveForward, col: col - 1 });
+    }
+  } else if (pawnElement.classList.contains('diagonalRight')) {
+    // Calculate diagonal right moves, similar boundary and enemy checks
+    if (row + moveForward >= 0 && row + moveForward < 8 && col + 1 < 8 && board[row + moveForward][col + 1] && board[row + moveForward][col + 1].color === enemyColor) {
+      validMoves.push({ row: row + moveForward, col: col + 1 });
+    }
+  }
+
   } else {
        console.log("Processing pawn");
-  let direction = this.color === "white" ? 1 : -1; // Adjusted for the board setup
+  let direction = color === "white" ? 1 : -1; // Adjusted for the board setup
   console.log('direction', direction); 
   let newRow = currentRow + direction;
   console.log('newRow for pawn in calculateValidMoves:', newRow);
@@ -1606,6 +1758,7 @@ return validMoves;
             console.log('pawn is on miniboard upgrading');
                 return Math.abs(newRow - currentRow) <= 1 && Math.abs(newCol - currentCol) <= 1;
             }
+            
             // pawns can move forward one square, or forward two squares on their first move
             if (currentPiece.color == 'white') {
                 if (newRow == currentRow - 1 && newCol == currentCol && !board[newRow][newCol]) {
@@ -2345,9 +2498,21 @@ updateRiftDurationOnPlayerChange() {
             // Existing move validation logic
         }
     }
+
     checkMiniBoardAndEndFinalStand() {
   console.log('checkMiniBoardAndEndFinalStand function called');
 
+  // Check if the mini-board spell is active
+  const miniBoardSquares = document.querySelectorAll('.mini-board-highlight');
+  console.log('miniBoardSquares', miniBoardSquares.length);
+
+  // If no mini-board squares are highlighted, return early
+  if (miniBoardSquares.length === 0) {
+    console.log('No mini-board squares highlighted. Spell is not active.');
+    return;
+  }
+
+  // If the spell is active, continue to check the pieces
   const miniBoardWhitePieces = document.querySelectorAll('.mini-board-highlight .chess-piece.white');
   const miniBoardBlackPieces = document.querySelectorAll('.mini-board-highlight .chess-piece.black');
   console.log('miniBoardWhitePieces', miniBoardWhitePieces.length, 'miniBoardBlackPieces', miniBoardBlackPieces.length);
@@ -2487,7 +2652,13 @@ queryAlliedMiniBoardPieces(color) {
 }
 
 randomlySelectPieces(pieces, count) {
-  const shuffledPieces = pieces.sort(() => 0.5 - Math.random());
+  console.log('pieces', pieces);
+
+  // Convert NodeList to an array
+  const piecesArray = Array.from(pieces);
+
+  // Now sort the array
+  const shuffledPieces = piecesArray.sort(() => 0.5 - Math.random());
   const selectedPieces = [];
 
   for (let i = 0; i < count && i < shuffledPieces.length; i++) {
@@ -2496,7 +2667,6 @@ randomlySelectPieces(pieces, count) {
 
   return selectedPieces;
 }
-
 placePiecesOnMiniBoard(playerPieces, opponentPieces) {
   // Shuffle and combine the pieces array
   const allPieces = playerPieces.concat(opponentPieces).sort(() => 0.5 - Math.random());
@@ -2586,10 +2756,366 @@ isSquareEmpty(row, col) {
     
 //END OF FINAL STAND SPELL
 
+
+                // BEGINNING OF PETRIFYING SPELL
+
+        castPetrifySpell() 
+        {
+        // Randomly select enemy and ally pieces
+          const enemyColor = this.currentPlayer === 'white' ? 'black' : 'white';
+          console.log(enemyColor);
+          const board = document.querySelector('#chessboard');
+
+          const enemyPieces = document.querySelectorAll(`.chess-piece.${enemyColor}-pawn`);
+          console.log("enemyPieces", enemyPieces);
+
+          const allyColor = this.currentPlayer;
+          console.log(allyColor);
+          // board = document.querySelector('#chessboard');
+
+          const allyPieces = document.querySelectorAll(`.chess-piece.${allyColor}-pawn`);
+          console.log("enemyPieces", enemyPieces);
+
+          const selectedEnemies = this.selectRandomPieces(enemyPieces, Math.floor(Math.random() * 3) + 2); // 2 to 4
+          const selectedAllies = this.selectRandomPieces(allyPieces, Math.floor(Math.random() * 3) + 1); // 1 to 3
+          console.log('selectedEnemies :', selectedEnemies);
+          console.log('selectedAllies :', selectedAllies);
+          // Apply petrification
+          this.applyPetrification(selectedEnemies.concat(selectedAllies));
+        }
+        
+        applyPetrification(pieces) 
+        {
+          pieces.forEach(pieceElement => 
+          {
+          const turnsPetrified = Math.floor(Math.random() * 2) + 1; // 1 or 2 turns
+          this.petrifyElement(pieceElement, turnsPetrified);
+        });
+        }
+
+        petrifyElement(element, turns) {
+        const turnsUntilDestruction = Math.floor(Math.random() * 3) + 1; // Random number between 1 and 3
+        element.classList.add('petrified'); // Add a class to indicate petrification
+        element.dataset.petrifiedOnTurn = this.getCurrentTurnCount();
+        element.dataset.turnsUntilDestruction = turnsUntilDestruction;
+
+        this.createPetrifiTimer(element, turnsUntilDestruction);
+      }
+
+      createPetrifiTimer(element, turns)
+      {
+        const indicator = document.createElement('span');
+        indicator.className = 'petrification-timer';
+        indicator.textContent = turns;
+        element.appendChild(indicator);
+      }
+
+      getCurrentTurnCount() 
+      {
+        const turnCountDisplay = document.querySelector('#turn-count-display');
+        if (turnCountDisplay) 
+        {
+        // Assuming the turn count is displayed as "Turn: X"
+          const turnText = turnCountDisplay.textContent;
+          const turnNumberMatch = turnText.match(/\d+/); // Regular expression to extract number
+          if (turnNumberMatch) 
+          {
+            return parseInt(turnNumberMatch[0], 10);
+          }
+        }
+        return -1; // Return an error value if turn count cannot be determined
+      }
+
+      updatePetrifiedPieces() 
+      {
+        console.log("updatePetrifyExpiration function called:");
+        const petrifiedPieces = document.querySelectorAll('.petrified');
+        petrifiedPieces.forEach(piece => 
+        {
+          this.updatePetrifyExpiration(piece);
+          this.updatePetrificationIndicator(piece);
+        });
+      }
+
+      updatePetrifyExpiration(piece) 
+      {
+      // Ensure the values are integers
+        const petrifiedOnTurn = parseInt(piece.dataset.petrifiedOnTurn, 10);
+        let turnsUntilDestruction = parseInt(piece.dataset.turnsUntilDestruction, 10);
+
+        // Calculate the number of full turns passed since petrification
+        const turnsPassed = Math.floor((this.getCurrentTurnCount() - petrifiedOnTurn) / 2);
+
+        // If more than a full turn has passed, update the turn countdown
+        if (turnsPassed > 0) 
+        {
+          turnsUntilDestruction -= turnsPassed;
+          // Update the data attribute and the indicator
+          piece.dataset.turnsUntilDestruction = turnsUntilDestruction;
+          this.updatePetrificationIndicator(piece);
+          // If the countdown has reached zero or less, remove petrification
+          if (turnsUntilDestruction <= 0) 
+          {
+            const parent = piece.parentNode;
+            const col = parent.getAttribute('data-col');
+            const row = parent.getAttribute('data-row');
+
+            console.log('parent', parent, 'row', row, 'col', col);
+            this.forceRemove(row, col);
+            piece.classList.remove('petrified');
+            piece.removeAttribute('data-turnsUntilDestruction');
+            const petrificationIndicator = piece.querySelector('.petrification-indicator');
+            if (petrificationIndicator) 
+            {
+              petrificationIndicator.remove();
+            }
+          }
+        }
+      }
+
+      updatePetrificationIndicator(piece) 
+      {
+        console.log("updatePetrificationIndicator function called with:", piece);
+        const turnsRemaining = parseInt(piece.dataset.turnsUntilDestruction, 10);
+        const indicator = piece.querySelector('.petrification-timer');
+
+        if (indicator) 
+        {
+          indicator.textContent = turnsRemaining;
+        }
+      }
+
+      // Method to attempt transferring petrification to an ally piece
+      attemptToTransferPetrification(currentPlayerColor) 
+      {
+        console.log("attemptToTransferPetrification function called for:", currentPlayerColor);
+
+        if (Math.random() <= 0.7) 
+        { // 70% chance to transfer petrification
+          console.log('petrification probability is correct');
+          const allyPieces = document.querySelectorAll(`.chess-piece.${currentPlayerColor}-pawn:not(.petrified)`);
+          console.log("Ally pieces for potential petrification:", allyPieces);
+
+          if (allyPieces.length > 0) 
+          {
+            const randomIndex = Math.floor(Math.random() * allyPieces.length);
+            const randomAlly = allyPieces[randomIndex];
+            console.log('randomAlly', randomAlly);
+            
+            // You need to ensure randomAlly is processed correctly for petrification
+            // For instance, add petrified class, set data attributes, etc.
+            randomAlly.classList.add('petrified');
+            randomAlly.dataset.petrifiedOnTurn = this.getCurrentTurnCount();
+            randomAlly.dataset.turnsUntilDestruction = 1; // Set petrification for 1 turn
+            this.createPetrifiTimer(randomAlly, 1);
+          }
+        }
+      }
+
+      selectRandomPieces(pieces, numPieces) 
+      {
+      // Convert NodeList to an array to use array methods
+        const piecesArray = Array.from(pieces);
+
+        // Shuffle the array using the Fisher-Yates (Durstenfeld) shuffle algorithm
+        for (let i = piecesArray.length - 1; i > 0; i--) 
+        {
+          const j = Math.floor(Math.random() * (i + 1));
+          [piecesArray[i], piecesArray[j]] = [piecesArray[j], piecesArray[i]];
+        }
+
+        // Slice the array to get the required number of pieces
+        return piecesArray.slice(0, numPieces);
+      }
+
+      clearPetrification(piece) 
+      {
+        piece.classList.remove('petrified');
+        piece.removeAttribute('data-petrifiedOnTurn');
+        piece.removeAttribute('data-turnsUntilDestruction');
+
+        const petrificationIndicator = piece.querySelector('.petrification-timer');
+        if (petrificationIndicator) 
+        {
+          petrificationIndicator.remove();
+        }
+      }
+
+    // END OF PETRIFYING SPELL
+      // BEGIN OF CHESSQUAKE SPELL
+applyChessquakeEffect(board) {
+  console.log('applyChessquakeEffect function entered');
+        // Applying effects to each piece
+  const chessBoard = document.querySelector('#chessboard');
+  const pieces = document.querySelectorAll('.chess-square.event-listener-attached.has-piece');
+  console.log('pieces', pieces);
+        pieces.forEach(piece => {
+            let effectRoll = Math.random();
+            if (effectRoll < 0.01) {
+                // 2;5% chance to remove the piece
+                this.removepPiece(board, piece);
+            } else if (effectRoll < 0.009) {
+                // 25% chance to move the piece to a random empty square
+                this.movePieceToRandomSquare(board, piece);
+            } else if (effectRoll < 0.1) {
+                // 25% chance to swap with another piece
+                this.swapPiece(piece);
+                
+            }
+            // 25% chance to do nothing
+        });
+        // console.log('Calling syncBoardState');
+        // this.syncBoardState();             
+        // console.log('syncBoardState called');
+      const emptySquares = document.querySelectorAll('.chess-square:not(.has-piece)');
+    console.log('emptySquares', emptySquares);
+    // Applying effects to unoccupied squares
+    emptySquares.forEach(square => {
+        let squareEffectRoll = Math.random();
+        if (squareEffectRoll < 0.05) {
+            // 5% chance for Magma Square
+            this.createMagmaSquare(board, square);
+        } else if (squareEffectRoll < 0.08) {
+            // 3% chance for Hole
+            this.createHole(board, square);
+        } else if (squareEffectRoll < 0.12) {
+            // 4% chance for Rock
+            this.createRock(board, square);
+        }
+        // Other squares remain unaffected
+    });
+}
+    removepPiece(board, piece) {
+    console.log('removepiece function called for :', piece);
+    
+    const row = piece.getAttribute('data-row');
+    const col = piece.getAttribute('data-col');
+    this.forceRemove(row, col);
+     }
+    movePieceToRandomSquare(board, piece) {
+    console.log('Moving piece to a random square:', piece);
+    const child =  piece.querySelector('.chess-piece');
+    const row = piece.getAttribute('data-row');
+    const col = piece.getAttribute('data-col');
+
+    const emptySquares = document.querySelectorAll('.chess-square:not(.has-piece)');
+    if (emptySquares.length === 0) {
+        console.log('No empty squares available for movement.');
+        return; // No empty square available
+    }
+
+    // Select a random empty square
+    const randomSquare = emptySquares[Math.floor(Math.random() * emptySquares.length)];
+    const newRow = randomSquare.getAttribute('data-row');
+    const newCol = randomSquare.getAttribute('data-col');
+    
+    // Remove piece from current position
+    
+     this.forceMove(child, row, col, newRow, newCol);
+
+   
+}
+    swapWithRandomPiece(board, piece) { 
+      console.log('removepiece function called')
+    }
+    createMagmaSquare(board, square) {
+  console.log('createMagmaSquare function called for:', square);
+
+  // Add a class to visually indicate the square is now a Magma Square
+  square.classList.add('magma-square');
+
+  // Update the board data structure to reflect the Magma effect
+  const row = parseInt(square.getAttribute('data-row'), 10);
+const col = parseInt(square.getAttribute('data-col'), 10);
+  this.game.board[row][col] = 'magma';
+}
+
+createHole(board, square) {
+  console.log('createHole function called for:', square);
+
+  // Add a class to visually indicate the square is now a Hole
+  square.classList.add('hole-square');
+
+  // Update the board data structure to reflect the Hole effect
+  const row = parseInt(square.getAttribute('data-row'), 10);
+const col = parseInt(square.getAttribute('data-col'), 10);
+  this.game.board[row][col] = 'hole';
+
+  // Add an event listener to move pieces that land on this hole to a random empty square
+  square.addEventListener('pieceLanded', () => {
+    const emptySquares = document.querySelectorAll('.chess-square:not(.has-piece)');
+    if (emptySquares.length > 0) {
+      const randomSquare = emptySquares[Math.floor(Math.random() * emptySquares.length)];
+      this.movePieceToRandomSquare(board, square); // Reuse the existing function
+    }
+  });
+}
+
+createRock(board, square) {
+  console.log('createRock function called for:', square);
+
+  // Add a class to visually indicate the square is now occupied by a Rock
+  square.classList.add('rock-square');
+
+  // Update the board data structure to reflect the Rock effect
+  const row = parseInt(square.getAttribute('data-row'), 10);
+const col = parseInt(square.getAttribute('data-col'), 10);
+  this.game.board[row][col] = 'rock';
+  this.game.board[row][col] = 'rock'; // This indicates that the square is occupied and cannot be landed on
+}
+
+// This helper function can be used to simulate a piece landing on a square
+ triggerPieceLanding(square) {
+  const pieceLandedEvent = new Event('pieceLanded');
+  square.dispatchEvent(pieceLandedEvent);
+}
+      //END OF CHESSQUAKESPELL
+
+
+    
+
+    //BEGINNING OF PLIT AND MERGE SPELL
+static activateSplitSpell(pieces) {
+        // Randomly select and split pieces
+        pieces.forEach(piece => piece.split());
+    }
+
+    // Split this piece
+    split() {
+        if (!this.isSplit && this.type !== 'King' && this.type !== 'Pawn') { // Assuming King and Pawn are not splittable
+            this.isSplit = true;
+            // You can define the behavior of each split part here or delegate to another method
+            // e.g., setting different movement capabilities for each part
+        }
+    }
+
+    // Check if this piece can merge with another
+    canMergeWith(otherPiece) {
+        return this.isSplit && otherPiece.isSplit && 
+               this.type === otherPiece.type && 
+               this.color === otherPiece.color &&
+               this.areAdjacent(otherPiece); // Implement areAdjacent to check adjacency
+    }
+
+    // Merge this piece with another
+    mergeWith(otherPiece) {
+        if (this.canMergeWith(otherPiece)) {
+            this.isSplit = false;
+            otherPiece.isSplit = false;
+            this.splitPart = null;
+            otherPiece.splitPart = null;
+            // Further merge logic, like combining back into a single piece on the board
+        }
+    }
+
+    //END OF SPLIT AND MERGE SPELL
+
+
     //BEGIN OF STICK OF THE FOREST SPELL
     castStickOfTheForestSpell()
     {
-      
+        console.log('castStickOfTheForestSpell function called');
+
     }
      assignRandomElement(seedElements) {
         const randomIndex = Math.floor(Math.random() * seedElements.length);
@@ -2681,6 +3207,141 @@ isSquareEmpty(row, col) {
 
     
     //END OF STICK OF THE FOREST SPELL
+
+//BEGINNING OF randomDiceMove spell\\
+// rollDiceForSpell() {
+//     return Math.floor(Math.random() * 4) + 1 + Math.floor(Math.random() * 4) + 1;
+//   }
+
+//   // Method to select a random piece for a specific player
+//   selectRandomPiece(playerColor) {
+//     // Select all pieces of the specified player's color
+//     const alliedPieces = Array.from(document.querySelectorAll(
+//         `.chess-piece.${playerColor}-pawn, 
+//          .chess-piece.${playerColor}-rook, 
+//          .chess-piece.${playerColor}-bishop, 
+//          .chess-piece.${playerColor}-knight, 
+//          .chess-piece.${playerColor}-queen, 
+//          .chess-piece.${playerColor}-king` // Include all piece types
+//     ));
+
+//     if (alliedPieces.length === 0) {
+//         console.error("No pieces found for player:", playerColor);
+//         return null;
+//     }
+
+//     // Randomly select one piece from the array
+//     const randomIndex = Math.floor(Math.random() * alliedPieces.length);
+//     return alliedPieces[randomIndex];
+// }
+
+//   // Method to execute a random move for a specific piece
+//   executeRandomMoveForPiece(pieceElement) {
+//     console.log('entering executeRandomMoveForPiece with :', pieceElement);
+//     pieceElement.classList.add('selected-piece');
+//     // Assuming you have a way to get legal moves for a piece DOM element
+//     const legalMoves = this.getLegalMovesForPieceElement(pieceElement);
+//     if (!legalMoves || legalMoves.length === 0) {
+//         console.error("No legal moves for piece:", pieceElement);
+//         return;
+//     }
+
+//     const randomMoveIndex = Math.floor(Math.random() * legalMoves.length);
+//     const randomMove = legalMoves[randomMoveIndex];
+//     // Assuming executeMove can handle a move defined in 'randomMove'
+
+//     console.log('randomMove,', randomMove);
+//     this.executeMove(randomMove);
+// }
+//  getLegalMovesForPieceElement(pieceElement) {
+//   console.log("entering getLegalMovesForPieceElement with :", pieceElement);
+//     // Assuming each piece element has a type (e.g., pawn, rook) as part of its class
+//     const pieceType = this.getPieceType(pieceElement); // Implement this method
+//     const currentPosition = this.getPosition(pieceElement); // Implement this method
+//     const clickedPiece = pieceElement.parentNode;
+//     const chessBoard = document.querySelector('#chessboard');
+//     const row = clickedPiece.getAttribute('data-row');
+//     const col = clickedPiece.getAttribute('data-col');
+//     const type = clickedPiece.getAttribute('data-type');
+//     const color = clickedPiece.getAttribute('data-color');
+
+    
+    
+//     console.log('pieceType', pieceType);
+//     console.log('currentPosition', currentPosition);
+//     console.log('row', row, 'col', col);
+//     console.log('clickedPiece', clickedPiece);
+    
+    
+//     // Calculate legal moves based on piece type and current position
+//     // This is highly game-specific and depends on your chess logic implementation
+//       return this.calculateValidMoves(row, col, chessBoard, type, color);
+
+//     return this.calculateLegalMoves(pieceType, currentPosition);
+//   }  
+
+//   // Method to cast the Dice of Destiny spell
+//   castDiceOfDestinySpell() {
+//     const movesPerPlayer = this.rollDiceForSpell();
+
+//     for (let player of ['white', 'black']) {
+//       for (let i = 0; i < movesPerPlayer; i++) {
+//         const piece = this.selectRandomPiece(player);
+//         if (piece) {
+//           this.executeRandomMoveForPiece(piece);
+//         }
+//       }
+//     }
+
+//     // ... Update game state or other necessary changes after spell execution ...
+//   }
+rollDiceForSpell() {
+    // Returns a number between 2 and 8 (simulating two four-sided dice)
+    return Math.floor(Math.random() * 4) + 1 + Math.floor(Math.random() * 4) + 1;
+  }
+
+  selectRandomPiece(playerColor) {
+    // Select all pieces of the specified player's color
+     const alliedPieces = Array.from(document.querySelectorAll(
+        `.chess-piece.${playerColor}-pawn, 
+         .chess-piece.${playerColor}-rook, 
+         .chess-piece.${playerColor}-bishop, 
+         .chess-piece.${playerColor}-knight, 
+         .chess-piece.${playerColor}-queen, 
+         .chess-piece.${playerColor}-king`
+    ));
+
+    if (alliedPieces.length === 0) {
+        console.error("No pieces found for player:", playerColor);
+        return null;
+    }
+
+    // Randomly select one piece from the array
+    return alliedPieces[Math.floor(Math.random() * alliedPieces.length)];
+  }
+
+
+
+castDiceOfDestinySpell() {
+    const movesPerPlayer = this.rollDiceForSpell();
+    let currentMove = 0;
+    const totalMoves = movesPerPlayer * 2; // 2 players
+
+    const moveInterval = setInterval(() => {
+        const player = currentMove % 2 === 0 ? 'white' : 'black';
+        const piece = this.selectRandomPiece(player);
+        if (piece) {
+            this.forceRandomMove(piece); // Use your existing function
+        }
+
+        currentMove++;
+        if (currentMove >= totalMoves) {
+            clearInterval(moveInterval);
+        }
+    }, 1000); // Delay of 1 second between moves
+}
+//END OF randomDiceMove SPELL
+
 
 //BEGINNING OF castDigitzKingSpell FUNCTION\\
 
@@ -3117,50 +3778,206 @@ downgradePiece(alliancePiece) {
 
 
 }
-swapPiece(piece) {
-    console.log('swapPiece function called with', piece);
-    // const pieceColor = piece.dataset.color;
 
-    // Fetch all pieces of the same color
-    //     const pieces = Array.from(document.querySelectorAll(`.chess-piece.${pieceColor}-rook, .chess-piece.${pieceColor}-bishop, .chess-piece.${pieceColor}-knight, .chess-piece.${pieceColor}-pawn, .chess-piece.${pieceColor}-queen, .chess-piece.${pieceColor}-king`))
-    const pieceTypes = ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'];
-const pieceColor = this.color; // or "black", depending on the color you need
+// swapPiece(square) { //ALMOST FUNCTIONNAL BUT MISSING SOME THINGS ABOUT SWAPPIECE DIRECTION CONCERNING VALIDMOVES -forpawn-
+//     console.log('swapPiece function called with square:', square);
 
-// Create a selector for each piece type and concatenate them
-const selectors = pieceTypes.map(type => `.chess-piece.${pieceColor}-${type}`).join(', ');
+//     const allSquares = Array.from(document.querySelectorAll('.chess-square.has-piece'));
+//     const eligibleSquares = allSquares.filter(s => s !== square);
 
-// Query all pieces of the specified color and types
-const allPieces = Array.from(document.querySelectorAll(selectors));
-    // const allPieces = Array.from(document.querySelectorAll(`.chess-piece.${pieceColor}`));
-    console.log('All pieces before filtering:', allPieces);
+//     if (eligibleSquares.length < 1) {
+//         console.error('Not enough squares available to swap.');
+//         return;
+//     }
 
-    // Filter out the piece that triggered the swap
-    const eligiblePieces = allPieces.filter(p => p !== piece);
-    console.log('Eligible pieces for swap:', eligiblePieces);
+//     let randomSquare = eligibleSquares[Math.floor(Math.random() * eligibleSquares.length)];
+//     console.log('randomsquare in swapPiece function:', randomSquare);
+//     if (square && randomSquare) {
+//       console.log('initial square check for swapping :', square, 'randomSquare', randomSquare);
+        
+//         let piece1 = square.querySelector('.chess-piece');
+//         let piece2 = randomSquare.querySelector('.chess-piece');
+//         console.log('initial piece for swapping :', piece1, 'randomPiece', piece2);
+//         if (square && randomSquare) {
+//           // Swap the attributes of the squares (which are the containers of the pieces)
+//         ['data-type', 'data-color', 'data-col', 'data-row'].forEach(attribute => {
+//                 this.swapAttributes(square, randomSquare, attribute);
+//         });
+       
 
-    if (eligiblePieces.length < 2) {
-        console.error('Not enough pieces available to swap.');
+//             let bgImage1 = piece1.style.backgroundImage;
+//             let bgImage2 = piece2.style.backgroundImage;
+//             console.log('backgroundImage1', bgImage1, "background-image2", bgImage2);
+//             piece1.style.backgroundImage = bgImage2;
+//             square.style.backgroundImage = '';
+//             piece2.style.backgroundImage = bgImage1;
+//             randomSquare.style.backgroundImage = '';
+//             console.log('piece1.style.backgroundImage', piece1.style.backgroundImage, "piece2.style.backgroundImage", piece2.style.backgroundImage);
+
+//             // Swap CSS for background images if needed
+//             // This part seems commented out but you can uncomment and adjust as needed
+//             let classPiece1 = piece1.className;
+//             let classPiece2 = piece2.className;
+//             piece1.className = classPiece2;
+//             piece2.className = classPiece1;
+
+//                         // Detach and re-append pieces to swap them
+//             // const detachedPiece1 = square.removeChild(piece1);
+//             // const detachedPiece2 = randomSquare.removeChild(piece2);
+//             // square.appendChild(detachedPiece2);
+//             // randomSquare.appendChild(detachedPiece1);
+
+//             // Calculate positions based on square attributes
+//             const piece1Position = [parseInt(square.getAttribute('data-row')), parseInt(square.getAttribute('data-col'))];
+//             const piece2Position = [parseInt(randomSquare.getAttribute('data-row')), parseInt(randomSquare.getAttribute('data-col'))];
+
+//             console.log('position of the pieces before changing the board internal state, piece 1 swapped', piece1Position[0], 'randomPiece aka piece2', piece2Position);
+//             console.log('this.game.board before trying to update the internal state', this.game.game.board);
+
+//             // Swap pieces in the game board array
+//             let tempPiece = this.game.game.board[piece1Position[0]][piece1Position[1]];
+//             this.game.game.board[piece1Position[0]][piece1Position[1]] = this.game.game.board[piece2Position[0]][piece2Position[1]];
+//             this.game.game.board[piece2Position[0]][piece2Position[1]] = tempPiece;
+//             console.log('this.game.board after the internalstate update but before calling this.syncBoardState', this.game.board);
+
+
+//             // Ensure syncBoardState properly reflects changes in the board state
+//             this.game.syncBoardState();
+//              console.log('this.game.board AFTER THE CALL TO syncBoardState ', this.game.game.board);
+
+//             this.pieceSwapped = true;
+//         } else {
+//             console.error('One of the squares does not contain a piece. Swap aborted.');
+//         }
+//     } else {
+//         console.error('Invalid square element encountered.');
+//     }
+// }
+
+
+// // Enhanced attribute swap function to handle both square and piece attributes
+// swapAttributes(square1, square2, attributeName) {
+//   console.log('swapAttributes function called for square', square1, 'randomsquare', square2, 'with attribute : ', attributeName);
+//     // Swap square attributes
+//     let tempSquareAttribute = square1.getAttribute(attributeName);
+//     square1.setAttribute(attributeName, square2.getAttribute(attributeName));
+//     square2.setAttribute(attributeName, tempSquareAttribute);
+    
+//     // Swap piece attributes if they exist
+//     // if (piece1 && piece2) {
+//     //     let tempPieceAttribute = piece1.getAttribute(attributeName);
+//     //     piece1.setAttribute(attributeName, piece2.getAttribute(attributeName));
+//     //     piece2.setAttribute(attributeName, tempPieceAttribute);
+//     // }
+// }
+swapPiece() {
+    console.log("swapTwoPieces called");
+
+    const squares = Array.from(document.querySelectorAll('.chess-square.has-piece'));
+    if (squares.length < 2) {
+        console.error("Not enough pieces on the board to swap.");
         return;
     }
 
-    // Randomly select two different pieces to swap
-    let randomIndex1 = Math.floor(Math.random() * eligiblePieces.length);
-    let randomPiece1 = eligiblePieces[randomIndex1];
-    let randomIndex2;
-    do {
-        randomIndex2 = Math.floor(Math.random() * eligiblePieces.length);
-    } while (randomIndex2 === randomIndex1);
-    let randomPiece2 = eligiblePieces[randomIndex2];
+    // Select two distinct squares randomly
+    let randomIndexes = this.selectTwoDistinctRandomIndexes(squares.length);
+    let square1 = squares[randomIndexes[0]];
+    let square2 = squares[randomIndexes[1]];
+    square1.style.backgroundImage = '';
+    square2.style.backgroundImage = '';
+    
 
-    // Swap the pieces
-    const randomPiece1Square = randomPiece1.parentNode;
-    const randomPiece2Square = randomPiece2.parentNode;
-    randomPiece1Square.appendChild(randomPiece2);
-    randomPiece2Square.appendChild(randomPiece1);
-    this.pieceSwapped = true;
+    // Swap 'data-' attributes and pieces
+    ['data-type', 'data-color'].forEach(attribute => {
+        this.swapAttributes(square1, square2, attribute);
+    });
+    this.swapChessPieces(square1, square2);
 
-    console.log('Swapped pieces:', randomPiece1, randomPiece2);
+    // Optionally, update internal game state
+    this.updateInternalGameStateForSwap(square1, square2);
+
+    console.log("Two pieces swapped successfully.");
 }
+
+selectTwoDistinctRandomIndexes(length) {
+    let index1 = Math.floor(Math.random() * length);
+    let index2;
+    do {
+        index2 = Math.floor(Math.random() * length);
+    } while (index1 === index2);
+    return [index1, index2];
+}
+
+swapAttributes(element1, element2, attributeName) {
+    let temp = element1.getAttribute(attributeName);
+    element1.setAttribute(attributeName, element2.getAttribute(attributeName));
+    element2.setAttribute(attributeName, temp);
+}
+
+swapChessPieces(square1, square2) {
+    const piece1 = square1.querySelector('.chess-piece');
+    const piece2 = square2.querySelector('.chess-piece');
+
+    const tempContainer = document.createElement('div');
+    tempContainer.appendChild(piece1.cloneNode(true));
+    square1.replaceChild(piece2.cloneNode(true), piece1);
+    square2.replaceChild(tempContainer.firstChild, piece2);
+}
+
+updateInternalGameStateForSwap(square1, square2) {
+    // Your logic to update the internal game state after a swap
+    // This should reflect the new positions of the swapped pieces in your game's data structure
+}
+    // swapPiece(piece) {
+//     console.log('swapPiece function called with', piece);
+//     // const pieceColor = piece.dataset.color;
+
+//     // Fetch all pieces of the same color
+//     //     const pieces = Array.from(document.querySelectorAll(`.chess-piece.${pieceColor}-rook, .chess-piece.${pieceColor}-bishop, .chess-piece.${pieceColor}-knight, .chess-piece.${pieceColor}-pawn, .chess-piece.${pieceColor}-queen, .chess-piece.${pieceColor}-king`))
+//     const pieceTypes = ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'];
+// const pieceColor = this.color; // or "black", depending on the color you need
+
+// // Create a selector for each piece type and concatenate them
+// const selectors = pieceTypes.map(type => `.chess-piece.${pieceColor}-${type}`).join(', ');
+
+// // Query all pieces of the specified color and types
+// const allPieces = Array.from(document.querySelectorAll(selectors));
+//     // const allPieces = Array.from(document.querySelectorAll(`.chess-piece.${pieceColor}`));
+//     console.log('All pieces before filtering:', allPieces);
+
+//     // Filter out the piece that triggered the swap
+//     const eligiblePieces = allPieces.filter(p => p !== piece);
+//     console.log('Eligible pieces for swap:', eligiblePieces);
+
+//     if (eligiblePieces.length < 2) {
+//         console.error('Not enough pieces available to swap.');
+//         return;
+//     }
+
+//     // Randomly select two different pieces to swap
+//     let randomIndex1 = Math.floor(Math.random() * eligiblePieces.length);
+//     let randomPiece1 = eligiblePieces[randomIndex1];
+//     let randomIndex2;
+//     do {
+//         randomIndex2 = Math.floor(Math.random() * eligiblePieces.length);
+//     } while (randomIndex2 === randomIndex1);
+//     let randomPiece2 = eligiblePieces[randomIndex2];
+
+//     // Swap the pieces
+// const randomPiece1Square = randomPiece1.parentNode;
+// const randomPiece2Square = randomPiece2.parentNode;
+
+// // Temporarily store one piece in a fragment to maintain a reference to it
+// const tempFragment = document.createDocumentFragment();
+// tempFragment.appendChild(randomPiece1);
+
+// // Swap positions
+// randomPiece1Square.appendChild(randomPiece2);
+// randomPiece2Square.appendChild(tempFragment.firstChild);
+//     this.pieceSwapped = true;
+
+//     console.log('Swapped pieces:', randomPiece1, randomPiece2);
+// }
 
 
 banishPiece(piece) {
@@ -3339,6 +4156,7 @@ blinkStep(piece) {
 //BEGINNING OF CHAOSTHEORYSPELL
 
 castChaosTheorySpell() {
+  console.log('chaostheoryspell entered');
     // Emit Chaos Theory start event
     document.dispatchEvent(this.chaosTheoryStartEvent);
     setTimeout(() => {
@@ -3531,37 +4349,36 @@ applyGravitationalField(selectedPiece, currentRow, currentCol) {
 //         }
 //     }
 // }
-forceRandomMove(piece, excludeMiniBoardArea = false) {
+forceRandomMove(piece, chessBoard, event, excludeMiniBoardArea = false) {
     console.log('forceRandomMove called for:', piece);
-    const parent = piece.parentNode;
-    const fromRow = parseInt(parent.getAttribute('data-row'));
-    const fromCol = parseInt(parent.getAttribute('data-col'));
+    const parentSquare = piece.parentNode;
+    const fromRow = parseInt(parentSquare.getAttribute('data-row'));
+    const fromCol = parseInt(parentSquare.getAttribute('data-col'));
 
-    
-    console.log('fromRow', fromRow, 'fromCol', fromCol);
-
-    // Assuming your board is an 8x8 grid
-    const totalRows = 8;
+    const totalRows = 8; // Assuming an 8x8 grid
     const totalCols = 8;
 
-    let toRow, toCol;
+    let toRow, toCol, targetSquare, isValidMove;
 
     do {
         toRow = Math.floor(Math.random() * totalRows);
         toCol = Math.floor(Math.random() * totalCols);
 
-        // If excluding mini-board area, ensure the destination is outside this area
+        targetSquare = document.querySelector(`[data-row='${toRow}'][data-col='${toCol}']`);
+
+        // Check if the square is empty and not the same as the starting square
+        isValidMove = targetSquare && !targetSquare.classList.contains('has-piece')
+                      && (toRow !== fromRow || toCol !== fromCol);
+
         if (excludeMiniBoardArea) {
-            // Check if the coordinates fall outside the mini-board
-            if (!this.isOutsideMiniBoard(toRow, toCol)) {
-              toRow = Math.floor(Math.random() * totalRows);
-              toCol = Math.floor(Math.random() * totalCols);
-                // continue; // Skip if inside mini-board, and generate new coordinates
-            }
+            isValidMove = isValidMove && !this.isWithinMiniBoard(toRow, toCol);
         }
-    } while (this.game.board[toRow][toCol] !== null || (toRow === fromRow && toCol === fromCol));
+    } while (!isValidMove);
 
     this.forceMove(piece, fromRow, fromCol, toRow, toCol);
+    this.syncBoardState();
+    console.log('this context', this);
+    // this.game.syncBoardState();
 }
 isOutsideMiniBoard(row, col) {
     return row < this.miniBoardArea.y1 || row > this.miniBoardArea.y2 ||
@@ -3569,6 +4386,95 @@ isOutsideMiniBoard(row, col) {
 }
 
 // END OF CASTENCHANTEDGROUNDSPELL\\
+//BEGINNING OF RANDOMPAWNMOVE
+activateWindOfChangeSpell() {
+    const allPawnElements = document.querySelectorAll('.chess-piece.white-pawn, .chess-piece.black-pawn');
+    allPawnElements.forEach(pawnElement => {
+        const directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
+        const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+        // Remove any existing direction classes first
+        directions.forEach(dir => pawnElement.classList.remove(dir));
+        // Add the new random direction as a class
+        pawnElement.classList.add(randomDirection);
+        pawnElement.classList.add('pawn-random-move'); // Indicate that this pawn is under the spell effect
+    });
+}
+// activateWindOfChangeSpell() {
+//         if (this.type !== 'pawn') return; // Only pawns are affected
+//             this.isWindOfChangeActive = true;
+
+//         const allPawnElements = document.querySelectorAll('.chess-piece.white-pawn, .chess-piece.black-pawn');
+    
+//     // Add the 'pawn-random-move' class to each pawn element
+//     allPawnElements.forEach(pawnElement => {
+//         pawnElement.classList.add('pawn-random-move');
+//     });
+//         this.movesLeftWithSpell = Math.floor(Math.random() * (9)) + 2; // 2 to 10 moves
+//         this.assignNewDirection(); // Assign initial random direction
+//     }
+
+//     // Assigns a new, random direction to the pawn
+//     assignNewDirection() {
+//       console.log('this context in assignNewDirection', this);
+//       const randomIndex = Math.floor(Math.random() * this.directions.length);
+//       this.currentDirection = this.directions[randomIndex];
+//       console.log(`New direction for ${this.color} pawn: ${this.currentDirection}`);
+//             console.log(`New direction for ${this.color} pawn: ${chessPiece.currentDirection}`);
+
+//     }
+
+//     // Called after each move to update the spell's effect
+//     updateAfterMove() {
+//         if (this.type !== 'pawn' || !this.isWindOfChangeActive) return;
+
+//         this.movesLeftWithSpell--;
+//         if (this.movesLeftWithSpell > 0) {
+//             this.assignNewDirection(); // Assign a new direction if spell is still active
+//         } else {
+//             this.isWindOfChangeActive = false; // Spell expires
+//             this.currentDirection = 'forward'; // Reset to default direction
+//         }
+//     }
+  // Additional methods as needed for standard chess piece behavior...
+  
+//END OD RANDOMPAWNMOVE
+//BEGINNING OF ARCANE ANARCHY spell
+
+    determineMovement() {
+        // Movement logic based on piece type
+        switch(this.type) {
+            case 'Pawn': return 'forward';
+            case 'Rook': return 'straight';
+            case 'Knight': return 'L-shape';
+            case 'Bishop': return 'diagonal';
+            default: return 'default';
+        }
+    }
+
+    // Static method to cast the Arcane Anarchy spell
+    static castArcaneAnarchy() {
+        const eligiblePieces = ChessPiece.allPieces.filter(piece => piece.type !== 'King' && piece.type !== 'Queen');
+        const shuffledMovements = eligiblePieces.map(piece => piece.originalMovement).sort(() => Math.random() - 0.5);
+
+        eligiblePieces.forEach((piece, index) => {
+            piece.applySpell(shuffledMovements[index] || piece.originalMovement);
+        });
+
+        // Reset the spell after 3 turns
+        // This logic would need to be integrated with the game's turn management system
+    }
+
+    applySpell(newMovement) {
+        this.currentMovement = newMovement;
+        this.isUnderSpell = true;
+    }
+
+    revertSpell() {
+        this.currentMovement = this.originalMovement;
+        this.isUnderSpell = false;
+    }
+    
+//END OF ARCANE ANARCHY SPELL
 
 //BEGIN OF TOWERACTIVATIONSPELL
 placeTower() {
@@ -4079,12 +4985,19 @@ removeAndStealEnemyPieces(enemyColor, playerColor, game) {
     });
 }
 getPieceType(piece) {
-    if (piece.classList.contains('pawn')) return 'pawn';
-    if (piece.classList.contains('rook')) return 'rook';
-    if (piece.classList.contains('king')) return 'king';
-    if (piece.classList.contains('queen')) return 'queen';
-     if (piece.classList.contains('bishop')) return 'bishop';
-    if (piece.classList.contains('knight')) return 'knight';
+  console.log('getPieceType entered with :', piece);
+    if (piece.classList.contains('white-pawn')) return 'pawn';
+    if (piece.classList.contains('black-pawn')) return 'pawn';
+    if (piece.classList.contains('white-rook')) return 'rook';
+    if (piece.classList.contains('black-rook')) return 'rook';
+    if (piece.classList.contains('white-king')) return 'king';
+    if (piece.classList.contains('white-queen')) return 'queen';
+     if (piece.classList.contains('white-bishop')) return 'bishop';
+    if (piece.classList.contains('white-knight')) return 'knight';
+    if (piece.classList.contains('black-king')) return 'king';
+    if (piece.classList.contains('black-queen')) return 'queen';
+     if (piece.classList.contains('black-bishop')) return 'bishop';
+    if (piece.classList.contains('black-knight')) return 'knight';
    
     return 'unknown'; // Default case
 }
@@ -4110,19 +5023,7 @@ placePieceOnBoard(piece, parent) {
     }
 }
 addPieceToPlayerSet(pieceElement, playerColor, game) {
-    console.log('this.game', this.game);  
-
-  console.log('this.game.board in addPieceToPlayerSet before syncBoardState', this.game.game.board);  
-    console.log('this.game.board in addPieceToPlayerSet before syncBoardState', this.game.board); 
-     this.syncBoardState();
-console.log('this.game.game.board in addPieceToPlayerSet after syncBoardState', this.game.game.board);
-    console.log('this.game.board in addPieceToPlayerSet after syncBoardState', this.game.board);  
-
-     
-
-  console.log("this.currentPlayer in necromancerspell subfunction", this.currentPlayer);
-    console.log("playerColor in necromancerspell subfunction", playerColor);
-
+  this.syncBoardState();
     const pieceTypes = ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'];
 
 
@@ -4233,7 +5134,69 @@ forceMove(piece, fromRow, fromCol, toRow, toCol, isRiftMove = false) {
 }
 
 //END OF NECROMANCER SPELL
+// BEGINNING OF GAMBITMOVE UPGRADEDPIECE
 
+activateGambitOfAges() {// Assuming you have a way to access the board and pieces
+  console.log('Casting gambitOfAges');
+        const enemyColor = this.currentPlayer === 'white' ? 'black' : 'white';
+        console.log(enemyColor);
+        const board = document.querySelector('#chessboard');
+
+        const enemyPawn = document.querySelectorAll(`.chess-piece.${enemyColor}-pawn`);
+        const alliedPawn = document.querySelectorAll(`.chess-piece.${this.currentPlayer}-pawn`);
+        console.log("enemyPawn", enemyPawn);
+        console.log("alliedPawn", alliedPawn);
+
+        
+        const opponentUpgradedPiece = Array.from(document.querySelectorAll(`.chess-piece.${enemyColor}-rook, 
+                                                                       .chess-piece.${enemyColor}-bishop, 
+                                                                       .chess-piece.${enemyColor}-knight`));
+
+        const alliedUpgradedPiece = Array.from(document.querySelectorAll(`.chess-piece.${this.currentPlayer}-rook, 
+                                                                       .chess-piece.${this.currentPlayer}-bishop, 
+                                                                       .chess-piece.${this.currentPlayer}-knight`));
+        
+        const enemyPawnSelected = this.randomlySelectPieces(enemyPawn, 2);
+        const opponentUpgradedPieceSelected = this.randomlySelectPieces(opponentUpgradedPiece, 2);
+
+        // Select two pawns and one 'upgraded' piece for each player
+        const alliedUpgradedPieceSelected = this.randomlySelectPieces(alliedUpgradedPiece, 2);
+        const alliedPawnSelected = this.randomlySelectPieces(alliedPawn, 2);
+        
+        console.log('alliedPawnSelected', enemyPawnSelected);        
+        console.log('alliedUpgradedPieceSelected', opponentUpgradedPieceSelected);
+        console.log('alliedPawnSelected', alliedPawnSelected);        
+        console.log('alliedUpgradedPieceSelected', alliedUpgradedPieceSelected);
+     
+        // Apply enhancements
+        alliedUpgradedPieceSelected.forEach(piece => this.enhancePiece(piece));
+        opponentUpgradedPieceSelected.forEach(piece => this.enhancePiece(piece));
+        enemyPawnSelected.forEach(piece => this.enhancePiece(piece));
+        alliedPawnSelected.forEach(piece => this.enhancePiece(piece));
+        // ... Additional logic for visual indicators and other effects
+    }
+
+    // Method to randomly select pieces
+    // selectRandomPieces(pieces, count, types) {
+    //     const filteredPieces = pieces.filter(piece => types.includes(piece.type));
+    //     // Shuffle and select the specified number of pieces
+    //     return filteredPieces.sort(() => 0.5 - Math.random()).slice(0, count);
+    // }
+
+    // Method to apply enhancements to a piece
+    enhancePiece(piece) {
+    // Assuming 'piece' is the DOM element representing the chess piece
+    console.log('Enhancing piece:', piece);
+
+    // Mark the piece as enhanced using a data attribute
+    piece.dataset.isEnhanced = 'true';
+
+    // Apply a universal visual indicator for all enhanced pieces
+    piece.style.boxShadow = '0 0 10px 5px rgba(255, 215, 0, 0.7)'; // Example: A glowing effect
+}
+
+// END OF GAMBITMOVE UPGRADEPIECE
+//BEGIN OF LIGHSABER SPELL
 castLightsaberSpell() {
     // Play lightsaber animation and sound across the columns
     const columnIndex = this.playLightsaberAnimation(); // Implement this animation logic
@@ -4328,6 +5291,8 @@ forceRemove(row, col) {
     // Identify the square from which the piece is to be removed
     const squareId = `square-${row}-${col}`;
     const square = document.getElementById(squareId);
+    const color = square.getAttribute('data-color');
+    const type = square.getAttribute('data-type');
     console.log('square in forceRemove:', square);
 
     if (square) {
@@ -4339,6 +5304,8 @@ forceRemove(row, col) {
             square.classList.remove('has-piece');
             square.removeAttribute('data-color');
             square.removeAttribute('data-type');
+            const pieceEmoji = this.mapPieceToEmoji(type, color);
+            this.addCapturedPiece(pieceEmoji, color);
         }
 
         // Clear the background-image style from the square
@@ -4358,7 +5325,7 @@ forceRemove(row, col) {
       return this.color;
     }
 
-    getPosition() 
+    getPosition(piece) 
     {
         // returns the current position of the piece on the board as an array [row, col]
       return [this.row, this.col];
