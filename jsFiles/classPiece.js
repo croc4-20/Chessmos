@@ -1,3 +1,5 @@
+import { getGameSession } from '../gameSessions.js'
+
 let clickedPiece;
 let pieces;
 let handleClick;
@@ -29,7 +31,15 @@ async function initialize()
   const { default: ChessBoard } = await import('./classBoard.js');
   const { default: ChessGame } = await import('./classGame.js');
   const { default: ChessArray } = await import('./classArray.js');
+//   const { getGameSession } = await import('../gameSessions.js');
+
+// ChessPiece.gameSession = getGameSession;
+
+
+ const seededRNG = import('./seedRng.js');
  
+ console.log('seededRNG', seededRNG);
+ let rng;
  
   const chessArray = new ChessArray();
   const chessBoard = new ChessBoard();
@@ -103,6 +113,7 @@ for (const piece of pieces)
     if (!squareElement.classList.contains('event-listener-attached')) {
         chessPiece.element.addEventListener('click', chessPiece.boundHandleClick);
         squareElement.classList.add('event-listener-attached');
+        // piece.dataset.listenerAttached = 'true';
         console.log(`Event listener attached to: ${chessPiece.elementId}`);
     }
 
@@ -173,10 +184,12 @@ export default class ChessPiece {
   default:
     throw new Error("Invalid piece type");
 }
+this.initObserver();
     this.board = chessBoard;
     console.log("this.board in chessPiece constructor", this.board);
     //this.chessBoard = new ChessBoard();
     this.color = color;
+    this.gameSession = ChessPiece.gameSession;
     console.log('Constructor color:', this.color);
     this.row = row;  
     this.col = col;
@@ -190,6 +203,9 @@ export default class ChessPiece {
     this.isSpellActive = false;
     this.pieceSwapped = true;
     this.riftSpellDuration = 0;
+    // this.checkAndUpdateSpellEffects = this.checkAndUpdateSpellEffects.bind(this);
+     this.setupMoveListener();
+     // this.forceMove = this.forceMove.bind(this);
    
     this.activeSpells = [];
     this.game = game;
@@ -260,7 +276,8 @@ export default class ChessPiece {
 
      if (!this.element.classList.contains('event-listener-attached')) {
         this.element.addEventListener('click', this.boundHandleClick, { once: true });
-        this.element.classList.add('event-listener-attached');
+        this.element.dataset.listenerAttached = 'true';
+        
         console.log('Adding event listener to:', this.element);
     } else {
         console.error(`Event listener already attached to: ${this.element}`);
@@ -272,6 +289,27 @@ export default class ChessPiece {
 }
 
 }
+// funtion to listen to moves made to reproduce them.
+
+setupMoveListener() {
+  console.log('setupMoveListener function entered');
+        document.addEventListener('moveReceived', (e) => {
+          console.log('move received trying to call applymove function');
+            const { piece, from, to } = e.detail; // Destructure the move details
+            this.applyMove(from, to);
+        });
+    }
+    applyMove(from, to) {
+      console.log('applyMove function entered in classPiece from being :', from, "to being:", to)
+        // Assuming you have a way to map 'from' and 'to' to pieces and their new positions
+        // and that ClassPiece instances are managed or accessible here
+        const piece = this.getPosition(from);
+        if (piece) {
+            this.forceMove(to);
+            // this.forceMove(piece, fromRow, fromCol, toRow, toCol, isRiftMove = false) {
+            // Additional logic to update the UI based on the move
+        }
+    }
 showNotification(spellName, spellDuration, description) {
     const notificationBox = document.createElement('div');
     notificationBox.className = 'notification-box';
@@ -491,10 +529,68 @@ initSquares(board, game) {
   return this.isSpellActive;
 }
 
-handleClick = (event, chessBoard, game) => {
-  console.log('player color : ', this.game.currentPlayer);
-  console.log('this context at the beginning of handleclick', this);
+handleBoardClick(event) {
+    const clickedElement = event.target;
+    const isPiece = clickedElement.classList.contains('chess-piece');
+    const square = isPiece ? clickedElement.closest('.chess-square') : clickedElement;
 
+    if (isPiece) {
+        // Logic for selecting a piece
+        selectPiece(clickedElement);
+    } else if (square.classList.contains('chess-square')) {
+        // Logic for moving a selected piece or capturing
+        moveToSquare(square);
+    }
+}
+
+ selectPiece(piece) {
+    // Deselect any currently selected piece
+    const currentlySelected = document.querySelector('.selected');
+    if (currentlySelected) {
+        currentlySelected.classList.remove('selected');
+    }
+
+    // Select the new piece
+    piece.classList.add('selected');
+
+    // Possibly show valid moves here
+}
+
+ moveToSquare(square) {
+    const selectedPiece = document.querySelector('.selected');
+
+    // Check if a piece is selected and the move is valid
+    if (selectedPiece && isValidMove(selectedPiece, square)) {
+        // Move the piece (assuming you have a function to move pieces)
+        movePiece(selectedPiece, square);
+        // Deselect the piece after moving
+        selectedPiece.classList.remove('selected');
+    }
+}
+
+
+handleClick = (event, chessBoard, game) => {
+ 
+  const previouslySelectedPieces = document.querySelectorAll('.chess-piece.selected-piece');
+  previouslySelectedPieces.forEach(piece => {
+    piece.removeEventListener('click', this.handleClick); // Prevent potential duplicates
+    piece.addEventListener('click', this.handleClick);
+});
+  // const chainId = 'stargaze-1';
+  // await window.keplr.enable(chainId);
+  // const offlineSigner = window.getOfflineSigner(chainId);
+  // const accounts = await offlineSigner.getAccounts();
+  // const currentUserAddress = accounts[0].address;
+  // if (!game.isPlayersTurn(currentUserAddress))
+  // {
+  //   console.log("It's not your turn!!!");
+  //   return;
+  // }
+  console.log('myTurn', myTurn);
+  if (!myTurn) {
+        console.log("Not your turn!");
+        return;
+    }
     console.log('this.game.board in handleclick before syncBoardState', this.game.game.board);  
     console.log('this.game.board in handleclick before syncBoardState', this.game.board); 
      this.game.syncBoardState();
@@ -502,12 +598,50 @@ handleClick = (event, chessBoard, game) => {
     console.log('this.game.board in handleclick after syncBoardState', this.game.board);  
       console.log("Active Spells in handleclick:", this.activeSpells);
     const clickedSquareElement = event.target.closest('.chess-square');
+    if (!clickedSquareElement) return;
     const clickedPieceElement = clickedSquareElement.querySelector('.chess-piece');
+    if (!clickedPieceElement) return;
 
+
+    const playerColor = myTurn ? 'white' : 'black';
+    console.log('currentPlayerColor', playerColor);
     if (this.isSpecialMoveActive || this.isSpellActive) return;
 
+
     const clickedPiece = clickedPieceElement ? this.getPieceFromElement(clickedPieceElement) : null;
-    console.log('this.selectedPiece', this.selectedPiece);
+    
+    console.log('trying to select piece : ', clickedPiece);
+      console.log('this.type', this.type);
+      const thistype = this.type;
+      const thiscolor = this.color;
+      console.log('check before selecting piece thistype being ', thistype, 'this.color being', thiscolor, 'playerColor', playerColor);
+      const isAlliedPiece = clickedPieceElement.classList.contains(`${thiscolor}-${thistype}`); // Extend this check as needed
+      const isSelected = clickedPieceElement.classList.contains('selected-piece');
+      const pieceType = clickedSquareElement.getAttribute('data-type');
+      console.log('isAlliedPiece', isAlliedPiece, 'isSelected', isSelected);
+      if (isAlliedPiece && !isSelected) 
+      {
+        console.log('piece is allied, not selected and of the correct color, trying to selectit.')
+        // Clear any existing selections among allied pieces, irrespective of type
+        console.log('currentPlayerColor', thiscolor, 'thistype', thistype);
+    
+        // This selector aims to match any selected piece of the current player, regardless of its type
+        const alliedSelectedPieces = document.querySelectorAll(`.${thiscolor}-pawn.selected-piece, .${thiscolor}-knight.selected-piece, .${thiscolor}-bishop.selected-piece, .${thiscolor}-rook.selected-piece, .${thiscolor}-queen.selected-piece, .${thiscolor}-king.selected-piece`);
+        console.log("alliedSelectedPieces", alliedSelectedPieces);
+    
+        alliedSelectedPieces.forEach(piece => piece.classList.remove('selected-piece'));
+        console.log('clickedPieceElement value before trying to addd selectedPiece to it.', clickedPieceElement);
+    // Then, select the clicked allied piece
+        clickedPieceElement.classList.add('selected-piece');
+      }
+
+    
+
+
+// Then proceed to select the new piece
+this.selectedPiece = clickedPiece;
+    
+
 
     //forbid frozen piece to move
     if (clickedPieceElement.classList.contains('frozen-piece') || clickedSquareElement.classList.contains('frozen-square')) {
@@ -517,7 +651,9 @@ handleClick = (event, chessBoard, game) => {
 
     // Allow capturing enemy pieces if a piece is already selected
     console.log('check for values before trying to capture, this.selectedPiece', this.currentlySelectedPiece, 'clickedPiece', clickedPiece, 'clickedPiece.color', clickedPiece.color);
-    if (this.selectedPiece && clickedPiece && clickedPiece.color !== this.game.currentPlayer) {
+   
+    console.log('this.selectedPiece', this.selectedPiece, 'this.clickedPieceElement', this.clickedPieceElement);
+    if (this.selectedPiece && clickedPieceElement && clickedPieceElement.color === (thiscolor ? 'black' : 'white')){
         if (clickedSquareElement.classList.contains('valid-move')) {
             // It's a valid capture, proceed with the move
           console.log('CHECK FOR MOVEMADE ')
@@ -526,23 +662,23 @@ handleClick = (event, chessBoard, game) => {
         } else {
             // Invalid move, not a capture
             alert("Invalid move!");
-            return;
-        }
-    }
-
-    // Turn validation
-    if (clickedPiece && clickedPiece.color !== this.game.currentPlayer) {
-        alert("It's not your turn!");
-        return;
-    }
-
-    // Handle Deselection
-    if (this.selectedPiece) {
-        if (this.shouldDeselect(clickedPiece, clickedSquareElement, clickedPieceElement)) {
             this.deselectAndClear();
+           
+              // this.refreshPieceEventListeners(true);
             return;
         }
     }
+
+   
+
+    // // Handle Deselection
+    // if (this.selectedPiece) {
+    //   console.log('trying to call shouldDeselect in handleClick function');
+    //     if (this.shouldDeselect(clickedPiece, clickedSquareElement, clickedPieceElement)) {
+    //         this.deselectAndClear();
+    //         return;
+    //     }
+    // }
 
     // If a valid move is selected, execute the move
     if (this.selectedPiece && clickedSquareElement.classList.contains('valid-move')) {
@@ -570,15 +706,31 @@ handleClick = (event, chessBoard, game) => {
 
     // Handle New Selection
     if (clickedPiece) {
+      console.log('handling new selection');
         this.selectNewPiece(clickedPiece, clickedPieceElement, chessBoard, game);
+       
+         // this.refreshPieceEventListeners(true);
     } else {
         this.deselectAndClear();
+        // this.refreshPieceEventListeners(true);
     }
 };
+// attachEventListenersToAllPieces() {
+//   document.querySelectorAll('.chess-piece').forEach(piece => {
+//     // Check if the event listener class is already attached
+//     const square = piece.parentNode;
+//     if (!square.classList.contains('event-listener-attached')) {
+//         piece.addEventListener('click', this.boundHandleClick);
+//         // Add the class to mark the listener as attached
+//         square.classList.add('event-listener-attached');
+//     }
+// });
+// }
 
  // Helper function to check if the piece should be deselected
  shouldDeselect(clickedPiece, clickedSquareElement, clickedPieceElement) 
  {
+  console.log('shouldDeselect function entenred');
   const isSamePiece = this.selectedPiece.element === clickedPieceElement;
   const isSameColor = clickedPiece && clickedPiece.color === this.selectedPiece.color;
   const isInvalidMove = !clickedSquareElement.classList.contains('valid-move');
@@ -623,18 +775,45 @@ extractPieceInfo(pieceElement) {
 }
 
 
+// deselectAndClear() {
+//   console.log('deselectAndClear function entered selectedPiece elemnt being :', this.selectedPiece);
+//   if (this.selectedPiece) {
+//     console.log('trying to deselectAndClear :', this.selectedPiece);
+//     this.selectedPiece.classList.remove('selected-piece');
+//   }
+//   this.clearValidMoves();
+//   this.selectedPiece = null;
+// }
+
 deselectAndClear() {
-  if (this.selectedPiece && this.selectedPiece.element) {
-    this.selectedPiece.element.classList.remove('selected-piece');
-  }
-  this.clearValidMoves();
-  this.selectedPiece = null;
+    console.log('deselectAndClear function entered, selectedPiece being:', this.selectedPiece);
+    if (this.selectedPiece) {
+        // Check if this.selectedPiece is an object with an .element property
+        if (this.selectedPiece.element && this.selectedPiece.element.classList) {
+            console.log('Deselecting piece with element property:', this.selectedPiece);
+            this.selectedPiece.element.classList.remove('selected-piece');
+        } else if (this.selectedPiece.classList) {
+            // Assume this.selectedPiece is directly the DOM element
+            console.log('Deselecting piece directly:', this.selectedPiece);
+            this.selectedPiece.classList.remove('selected-piece');
+        } else {
+            console.log('selectedPiece does not have a classList to modify:', this.selectedPiece);
+        }
+        this.clearValidMoves();
+        this.selectedPiece = null;
+    }
 }
 
+initChessBoard() {
+  console.log('initChessBoard function called');
+    const board = document.querySelector('.chess-board'); // Adjust this selector to match your board's container
+    board.addEventListener('click', this.handleBoardClick.bind(this));
+}
 
 executeMove(board, clickedSquareElement, chessBoard, activeSpells) {
   const oldPiece = document.querySelector(".selected-piece");
   const oldSquare = oldPiece.parentNode;
+  const oldType = oldSquare.getAttribute('data-type');
   const oldColor = oldSquare.getAttribute('data-color');
   
   console.log(`oldPiece`, oldPiece);
@@ -680,21 +859,78 @@ executeMove(board, clickedSquareElement, chessBoard, activeSpells) {
   const destinationElement = document.getElementById(`square-${newRow}-${newCol}`);
   const destinationSquare = this.game.game.board[newRow][newCol];
   console.log('destinationElement', destinationElement);
-  
+
+  //TRYING TO SEND MOVE TO THE SERVER//
+// Convert numeric row and column into chess board coordinates (e.g., 2, 4 -> "e2")
+function toChessNotation(row, col) {
+
+    // Assuming col is 0-based and corresponds to a-h, and row is 1-based
+    const letter = String.fromCharCode('a'.charCodeAt(0) + col); // Convert column to letter
+    return letter + row.toString(); // Combine with row
+}
+
+function isCapture(board, newRow, newCol, playerColor) {
+
+   
+  // console.log('isCapture function entered this.game.game.board being ::', this.game.game.board, 'newRow', newRow, 'newCol', newCol, '^playerColor', playerColor);
+    const targetPiece = board[newRow][newCol];
+    return targetPiece && targetPiece.color !== playerColor;
+}
+const fromPosition = toChessNotation(oldRow, oldCol);
+const toPosition = toChessNotation(newRow, newCol);
+
+console.log('game.board', this.game.game.board);
+const thisGameGameBoard = this.game.game.board;
+const captureOccurred = isCapture(thisGameGameBoard, newRow, newCol, oldColor);
+console.log('piece', oldPiece, 'fromPosition sending the to the serv', fromPosition, 'toPosition sending to the serv', toPosition);
+
+const moveEvent = new CustomEvent('pieceMoved', {
+    detail: {
+        color: oldColor,
+        type: oldType,
+        capture: captureOccurred,
+        from:
+        {
+          row: oldRow,
+          col: oldCol
+        },
+        to:
+        {
+          row: newRow,
+          col: newCol
+        }
+      }
+    });
+// This should use the dynamically calculated positions
+console.log('trying to emit the move to the socket')
+ socket.emit('move', { color: oldColor, type: oldType, capture: captureOccurred, from:
+        {
+          row: oldRow,
+          col: oldCol
+        },to:
+        {
+          row: newRow,
+          col: newCol
+        } });
+//socket.emit('move', { from: fromPosition, to: toPosition });
+myTurn = !myTurn;
+console.log('trying to send move to the server :', moveEvent);
+
+//END OF SERVER MOVE SEND TESTING//
 
 if (destinationElement.classList.contains('hole-square')) {
     // Logic for when destination is a hole
     this.forceRandomMove(oldPiece, chessBoard, event, this.excludeMiniBoardArea = false);
     this.game.endTurnMove();
-          this.game.startTurn();
-          this.game.currentPlayer = this.game.currentPlayer === "white" ? "black" : "white";
+    this.game.startTurn();
+    this.game.currentPlayer = this.game.currentPlayer === "white" ? "black" : "white";
     return;
 } else if (destinationElement.classList.contains('magma-square')) {
     // Logic for when destination is a magma square
   this.forceRemove(oldRow, oldCol);
   this.game.endTurnMove();
   this.game.currentPlayer = this.game.currentPlayer === "white" ? "black" : "white";
-          this.game.startTurn();
+  this.game.startTurn();
   return;
     // Implement specific logic for magma square
 } else if (destinationElement.classList.contains('rock-square')) {
@@ -705,7 +941,7 @@ if (destinationElement.classList.contains('hole-square')) {
 
   
   
-  const oldType = this.selectedPiece.piece.type;
+  // const oldType = this.selectedPiece.piece.type;
   // const oldColor = this.selectedPiece.piece.color;
   
    // Move logic
@@ -782,11 +1018,12 @@ console.log("Flag before requestAnimationFrame in executeMove:", this.hasMovedDu
 
   console.log('this.game before trying to endTurn', this.game);
    // this.game.endTurn = this.game.endTurn.bind(this);
-          this.game.endTurnMove();
+        //  this.game.endTurnMove();
           this.game.startTurn();
   console.log('this.game after trying to endTurn', this.game);
   // this.updateRiftDurationOnPlayerChange();
   oldPiece.addEventListener('click', this.boundHandleClick, { once: true });
+
     // console.log('selectedElement', selectedElement);
           // const chessPiece = this.getPiece(newRow, newCol);
           // console.log('chessPiece right after executeMovecalled in movepiece.');
@@ -814,6 +1051,7 @@ console.log("Flag before requestAnimationFrame in executeMove:", this.hasMovedDu
 
 
           }
+          
 
 getPiece(row, col) {
   console.log('getPiece function called');
@@ -848,11 +1086,11 @@ selectNewPiece(clickedPiece, clickedPieceElement, chessBoard, game) {
    chessBoard = document.querySelector(`#chessboard`);
   console.log("chessBoard in selectNewPiece after querySelector:", chessBoard);
 
-  if (this.selectedPiece) {
-   
-    this.previousPiece = this.selectedPiece;
-     this.deselectAndClear();
-  }
+  // if (this.selectedPiece) {
+  //  console.log('calling deselect&clear for ', this.selectedPiece);
+  //   // this.previousPiece = this.selectedPiece;
+  //    this.deselectAndClear();
+  // }
   
   // Calculate the valid moves once.
   
@@ -957,6 +1195,8 @@ console.log("game.game.board in showValidMoves:", this.game.game.board);
     const squareId = `${square.dataset.row}-${square.dataset.col}`;
     if (this.activeClickListeners[squareId]) {
       square.removeEventListener('click', this.activeClickListeners[squareId]);
+      square.classList.remove('event-listener-attached');
+      delete square.dataset.listenerAttached;
       delete this.activeClickListeners[squareId];  // Remove the stored function reference
     }
   });
@@ -1025,12 +1265,18 @@ console.log("game.game.board in showValidMoves:", this.game.game.board);
 
     // Attach the event listener
     square.addEventListener('click', clickListener, { once: true });
+    if (square.hasChildNodes())
+    {
+    const piece = square.firstChild; // Assuming there's only one piece per square for simplicity
+    piece.dataset.listenerAttached = 'true'; // Set the data attribute on the piece
   }
+}
 }
 
 
-switchTurn() {
+static switchTurn() {
   console.log('witchTurn entered with player :', this.currentPlayer);
+  console.log('this.game', this.game, 'chessGame', chessGame);
     // Assuming 'white' and 'black' are your player identifiers
     this.game.currentPlayer = this.game.currentPlayer === 'white' ? 'black' : 'white';
     console.log(this.currentPlayer);
@@ -1038,6 +1284,7 @@ switchTurn() {
     // Any other logic required to switch turns
 }
     clearValidMoves() {
+      console.log('clearValidMoves function entered');
     const validMoveSquares = document.querySelectorAll('.valid-move');
     validMoveSquares.forEach(square => {
         square.classList.remove('valid-move');
@@ -1343,12 +1590,89 @@ setupSquareListeners() {
         }
     });
 }
+addPieceEventListener(pieceElement) {
+       pieceElement.addEventListener('click', this.boundHandleClick);
+    pieceElement.classList.add('event-listener-attached');
+}
+
+// Method to remove an event listener
+removePieceEventListener(pieceElement) {
+    pieceElement.removeEventListener('click', this.boundHandleClick);
+    pieceElement.classList.remove('event-listener-attached');
+}
+
+// Assume each piece is contained within a square and they are separate entities
+// refreshPieceEventListeners(enableListeners) {
+//     console.log('refreshPieceEventListeners function called');
+//     const pieces = document.querySelectorAll('.chess-piece');
+
+//     pieces.forEach(piece => {
+//         const square = piece.parentNode; // Assuming the piece is directly inside the square
+
+//         // Check both the piece and its square for the event-listener-attached class
+//         const needsListener = !piece.classList.contains('event-listener-attached') ||
+//                               !square.classList.contains('event-listener-attached');
+
+//         if (enableListeners && needsListener) {
+//             console.log('Attaching event listener to piece:', piece);
+//             square.addEventListener('click', this.boundHandleClick);
+//             piece.classList.add('event-listener-attached');
+//             square.classList.add('event-listener-attached'); // Also mark the square
+//         } else if (!enableListeners && !needsListener) {
+//             console.log('Detaching event listener from piece:', piece);
+//             square.removeEventListener('click', this.boundHandleClick);
+//             piece.classList.remove('event-listener-attached');
+//             square.classList.remove('event-listener-attached'); // Also unmark the square
+//         }
+//     });
+// }
+initObserver() {
+  console.log('initObserver function entered');
+        // Observer configuration: watch for data attribute changes
+        const config = { attributes: true, childList: false, subtree: true, attributeFilter: ['data-listenerAttached'] };
+        console.log('config', config);
+
+        // Callback function to execute when mutations are observed
+        const callback = (mutationsList, observer) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'data-listenerAttached') {
+                  console.log(`Mutation type: ${mutation.type}`);
+                    console.log(`The data-listenerAttached attribute was modified on:`, mutation.target);
+                    const enableListeners = mutation.target.dataset.listenerAttached !== 'true';
+                    this.refreshPieceEventListeners(enableListeners);
+                }
+            }
+        };
+
+        // Create an instance of the observer with the callback function
+        const observer = new MutationObserver(callback);
+
+        // Start observing the document for configured mutations
+        observer.observe(document.body, config);
+    }
+
+
 refreshPieceEventListeners(enableListeners) {
-    const chessPieces = document.querySelectorAll('.chess-piece');
-    chessPieces.forEach(pieceElement => {
-        pieceElement.removeEventListener('click', this.boundHandleClick);
-        if (enableListeners) {
-            pieceElement.addEventListener('click', this.boundHandleClick);
+    console.log('refreshPieceEventListeners function called, enableListeners being :', enableListeners);
+    const pieces = document.querySelectorAll('.chess-piece');
+
+    pieces.forEach(piece => {
+        const square = piece.parentNode; // Assuming the piece is directly inside the square
+        // Use data attributes to check if the listener is attached
+        const needsListener = !square.dataset.listenerAttached;
+        console.log('square, needsListener', square, needsListener);
+
+
+        if (enableListeners && needsListener) {
+            console.log('Attaching event listener to piece:', piece);
+            square.addEventListener('click', this.boundHandleClick);
+            
+            square.dataset.listenerAttached = 'true';
+        } else if (!enableListeners && !needsListener) {
+            console.log('Detaching event listener from piece:', piece);
+            square.removeEventListener('click', this.boundHandleClick);
+            
+            delete square.dataset.listenerAttached;
         }
     });
 }
@@ -1523,59 +1847,151 @@ calculateValidMoves(row, col, board, type, color, game) {
     });
 
     } else if (type === 'pawn' && isWindOfChangeActive) {
+      const moveForward = color === "white" ? 1 : -1;
   console.log('Pawn under Wind of Change spell', this);
+  console.log('moveForward', moveForward);
+  console.log('currentCol', currentCol);
+  
   // Directly use the board state to check move validity instead of relying on an external method
   // This approach considers both the boundaries and occupancy directly
 
   // Movement logic when the 'left' or 'right' class is active
   if (pawnElement.classList.contains('left')) {
-    // Calculate left moves, ensuring we're not at the left edge of the board
-    if (col > 0 && !board[row][col - 1]) {
-      validMoves.push({ row, col: col - 1 });
-    }
-  } else if (pawnElement.classList.contains('right')) {
-    // Calculate right moves, ensuring we're not at the right edge of the board
-    if (col < 7 && !board[row][col + 1]) {
-      validMoves.push({ row, col: col + 1 });
+    console.log('moveForward in left moves', moveForward);
+  console.log('currentCol in left moves', currentCol, "currentRow in left move", currentRow);
+  // Standard left move
+  if (currentCol > 0 && !this.game.game.board[currentRow][currentCol - 1]) {
+    validMoves.push({ row: currentRow, col: currentCol - 1 });
+
+    // Double move left (ensure no blockage and within board limits)
+    if (currentCol - 2 >= 0 && !this.game.game.board[currentRow][currentCol - 2]) {
+      validMoves.push({ row: currentRow, col: currentCol - 2 });
     }
   }
+} else if (pawnElement.classList.contains('right')) {
+  // Standard right move
+  if (currentCol < 7 && !this.game.game.board[currentRow][currentCol + 1]) {
+    validMoves.push({ row: currentRow, col: currentCol + 1 });
 
-  // Movement logic when a 'diagonal' class is active
-  if (pawnElement.classList.contains('diagonalLeft')) {
-    // Calculate diagonal left moves, checking for board boundaries and enemy presence
-    if (row + moveForward >= 0 && row + moveForward < 8 && col - 1 >= 0 && board[row + moveForward][col - 1] && board[row + moveForward][col - 1].color === enemyColor) {
-      validMoves.push({ row: row + moveForward, col: col - 1 });
-    }
-  } else if (pawnElement.classList.contains('diagonalRight')) {
-    // Calculate diagonal right moves, similar boundary and enemy checks
-    if (row + moveForward >= 0 && row + moveForward < 8 && col + 1 < 8 && board[row + moveForward][col + 1] && board[row + moveForward][col + 1].color === enemyColor) {
-      validMoves.push({ row: row + moveForward, col: col + 1 });
+    // Double move right (ensure no blockage and within board limits)
+    if (currentCol + 2 <= 7 && !this.game.game.board[currentRow][currentCol + 2]) {
+      validMoves.push({ row: currentRow, col: currentCol + 2 });
     }
   }
+}
 
-  } else {
+  else if (pawnElement.classList.contains('forward')) 
+  {
+    // Single forward move
+    let targetRow = currentRow + moveForward;
+    if (targetRow >= 0 && targetRow < 8 && !this.game.game.board[targetRow][currentCol]) 
+    {
+        validMoves.push({ row: targetRow, col: currentCol });
+    }
+
+    // Double move on first move
+     if ((this.color === "white" && currentRow === 1) || (this.color === "black" && currentRow === 6)) 
+    {
+      let doubleMoveRow = targetRow + moveForward;
+      if (!this.game.game.board[doubleMoveRow][currentCol]) 
+      {
+        validMoves.push({ row: doubleMoveRow, col: currentCol });
+      }
+    }
+  }
+    // Movement logic when a 'diagonal' class is active
+    else if (pawnElement.classList.contains('diagonalLeft')) {
+    let targetRow = currentRow + moveForward; // Move one row forward based on color
+    let targetCol = currentCol - 1; // Move one column to the left
+
+    // First diagonal move
+    if (targetRow >= 0 && targetRow < 8 && targetCol >= 0 && targetCol < 8) {
+      if (!this.game.game.board[targetRow][targetCol] || this.game.game.board[targetRow][targetCol].color !== this.color) {
+        validMoves.push({ row: targetRow, col: targetCol });
+
+        // Double move diagonal left
+        let doubleMoveRow = targetRow + moveForward;
+        let doubleMoveCol = targetCol - 1;
+        if (doubleMoveRow >= 0 && doubleMoveRow < 8 && doubleMoveCol >= 0 && doubleMoveCol < 8) {
+          if (!this.game.game.board[doubleMoveRow][doubleMoveCol] || this.game.game.board[doubleMoveRow][doubleMoveCol].color !== this.color) {
+            validMoves.push({ row: doubleMoveRow, col: doubleMoveCol });
+          }
+        }
+      }
+      // Capturing Moves
+  const captureOffsets = [1, -1];
+  for (let offset of captureOffsets) 
+  {
+    let captureCol = currentCol + offset;
+    if (captureCol >= 0 && captureCol < 8) 
+    {
+      let captureSquare = this.game.game.board[targetRow][captureCol];
+      if (captureSquare && captureSquare.color !== this.color) 
+      {
+        validMoves.push({ row: newRow, col: captureCol });
+      }
+    }
+  }
+    }
+
+}
+
+  // Diagonal Right Movement
+ else if (pawnElement.classList.contains('diagonalRight')) {
+    let targetRow = currentRow + moveForward; // Move one row forward based on color
+    let targetCol = currentCol + 1; // Move one column to the right
+
+    // First diagonal move
+    if (targetRow >= 0 && targetRow < 8 && targetCol >= 0 && targetCol < 8) {
+      if (!this.game.game.board[targetRow][targetCol] || this.game.game.board[targetRow][targetCol].color !== this.color) {
+        validMoves.push({ row: targetRow, col: targetCol });
+
+        // Double move diagonal right
+        let doubleMoveRow = targetRow + moveForward;
+        let doubleMoveCol = targetCol + 1;
+        if (doubleMoveRow >= 0 && doubleMoveRow < 8 && doubleMoveCol >= 0 && doubleMoveCol < 8) {
+          if (!this.game.game.board[doubleMoveRow][doubleMoveCol] || this.game.game.board[doubleMoveRow][doubleMoveCol].color !== this.color) {
+            validMoves.push({ row: doubleMoveRow, col: doubleMoveCol });
+          }
+        }
+      }
+    }
+    // Capturing Moves
+  const captureOffsets = [1, -1];
+  for (let offset of captureOffsets) 
+  {
+    let captureCol = currentCol + offset;
+    if (captureCol >= 0 && captureCol < 8) 
+    {
+      let captureSquare = this.game.game.board[targetRow][captureCol];
+      if (captureSquare && captureSquare.color !== this.color) 
+      {
+        validMoves.push({ row: newRow, col: captureCol });
+      }
+    }
+  }
+}
+ }else {
        console.log("Processing pawn");
   let direction = color === "white" ? 1 : -1; // Adjusted for the board setup
   console.log('direction', direction); 
   let newRow = currentRow + direction;
   console.log('newRow for pawn in calculateValidMoves:', newRow);
-  console.log('Board at newRow:', this.game.game.board[newRow]);
-  console.log('Board state:', board);
-  console.log("this.game.board", this.game.board);
-
 
   // Forward Move
   if (newRow >= 0 && newRow < 8 && !this.game.game.board[newRow][currentCol]) {
     validMoves.push({ row: newRow, col: currentCol });
-
+      console.log('this.color before the pawn double square first move aka PDSFM', this.color)
       console.log("Pawn starting row check:", (this.color === "white" && row === 1) || (this.color === "black" && row === 6));
       console.log("Square directly in front is empty:", !this.game.game.board[currentRow + direction][currentCol]);
       console.log("Square two steps ahead is empty:", !this.game.game.board[currentRow + 2 * direction][currentCol]);
 
     // Double Move on First Move
-    if ((this.color === "white" && currentRow === 1) || (this.color === "black" && currentRow === 6)) {
+    if ((this.color === "white" && currentRow === 1) || (this.color === "black" && currentRow === 6)) 
+    {
       let doubleMoveRow = newRow + direction;
-      if (!this.game.game.board[doubleMoveRow][currentCol]) {
+      if (!this.game.game.board[doubleMoveRow][currentCol]) 
+      {
         validMoves.push({ row: doubleMoveRow, col: currentCol });
       }
     }
@@ -1583,11 +1999,14 @@ calculateValidMoves(row, col, board, type, color, game) {
 
   // Capturing Moves
   const captureOffsets = [1, -1];
-  for (let offset of captureOffsets) {
+  for (let offset of captureOffsets) 
+  {
     let captureCol = currentCol + offset;
-    if (captureCol >= 0 && captureCol < 8) {
+    if (captureCol >= 0 && captureCol < 8) 
+    {
       let captureSquare = this.game.game.board[newRow][captureCol];
-      if (captureSquare && captureSquare.color !== this.color) {
+      if (captureSquare && captureSquare.color !== this.color) 
+      {
         validMoves.push({ row: newRow, col: captureCol });
       }
     }
@@ -2116,14 +2535,34 @@ deactivateSpell() {
         return null; // Return null if the coordinates are out of bounds
     }
 }
+syncWithClients(gameId, data) {
+    const gameSession = getGameSession(gameId);
+    gameSession.players.forEach(player => {
+        player.socket.emit('gameUpdate', data);
+    });
+}
 
+castAdeptWandSpell(board, game, gameId) {
+  const gameSession = getGameSession(gameId);
+    if (!gameSession) {
+        console.error('No game session found for ID:', gameId);
+        return;
+    }
 
-castAdeptWandSpell() {
+    console.log('Retrieved gameSession:', gameSession);
+    const rng = gameSession.rng;
+    if (!rng) {
+        console.error('RNG not available in game session:', gameId);
+        return;
+    }
+    const riftDuration = Math.floor(rng.next() * 6) + 1;
         // Initialize the rift duration
         this.riftDuration = Math.floor(Math.random() * 6) + 1; // Duration between 1 and 6 turns
         console.log(`Rift started with duration: ${this.riftDuration} turns`);
-       // this.updateRiftTurns = this.showNotification("Rift", this.riftDuration, "Piece teleported to a random square.");
-  // Define and visually represent the rift area
+        // this.updateRiftTurns = this.showNotification("Rift", this.riftDuration, "Piece teleported to a random square.");
+        // Define and visually represent the rift area
+        this.syncWithClients(gameId, { type: 'castSpell', duration: riftDuration });
+
         this.defineAndShowRiftArea();
 
         // // Check if this piece is in the rift area
@@ -4387,18 +4826,57 @@ isOutsideMiniBoard(row, col) {
 
 // END OF CASTENCHANTEDGROUNDSPELL\\
 //BEGINNING OF RANDOMPAWNMOVE
+// Method to activate the Wind of Change spell for all pawns
 activateWindOfChangeSpell() {
+  const rng = new SeededRNG(this.game.turnCount);
+  console.log('rng', rng);
     const allPawnElements = document.querySelectorAll('.chess-piece.white-pawn, .chess-piece.black-pawn');
+    const currentTurn = this.game.turnCount; // Assuming this is available globally
     allPawnElements.forEach(pawnElement => {
+        const spellDuration = Math.floor(Math.random() * 4) + 2; // Duration from 2 to 5 turns
+        pawnElement.dataset.spellExpirationTurn = currentTurn + spellDuration;
+
         const directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
         const randomDirection = directions[Math.floor(Math.random() * directions.length)];
-        // Remove any existing direction classes first
-        directions.forEach(dir => pawnElement.classList.remove(dir));
-        // Add the new random direction as a class
-        pawnElement.classList.add(randomDirection);
-        pawnElement.classList.add('pawn-random-move'); // Indicate that this pawn is under the spell effect
+        pawnElement.classList.remove(...directions); // Remove existing direction classes
+        pawnElement.classList.add(randomDirection, 'pawn-random-move'); // Add new direction and spell effect
     });
 }
+
+// Method to check and update spell effects for all pawns
+// checkAndUpdateSpellEffects() {
+//     console.log('checkAndUpdateSpellEffects function entered in classPiece');
+//     const allPawnElements = document.querySelectorAll('.chess-piece.pawn-random-move');
+//     allPawnElements.forEach(pawnElement => {
+//         const spellExpirationTurn = parseInt(pawnElement.dataset.spellExpirationTurn, 10);
+//         if (spellExpirationTurn > 0) {
+//             pawnElement.dataset.spellExpirationTurn = spellExpirationTurn - 1; // Decrement the value
+//         } else {
+//             // If the expiration turn has passed, remove the spell effect
+//             ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight', 'pawn-random-move'].forEach(dir => pawnElement.classList.remove(dir));
+//             // Clean up data attribute
+//             delete pawnElement.dataset.spellExpirationTurn; // Corrected to delete the dataset attribute
+//         }
+//     });
+// }
+
+
+// checkAndUpdateSpellEffects() {
+//   console.log('checkAndUpdateSpellEffects function entered in classPiece');
+//     const allPawnElements = document.querySelectorAll('.chess-piece.pawn-random-move');
+//     allPawnElements.forEach(pawnElement => {
+//         const spellStartTurn = parseInt(pawnElement.dataset.spellStartTurn, 10);
+//         const spellDuration = parseInt(pawnElement.dataset.spellDuration, 10);
+//         if (game.turnCount >= spellStartTurn + spellDuration) {
+//             // Spell duration has elapsed, remove the spell effect
+//             ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight', 'pawn-random-move'].forEach(dir => pawnElement.classList.remove(dir));
+//             // Clean up data attributes
+//             delete pawnElement.dataset.spellStartTurn;
+//             delete pawnElement.dataset.spellDuration;
+//         }
+//     });
+// }
+
 // activateWindOfChangeSpell() {
 //         if (this.type !== 'pawn') return; // Only pawns are affected
 //             this.isWindOfChangeActive = true;
@@ -4423,18 +4901,18 @@ activateWindOfChangeSpell() {
 
 //     }
 
-//     // Called after each move to update the spell's effect
-//     updateAfterMove() {
-//         if (this.type !== 'pawn' || !this.isWindOfChangeActive) return;
+    // // Called after each move to update the spell's effect
+    // updateAfterMove() {
+    //     if (this.type !== 'pawn' || !this.isWindOfChangeActive) return;
 
-//         this.movesLeftWithSpell--;
-//         if (this.movesLeftWithSpell > 0) {
-//             this.assignNewDirection(); // Assign a new direction if spell is still active
-//         } else {
-//             this.isWindOfChangeActive = false; // Spell expires
-//             this.currentDirection = 'forward'; // Reset to default direction
-//         }
-//     }
+    //     this.movesLeftWithSpell--;
+    //     if (this.movesLeftWithSpell > 0) {
+    //         this.assignNewDirection(); // Assign a new direction if spell is still active
+    //     } else {
+    //         this.isWindOfChangeActive = false; // Spell expires
+    //         this.currentDirection = 'forward'; // Reset to default direction
+    //     }
+    // }
   // Additional methods as needed for standard chess piece behavior...
   
 //END OD RANDOMPAWNMOVE
@@ -4534,6 +5012,7 @@ checkAndApplyBeamEffects(tower) {
     // This will depend on the layout of your board and how pieces are managed
 }
  updateTurnCount(newTurnCount) {
+  console.log('updateTurnCount function called');
     console.log('Updating turn count to', newTurnCount); // Added for debugging
     document.getElementById('turn-count-display').textContent = `Turn: ${newTurnCount}`;
     
@@ -4719,6 +5198,7 @@ castAutoSpellSpell(spellType, board, game) {
     break;
     
     case 'adept-wand' :
+
  chessPiece.castAdeptWandSpell(chessBoard, chessGame); //PROBLEME AVEC le changement de tours, concernant le nombre de tours qu'il reste pour le rift spell, et sa désimplemntation.
 
     break;
@@ -5065,6 +5545,7 @@ addPieceToPlayerSet(pieceElement, playerColor, game) {
     targetSquare.setAttribute('data-type', pieceType);
     targetSquare.setAttribute('data-color', playerColor);
      newPiece.addEventListener('click', this.boundHandleClick, { once: true });
+     newPiece.dataset.listenerAttached = 'true';
     console.log('this.game', this.game);  
     console.log('this.game.board in addPieceToPlayerSet before syncBoardState', this.game.game.board);  
     console.log('this.game.board in addPieceToPlayerSet before syncBoardState', this.game.board);  
@@ -5075,7 +5556,7 @@ addPieceToPlayerSet(pieceElement, playerColor, game) {
 
 }
 
-forceMove(piece, fromRow, fromCol, toRow, toCol, isRiftMove = false) {
+static forceMove(piece, fromRow, fromCol, toRow, toCol, isRiftMove = false) {
     console.log('forceMove called with piece:', piece, 'fromRow:', fromRow, 'fromCol:', fromCol, 'toRow:', toRow, 'toCol:', toCol);
 
     // Validate positions
@@ -5087,9 +5568,11 @@ forceMove(piece, fromRow, fromCol, toRow, toCol, isRiftMove = false) {
     // Handle the square the piece is moving from
     const fromSquare = document.getElementById(`square-${fromRow}-${fromCol}`);
     let pieceType = fromSquare.getAttribute('data-type');
-    console.log('pieceType', pieceType);
+    
     let pieceColor = fromSquare.getAttribute('data-color');    
-    console.log('pieceColor', pieceColor);
+    
+    console.log('pieceType', pieceType, 'pieceColor', pieceColor, 'fromSquare', fromSquare);
+    console.log('piece', piece);
     if (fromSquare && fromSquare.contains(piece)) {
         fromSquare.classList.remove('has-piece', 'enchanted-ground', 'event-listener-attached');
         fromSquare.removeAttribute('data-color');
@@ -5284,8 +5767,7 @@ updateLightsaberColumn(columnIndex) {
         lightsaber.style.display = 'none';
     }, 400); // 1000 milliseconds = 1 second
 }
-
-forceRemove(row, col) {
+ forceRemove(row, col) {
     console.log("forceRemove function called for row:", row, "col:", col);
 
     // Identify the square from which the piece is to be removed
@@ -5304,8 +5786,9 @@ forceRemove(row, col) {
             square.classList.remove('has-piece');
             square.removeAttribute('data-color');
             square.removeAttribute('data-type');
-            const pieceEmoji = this.mapPieceToEmoji(type, color);
-            this.addCapturedPiece(pieceEmoji, color);
+           // EMOJI MAPPING
+             // const pieceEmoji = this.mapPieceToEmoji(type, color);
+            // this.addCapturedPiece(pieceEmoji, color);
         }
 
         // Clear the background-image style from the square
@@ -5313,7 +5796,38 @@ forceRemove(row, col) {
     }
 
     // Update the internal game state
-    this.game.board[row][col] = null;
+    // this.game.board[row][col] = null;
+}
+static forceRemove(row, col) {
+    console.log("forceRemove function called for row:", row, "col:", col);
+
+    // Identify the square from which the piece is to be removed
+    const squareId = `square-${row}-${col}`;
+    const square = document.getElementById(squareId);
+    const color = square.getAttribute('data-color');
+    const type = square.getAttribute('data-type');
+    console.log('square in forceRemove:', square);
+
+    if (square) {
+        // Remove the piece element from the square
+        const piece = square.querySelector('.chess-piece');
+        console.log('piece to be removed:', piece);
+        if (piece) {
+            square.removeChild(piece);
+            square.classList.remove('has-piece');
+            square.removeAttribute('data-color');
+            square.removeAttribute('data-type');
+           // EMOJI MAPPING
+             // const pieceEmoji = this.mapPieceToEmoji(type, color);
+            // this.addCapturedPiece(pieceEmoji, color);
+        }
+
+        // Clear the background-image style from the square
+        square.style.backgroundImage = ''; // This line removes the image
+    }
+
+    // Update the internal game state
+    // this.game.board[row][col] = null;
 }
     getType() {
         // returns the type of the piece (e.g. "pawn", "rook", etc.)
@@ -5394,3 +5908,39 @@ document.addEventListener('turnChanged', (e) => {
     chessPiece.placeTower()
     chessPiece.checkTowerCountAndActivateBeam();
 });
+document.getElementById('turn-count-display').addEventListener('turnChanged', (e) => {
+    const { turnCount } = e.detail; // Get the current turn count from the event detail
+    console.log('Turn changed:', turnCount);
+    this.checkAndUpdateSpellEffects();
+    // Additional logic here if needed
+});
+// document.addEventListener('turnChanged', (e) => {
+//     const { turnCount } = e.detail; // Get the current turn count from the event detail
+//     console.log('Turn changed to', turnCount);
+    
+//     const pawns = document.querySelectorAll('.chess-piece.pawn-random-move'); // Select all random pawns
+    
+//     console.log('Selected pawns:', pawns);
+    
+//     pawns.forEach(pawn => {
+//         let expirationTurn = parseInt(pawn.dataset.spellExpirationTurn); // Get the expiration turn from the dataset
+//         console.log('Expiration turn before update:', expirationTurn);
+        
+//         if (!isNaN(expirationTurn) && expirationTurn > 0) {
+//             expirationTurn--; // Decrease the expiration turn by one
+//             pawn.dataset.spellExpirationTurn = expirationTurn; // Update the dataset attribute
+            
+//             // Update the visual representation of the expiration turn if needed
+//             pawn.textContent = `Expiration Turn: ${expirationTurn}`;
+            
+//             console.log('Expiration turn after update:', expirationTurn);
+//         }
+        
+//         // Additional logic as necessary
+//     });
+// });
+document.addEventListener('turnChanged', function(event) {
+    console.log('trying to call checkAndUpdateSpellEffects');
+    // Call the checkAndUpdateSpellEffects method after each turn change
+    this.checkAndUpdateSpellEffects();
+}.bind(this));
