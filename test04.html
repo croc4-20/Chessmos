@@ -5,7 +5,70 @@
     <script type="module" src="KeplrConnect.js" defer></script>
     <script src="https://unpkg.com/@keplr-wallet/provider"></script>
     <script src="./New/main.bundle.js"></script>
+    <script type="module" src="./jsFiles/seedRng.js"></script>
+   
+<script>// In your client-side script where you need to use SeededRNG
+
+</script>
+    <!-- Load the socket.io client script from your Node.js server on port 8080 -->
+    <script src="http://192.168.1.82:8080/socket.io/socket.io.js"></script>
+
     <style>
+        .styling1
+        {
+          position: fixed;
+    border-radius: 5px;
+    left: 250px;
+    z-index: 50;
+    border: solid;
+    padding: 10px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        top: 250px;
+
+            
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loader 
+        {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            -webkit-animation: spin 2s linear infinite; /* Safari */
+            animation: spin 2s linear infinite;
+        }
+
+.SearchPlayerUi
+{
+    display : none;
+    position: fixed;
+    border-radius: 5px;
+    left: 250px;
+    z-index: 50;
+    border: solid;
+    padding: 10px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+
+}
+
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
         #lightsaber 
         {
             display: none;
@@ -18,200 +81,543 @@
         #chessboard 
         {
             position: relative;
+            margin: auto;
             display: grid;
             grid-template-columns: repeat(8, 67.2px);
             grid-template-rows: repeat(8, 67.2px);
             width: 560px;
             height: 560px;
+            gap: 1px;
             overflow: hidden;
+            aspect-ratio: 1;
             z-index: 2;
         }
+        :root {
+    --dark-square-color: #769656;  /* Default dark square color */
+    --light-square-color: #eeeed2; /* Default light square color */
+}
         #body
         {
             background-color: lightslategrey;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             /*    background-image: url('img/background.png');*/
             background-size: cover;
 /*            overflow: hidden;*/
             z-index: 2;
+            line-height: 1.6;
+            
         }
-        .rainbow-background {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-/*    background: radial-gradient(circle, red, yellow, lime, aqua, blue, fuchsia, red);*/
-    background-size: cover;
-    animation: colorChange 30s linear infinite;
-    z-index: -1;
+
+        #particle-container 
+        {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle 
+        {
+            position: absolute;
+            border-radius: 50%;
+            background-color: white; /* Make particles white for visibility */
+            width: 5px; /* Size of particles */
+            height: 5px;
+            opacity: 5; /* Start hidden, appear on interaction */
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            z-index: 3;
+        }
+
+
+        #openSettingsBtn {
+    position: absolute;
+    top: 20px;
+    left: 1300px; /* Adjust as necessary */
+    z-index: 1000;
 }
 
-@keyframes colorChange {
-    0.0% { background-color: #ff0000; }
-    0.67% { background-color: #ff0a00; }
-    1.33% { background-color: #ff1400; }
-    2.0% { background-color: #ff1e00; }
-    2.67% { background-color: #ff2800; }
-    3.33% { background-color: #ff3200; }
-    4.0% { background-color: #ff3d00; }
-    4.67% { background-color: #ff4700; }
-    5.33% { background-color: #ff5100; }
-    6.0% { background-color: #ff5b00; }
-    6.67% { background-color: #ff6600; }
-    7.33% { background-color: #ff7000; }
-    8.0% { background-color: #ff7a00; }
-    8.67% { background-color: #ff8400; }
-    9.33% { background-color: #ff8e00; }
-    10.0% { background-color: #ff9900; }
-    10.67% { background-color: #ffa300; }
-    11.33% { background-color: #ffad00; }
-    12.0% { background-color: #ffb700; }
-    12.67% { background-color: #ffc100; }
-    13.33% { background-color: #ffcc00; }
-    14.0% { background-color: #ffd600; }
-    14.67% { background-color: #ffe000; }
-    15.33% { background-color: #ffea00; }
-    16.0% { background-color: #fff400; }
-    16.67% { background-color: #ffff00; }
-    17.33% { background-color: #f4ff00; }
-    18.0% { background-color: #eaff00; }
-    18.67% { background-color: #e0ff00; }
-    19.33% { background-color: #d6ff00; }
-    20.0% { background-color: #cbff00; }
-    20.67% { background-color: #c1ff00; }
-    21.33% { background-color: #b7ff00; }
-    22.0% { background-color: #adff00; }
-    22.67% { background-color: #a3ff00; }
-    23.33% { background-color: #99ff00; }
-    24.0% { background-color: #8eff00; }
-    24.67% { background-color: #84ff00; }
-    25.33% { background-color: #7aff00; }
-    26.0% { background-color: #70ff00; }
-    26.67% { background-color: #65ff00; }
-    27.33% { background-color: #5bff00; }
-    28.0% { background-color: #51ff00; }
-    28.67% { background-color: #47ff00; }
-    29.33% { background-color: #3dff00; }
-    30.0% { background-color: #33ff00; }
-    30.67% { background-color: #28ff00; }
-    31.33% { background-color: #1eff00; }
-    32.0% { background-color: #14ff00; }
-    32.67% { background-color: #0aff00; }
-    33.33% { background-color: #00ff00; }
-    34.0% { background-color: #00ff0a; }
-    34.67% { background-color: #00ff14; }
-    35.33% { background-color: #00ff1e; }
-    36.0% { background-color: #00ff28; }
-    36.67% { background-color: #00ff32; }
-    37.33% { background-color: #00ff3d; }
-    38.0% { background-color: #00ff47; }
-    38.67% { background-color: #00ff51; }
-    39.33% { background-color: #00ff5b; }
-    40.0% { background-color: #00ff66; }
-    40.67% { background-color: #00ff70; }
-    41.33% { background-color: #00ff7a; }
-    42.0% { background-color: #00ff84; }
-    42.67% { background-color: #00ff8e; }
-    43.33% { background-color: #00ff99; }
-    44.0% { background-color: #00ffa3; }
-    44.67% { background-color: #00ffad; }
-    45.33% { background-color: #00ffb7; }
-    46.0% { background-color: #00ffc1; }
-    46.67% { background-color: #00ffcb; }
-    47.33% { background-color: #00ffd6; }
-    48.0% { background-color: #00ffe0; }
-    48.67% { background-color: #00ffea; }
-    49.33% { background-color: #00fff4; }
-    50.0% { background-color: #00ffff; } /* cyan */
-    50.67% { background-color: #00f4ff; }
-    51.33% { background-color: #00eaff; }
-    52.0% { background-color: #00e0ff; }
-    52.67% { background-color: #00d6ff; }
-    53.33% { background-color: #00cbff; }
-    54.0% { background-color: #00c1ff; }
-    54.67% { background-color: #00b7ff; }
-    55.33% { background-color: #00adff; }
-    56.0% { background-color: #00a3ff; }
-    56.67% { background-color: #0099ff; }
-    57.33% { background-color: #008eff; }
-    58.0% { background-color: #0084ff; }
-    58.67% { background-color: #007aff; }
-    59.33% { background-color: #0070ff; }
-    60.0% { background-color: #0066ff; }
-    60.67% { background-color: #005bff; }
-    61.33% { background-color: #0051ff; }
-    62.0% { background-color: #0047ff; }
-    62.67% { background-color: #003dff; }
-    63.33% { background-color: #0033ff; }
-    64.0% { background-color: #0028ff; }
-    64.67% { background-color: #001eff; }
-    65.33% { background-color: #0014ff; }
-    66.0% { background-color: #000aff; }
-    66.67% { background-color: #0000ff; } /* blue */
-    67.33% { background-color: #0a00ff; }
-    68.0% { background-color: #1400ff; }
-    68.67% { background-color: #1e00ff; }
-    69.33% { background-color: #2800ff; }
-    70.0% { background-color: #3200ff; }
-    70.67% { background-color: #3d00ff; }
-    71.33% { background-color: #4700ff; }
-    72.0% { background-color: #5100ff; }
-    72.67% { background-color: #5b00ff; }
-    73.33% { background-color: #6500ff; }
-    74.0% { background-color: #7000ff; }
-    74.67% { background-color: #7a00ff; }
-    75.33% { background-color: #8400ff; }
-    76.0% { background-color: #8e00ff; }
-    76.67% { background-color: #9900ff; }
-    77.33% { background-color: #a300ff; }
-    78.0% { background-color: #ad00ff; }
-    78.67% { background-color: #b700ff; }
-    79.33% { background-color: #c100ff; }
-    80.0% { background-color: #cc00ff; }
-    80.67% { background-color: #d600ff; }
-    81.33% { background-color: #e000ff; }
-    82.0% { background-color: #ea00ff; }
-    82.67% { background-color: #f400ff; }
-    83.33% { background-color: #ff00ff; } /* magenta */
-    84.0% { background-color: #ff00f4; }
-    84.67% { background-color: #ff00ea; }
-    85.33% { background-color: #ff00e0; }
-    86.0% { background-color: #ff00d6; }
-    86.67% { background-color: #ff00cb; }
-    87.33% { background-color: #ff00c1; }
-    88.0% { background-color: #ff00b7; }
-    88.67% { background-color: #ff00ad; }
-    89.33% { background-color: #ff00a3; }
-    90.0% { background-color: #ff0098; }
-    90.67% { background-color: #ff008e; }
-    91.33% { background-color: #ff0084; }
-    92.0% { background-color: #ff007a; }
-    92.67% { background-color: #ff0070; }
-    93.33% { background-color: #ff0066; }
-    94.0% { background-color: #ff005b; }
-    94.67% { background-color: #ff0051; }
-    95.33% { background-color: #ff0047; }
-    96.0% { background-color: #ff003d; }
-    96.67% { background-color: #ff0033; }
-    97.33% { background-color: #ff0028; }
-    98.0% { background-color: #ff001e; }
-    98.67% { background-color: #ff0014; }
-    99.33% { background-color: #ff000a; }
-    100% { background-color: #FF0000; } 
+.settings-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    width: 50px;
+    height: 50px;
 }
-        
-.background {
-    position: fixed;
-    top: 0;
+
+.settings-btn img {
+    width: 300%;
+    height: auto;
+    display: block;
+}
+
+/* Modal Styles */
+.settingsModal {
+    display: none;
+    position: relative;
+    z-index: 1;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    z-index: -1;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
-.particle {
+.settingsModalcontent {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    
+    width: 50%; /* Adjust for better sizing */
+    
+    border-radius: 10px; /* Optional: rounded corners */
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+.customizer {
+    padding: 10px;
+    height: 700px;
+}
+
+.customizer-item {
+    margin-bottom: 15px;
+}
+
+        /*   SIDEBAR CSS     */
+        #sidebar {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex; /* Use flexbox layout */
+            flex-direction: row; /* Stack children vertically */
+            align-items: baseline;
+            justify-content: space-between; /* Distribute space between elements */
+            position: fixed; /* Stay in place during scroll */
+            left: 0;
+            top: 0px; /* Adjust to the height of your header */
+            bottom: 700%;
+            
+            gap: 2px;
+            padding: 10px;
+            border: black 1px;
+            background-color: lightslategrey;
+            box-sizing: border-box;
+            z-index: 50;
+        }
+
+      #sidebar a,
+#sidebar button {
+    box-shadow: 0 0 5000px rgb(255 0 0 / 20%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    flex-grow: 1; /* Allow the links and buttons to grow and fill the space */
+    margin-bottom: 5px;
+    padding: 10px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border: black 1px;
+    box-sizing: border-box;
+    
+    font-size: 20px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    text-decoration: none; /* Remove underline from links */
+  
+   
+}
+
+#sidebar a:last-child,
+#sidebar button:last-child {
+    margin-bottom: 0; /* Remove margin for the last item */
+}
+
+#sidebar a:hover,
+#sidebar button:hover {
+    background-color: #ddd;
+    
+}
+
+#nfts-container
+{
+    left: 50px;
+}
+/* Resetting default styles for a and button to make them consistent */
+#sidebar a, #sidebar button {
+    display: inline-grid; 
+    width: 100%; 
+    border-radius: 5px;
+    border: solid;
+    box-sizing: border-box; 
+    
+}
+/* Ensure your banner has a lower z-index than the sidebar */
+#nav-toolbar .hidden {
+  display: none !important;
+}
+
+#connectWalletButton:hover {
+  background-color: red;
+  cursor: url('img/kplr.png') 41 40, pointer;
+}
+        
+
+
+#player-list-container {
+  margin-top: 20px; /* Adjust margin as needed */
+}
+.player-list-container {
+    border: 2px black;
+    background-color: #1e1616;
+  /* Add styles for the container if needed */
+}
+
+
+/* CSS for online players */
+#player-list {
+    list-style-type: none;
+    padding: 0;
+    width: 200px;
+    height: 200px;
+    border-radius: 2px;
+    border: solid;
+    background-color: darkred;
+    top: 200px;
     position: absolute;
+}
+
+.online-player {
+    display: inline-block;
+    width: 10px; /* Adjust the width as needed */
+    height: 10px; /* Adjust the height as needed */
+    background-color: #007bff; /* Default color */
+    border-radius: 50%; /* Make it a circle */
+    margin-right: 5px; /* Add spacing between dots */
+    cursor: pointer; /* Show pointer cursor on hover */
+    position: relative; /* Required for positioning the tooltip */
+}
+
+/* Tooltip for displaying wallet address on hover */
+.online-player::after {
+    content: attr(data-address);
+    position: absolute;
+    display: none; /* Initially hidden */
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    top: -25px; /* Adjust the distance from the dot */
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.online-player:hover::after {
+    display: inline-block; /* Show on hover */
+}
+/* Additional styles for a bow or container */
+      .rainbow-background 
+        {
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-size: cover;
+            animation: colorChange 30s linear infinite;
+            z-index: -1;
+        }
+
+        .userProfile 
+        {
+            width: 80%; /* Full width */
+            display: flex;
+            justify-content: space-around; /* Distribute content evenly */
+            align-items: center; /* Center content vertically */
+            z-index: 1000; /* Ensures the profiles are above other content */
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            color: #333;
+            transition: all 0.3s ease; /* Smooth transition for hover effects */
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+
+        /* Hover effect for user profiles */
+        .userProfile:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px); /* Slight lift */
+        }
+
+        /* Fixed position at the top for white user profile */
+        #whiteUserProfile {
+            position: fixed;
+            top: 0; /* Aligns to the top of the viewport */
+            background: linear-gradient(to left, white 1% , lightslategray 90%, white 99%, lightslategray 10%);
+            border-bottom: 2px solid #ddd;
+        }
+
+        /* Fixed position at the bottom for black user profile */
+        #blackUserProfile {
+            position: fixed;
+            bottom: 0; /* Aligns to the bottom of the viewport */
+            background: linear-gradient(to right, black, lightslategray);
+            color: #ffffff;
+            border-top: 2px solid #222;
+        }
+
+        /* Style for NFT image or placeholder */
+        .userProfile .profilePicture {
+            width: 60px; /* Adjust size as needed */
+            height: 60px;
+            border-radius: 50%; /* Circular shape */
+            background-color: #eee; /* Placeholder color */
+            border: 2px solid #bbb;
+            overflow: hidden; /* Ensures content fits in the circle */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Sample text to indicate where the wallet address will be */
+        .userProfile .walletAddress {
+            margin-left: 10px;
+        }
+
+        #captured-pieces {
+            overflow: hidden;
+              position: fixed;
+              right: 748px;
+             top: 1300px;
+             z-index: 5;
+              height: max-content;
+              width: max-content;
+              transform: translateY(-263%);
+              border: solid #FFF;
+              background-color: #555;
+              color: #fff;
+              padding: 5px;
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            }
+
+            .captured-display {
+                display: flex;
+                flex-wrap: wrap;
+                align-content: flex-start; /* Aligns the emojis to the top */
+                justify-content: center;
+              flex-wrap: wrap;
+              justify-content: center;
+              padding: 5px;
+              min-height: 150px; /* Adjust as needed */
+            }
+            #white-captured {
+                
+               background-color: rgb(105 104 105);
+               
+               border: 1px solid white;
+
+  /* specific styles for white captures */
+}
+
+#black-captured {
+  /* specific styles for black captures */
+ 
+  
+   background-color: white;
+   border: 1px solid black;
+}
+            .captured-display > .chess-piece {
+  transition: transform 0.3s ease;
+}
+
+.captured-display > .chess-piece:hover {
+  transform: scale(1.1); /* Slightly enlarge the piece on hover */
+}
+
+        @keyframes colorChange {
+            0.0% { background-color: #ff0000; }
+            0.67% { background-color: #ff0a00; }
+            1.33% { background-color: #ff1400; }
+            2.0% { background-color: #ff1e00; }
+            2.67% { background-color: #ff2800; }
+            3.33% { background-color: #ff3200; }
+            4.0% { background-color: #ff3d00; }
+            4.67% { background-color: #ff4700; }
+            5.33% { background-color: #ff5100; }
+            6.0% { background-color: #ff5b00; }
+            6.67% { background-color: #ff6600; }
+            7.33% { background-color: #ff7000; }
+            8.0% { background-color: #ff7a00; }
+            8.67% { background-color: #ff8400; }
+            9.33% { background-color: #ff8e00; }
+            10.0% { background-color: #ff9900; }
+            10.67% { background-color: #ffa300; }
+            11.33% { background-color: #ffad00; }
+            12.0% { background-color: #ffb700; }
+            12.67% { background-color: #ffc100; }
+            13.33% { background-color: #ffcc00; }
+            14.0% { background-color: #ffd600; }
+            14.67% { background-color: #ffe000; }
+            15.33% { background-color: #ffea00; }
+            16.0% { background-color: #fff400; }
+            16.67% { background-color: #ffff00; }
+            17.33% { background-color: #f4ff00; }
+            18.0% { background-color: #eaff00; }
+            18.67% { background-color: #e0ff00; }
+            19.33% { background-color: #d6ff00; }
+            20.0% { background-color: #cbff00; }
+            20.67% { background-color: #c1ff00; }
+            21.33% { background-color: #b7ff00; }
+            22.0% { background-color: #adff00; }
+            22.67% { background-color: #a3ff00; }
+            23.33% { background-color: #99ff00; }
+            24.0% { background-color: #8eff00; }
+            24.67% { background-color: #84ff00; }
+            25.33% { background-color: #7aff00; }
+            26.0% { background-color: #70ff00; }
+            26.67% { background-color: #65ff00; }
+            27.33% { background-color: #5bff00; }
+            28.0% { background-color: #51ff00; }
+            28.67% { background-color: #47ff00; }
+            29.33% { background-color: #3dff00; }
+            30.0% { background-color: #33ff00; }
+            30.67% { background-color: #28ff00; }
+            31.33% { background-color: #1eff00; }
+            32.0% { background-color: #14ff00; }
+            32.67% { background-color: #0aff00; }
+            33.33% { background-color: #00ff00; }
+            34.0% { background-color: #00ff0a; }
+            34.67% { background-color: #00ff14; }
+            35.33% { background-color: #00ff1e; }
+            36.0% { background-color: #00ff28; }
+            36.67% { background-color: #00ff32; }
+            37.33% { background-color: #00ff3d; }
+            38.0% { background-color: #00ff47; }
+            38.67% { background-color: #00ff51; }
+            39.33% { background-color: #00ff5b; }
+            40.0% { background-color: #00ff66; }
+            40.67% { background-color: #00ff70; }
+            41.33% { background-color: #00ff7a; }
+            42.0% { background-color: #00ff84; }
+            42.67% { background-color: #00ff8e; }
+            43.33% { background-color: #00ff99; }
+            44.0% { background-color: #00ffa3; }
+            44.67% { background-color: #00ffad; }
+            45.33% { background-color: #00ffb7; }
+            46.0% { background-color: #00ffc1; }
+            46.67% { background-color: #00ffcb; }
+            47.33% { background-color: #00ffd6; }
+            48.0% { background-color: #00ffe0; }
+            48.67% { background-color: #00ffea; }
+            49.33% { background-color: #00fff4; }
+            50.0% { background-color: #00ffff; } /* cyan */
+            50.67% { background-color: #00f4ff; }
+            51.33% { background-color: #00eaff; }
+            52.0% { background-color: #00e0ff; }
+            52.67% { background-color: #00d6ff; }
+            53.33% { background-color: #00cbff; }
+            54.0% { background-color: #00c1ff; }
+            54.67% { background-color: #00b7ff; }
+            55.33% { background-color: #00adff; }
+            56.0% { background-color: #00a3ff; }
+            56.67% { background-color: #0099ff; }
+            57.33% { background-color: #008eff; }
+            58.0% { background-color: #0084ff; }
+            58.67% { background-color: #007aff; }
+            59.33% { background-color: #0070ff; }
+            60.0% { background-color: #0066ff; }
+            60.67% { background-color: #005bff; }
+            61.33% { background-color: #0051ff; }
+            62.0% { background-color: #0047ff; }
+            62.67% { background-color: #003dff; }
+            63.33% { background-color: #0033ff; }
+            64.0% { background-color: #0028ff; }
+            64.67% { background-color: #001eff; }
+            65.33% { background-color: #0014ff; }
+            66.0% { background-color: #000aff; }
+            66.67% { background-color: #0000ff; } /* blue */
+            67.33% { background-color: #0a00ff; }
+            68.0% { background-color: #1400ff; }
+            68.67% { background-color: #1e00ff; }
+            69.33% { background-color: #2800ff; }
+            70.0% { background-color: #3200ff; }
+            70.67% { background-color: #3d00ff; }
+            71.33% { background-color: #4700ff; }
+            72.0% { background-color: #5100ff; }
+            72.67% { background-color: #5b00ff; }
+            73.33% { background-color: #6500ff; }
+            74.0% { background-color: #7000ff; }
+            74.67% { background-color: #7a00ff; }
+            75.33% { background-color: #8400ff; }
+            76.0% { background-color: #8e00ff; }
+            76.67% { background-color: #9900ff; }
+            77.33% { background-color: #a300ff; }
+            78.0% { background-color: #ad00ff; }
+            78.67% { background-color: #b700ff; }
+            79.33% { background-color: #c100ff; }
+            80.0% { background-color: #cc00ff; }
+            80.67% { background-color: #d600ff; }
+            81.33% { background-color: #e000ff; }
+            82.0% { background-color: #ea00ff; }
+            82.67% { background-color: #f400ff; }
+            83.33% { background-color: #ff00ff; } /* magenta */
+            84.0% { background-color: #ff00f4; }
+            84.67% { background-color: #ff00ea; }
+            85.33% { background-color: #ff00e0; }
+            86.0% { background-color: #ff00d6; }
+            86.67% { background-color: #ff00cb; }
+            87.33% { background-color: #ff00c1; }
+            88.0% { background-color: #ff00b7; }
+            88.67% { background-color: #ff00ad; }
+            89.33% { background-color: #ff00a3; }
+            90.0% { background-color: #ff0098; }
+            90.67% { background-color: #ff008e; }
+            91.33% { background-color: #ff0084; }
+            92.0% { background-color: #ff007a; }
+            92.67% { background-color: #ff0070; }
+            93.33% { background-color: #ff0066; }
+            94.0% { background-color: #ff005b; }
+            94.67% { background-color: #ff0051; }
+            95.33% { background-color: #ff0047; }
+            96.0% { background-color: #ff003d; }
+            96.67% { background-color: #ff0033; }
+            97.33% { background-color: #ff0028; }
+            98.0% { background-color: #ff001e; }
+            98.67% { background-color: #ff0014; }
+            99.33% { background-color: #ff000a; }
+            100% { background-color: #FF0000; } 
+        }
+                
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+.particlee {
+    position: relative;
     width: var(--size);
     height: var(--size);
     background-color: rgba(255, 255, 255, var(--opacity));
@@ -231,25 +637,38 @@
     animation-duration: calc(var(--duration) / 2); /* Speeds up the animation */
 }
 
-#spell-buttons {
-    position: relative;
-  display: flex;
-  justify-content: space-around;
-  margin: 20px;
-  z-index: 2;
-}
+
 /*CSS TIMER*/
+#game-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  position: relative;
+  margin-left: 260px; /* Assuming sidebar is 250px plus 10px margin */
+  margin-top: 120px; /* Assuming top banner is 60px plus 10px margin */
+  gap: 50px;
+
+}
+
+
 .turn-timer-display {
     font-size: 20px;
     font-weight: bold;
     color: #fff;
-    background-color: #444;
+    background-color: #555;
     padding: 10px;
     border-radius: 5px;
     text-align: center;
     width: 200px;
-    margin: 10px auto;
-}
+    margin: 0;
+    text-align: center;
+    transition: transform 0.2s;
+    border: 2px solid #fff;  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}   
 
 .extra-timer-display {
     font-size: 20px;
@@ -260,7 +679,13 @@
     border-radius: 5px;
     text-align: center;
     width: 200px;
-    margin: 10px auto;
+    margin: 0;
+    text-align: center;
+    transition: transform 0.2s;
+    border: 2px solid #fff;  
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .turn-count-display {
@@ -272,7 +697,13 @@
     border-radius: 5px;
     text-align: center;
     width: 200px;
-    margin: 10px auto;
+    margin: 0;
+    text-align: center;
+    transition: transform 0.2s;
+    border: 2px solid #fff;  
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 @keyframes blink {
     0% { background-color: #444; }
@@ -290,8 +721,8 @@
 /*asking user to click on square css*/
 .modal {
   display: none;
-  position: fixed;
-  z-index: 1;
+  position: relative;
+  z-index: 11;
   left: 0;
   top: 0;
   width: 100%;
@@ -321,9 +752,18 @@
   text-decoration: none;
   cursor: pointer;
 }
+#spell-buttons {
+
+    position: relative;
+    display: flex;
+    justify-content: space-evenly;
+    margin: 20px;
+    z-index: 2;
+}
 
 .spell-button {
   padding: 20px;
+   overflow: hidden;
   font-size: 1.5em;
   color: white;
   border-radius: 10px;
@@ -333,9 +773,10 @@
   border: 2px solid #fff;
   background-color: #444;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   overflow: hidden;
+  gap: 10px;
   width: 150px; /* Adjust the width as needed */
   height: 150px; /* Adjust the height as needed */
 }
@@ -368,25 +809,57 @@
   transition: opacity 0.5s;
   font-size: 14px;
 }
-
+#hatSpell-button,
+#robeSpell-button{
+    cursor: not-allowed;
+    display: none;
+    background-color: lightslategray;
+}
 .spell-button:hover .tooltiptext {
   visibility: visible;
   opacity: 1;
 }
 
-
-#defensive-spell-button {
-  background-color: #4CAF50; /* Green */
-}
-
-#offensive-spell-button {
-  background-color: #f44336; /* Red */
-}
-
 .spell-button:hover {
   transform: scale(1.1);
+  background-color: #003558;
+}
+.development-disclaimer {
+    position: absolute;
+    width: 60px; 
+    height: 20px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white; 
+    pointer-events: none; 
+    animation: bounce 2s linear infinite alternate,
+               color-change 5s infinite alternate;
 }
 
+/* Combined bounce animation for both axes 
+@keyframes bounce {
+    0%, 100% { 
+        transform: translate(0, 0); 
+    }
+    25% { 
+        transform: translate(calc(90% - 60px), 0); 
+    }
+    50% { 
+        transform: translate(calc(90% - 60px), calc(90% - 20px)); 
+    }
+    75% { 
+        transform: translate(0, calc(90% - 20px));  
+    }
+}
+
+ 
+@keyframes color-change {
+    0%, 100% { color: red; }
+    25% { color: green; }
+    50% { color: blue; }
+    75% { color: yellow; }
+}*/
 .light
 {
     background-color: lightskyblue;
@@ -458,22 +931,49 @@
     position: absolute;
     z-index: 1;
     overflow: hidden;
+    background-position: top;
 
+}
+.chess-piece:hover {
+    transform: scale(1.1); /* Enlarge piece on hover */
+    transition: transform 0.3s ease; /* Smooth transition */
+}
+.chess-piece.pawn-random-move::after {
+  content: '';
+  position: absolute;
+  /* Adjust based on your design */
+  left: 50%;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 15px solid black; /* Arrow color */
+  transform: translateX(-50%);
+}
+
+/* Rotate arrow based on direction, only when 'random-pawn-move' is present */
+.chess-piece.pawn-random-move.left::after {
+  transform: translateX(-50%) rotate(270deg); /* or -90deg for left */
+}
+
+/* Rotate arrow to the right */
+.chess-piece.pawn-random-move.right::after {
+  transform: translateX(-50%) rotate(90deg);
+}
+
+/* Diagonal left - pointing towards top-left for white, bottom-left for black */
+.chess-piece.pawn-random-move.diagonal-left::after {
+  transform: translateX(-50%) rotate(this.color === "white" ? 225deg : 45deg);
+}
+
+/* Diagonal right - pointing towards top-right for white, bottom-right for black */
+.chess-piece.pawn-random-move.diagonal-right::after {
+  transform: translateX(-50%) rotate(this.color === "white" ? 315deg : 135deg);
 }
 
 .white-pawn
 {
     width: 66.2px;
     height: 66.2px;
-   background-size: cover; 
-   background-image: url('/WhitePAWN.png');
-
-   position: relative;
-   top: 0;
-   left: 0;
-   bottom: 0;
-   right: 0;
-
+    position: relative;
     
 }
 .black-knight
@@ -481,10 +981,7 @@
     
     width: 66.2px;
     height: 66.2px;
-    background-image: url('/BlackBISHOP.png');
-    background-size: cover;
-    
-   
+    background-image: url('img/blackBISHOP.png');
 
 }
 .white-knight
@@ -492,9 +989,8 @@
     width: 67.2px;
     height: 67.2px;
     background-size: cover;
-    background-image: url('/WhiteKnight.png');
-
     background-position: center;
+    position: relative;
 }
 
 .black-pawn
@@ -502,20 +998,11 @@
     
     width: 66.2px;
     height: 66.2px;
-    background-size: cover;
-    background-image: url('/BlackPAWN.png');
-
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    position: absolute;
-    z-index: 1;
-    overflow: hidden;
+    position: relative;
 }
 .white-king
 {
-    background-image: url('/WhiteKING.png');
+    
     background-size: cover;
     width: 66.2px;
     height: 66.2px;
@@ -526,8 +1013,6 @@
     height: 66.2px;
     background-size: cover;
     position: absolute;
-    background-image: url('/BlackKING.png');
-
     
 }
 .black-queen
@@ -544,14 +1029,14 @@
 }
 .white-queen
 {
-    background-image: url('/WhiteQUEEN.png');
+    background-image: url('/whiteQUEEN.png');
     background-size: cover;
     width: 66.2px;
     height: 66.2px;
 }
 .black-rook
 {
-    background-image: url('/blackROOK.png');
+    background-image: url('/BlackROOK.png');
     background-size: cover;
     width: 67.2px;
     height: 67.2px;
@@ -565,7 +1050,7 @@
 }
 .white-bishop
 {
-    background-image: url('/WhiteBISHOP.png');
+    background-image: url('/whiteBISHOP.png');
     background-size: cover;
      width: 67.2px;
     height: 67.2px;
@@ -573,7 +1058,7 @@
 }
 .black-bishop
 {
-    background-image: url('/BlackBISHOP.png');
+    background-image: url('/blackBishop.png');
    width: 67.2px;
     height: 67.2px;
 }
@@ -620,18 +1105,30 @@
 
 .notification-box {
     position: absolute;
-    top: 10px; /* Adjust as needed */
-    right: 10px; /* Adjust as needed */
+    top: 10px; /* Stacked vertically from top */
+    right: 10px; /* Align to the right */
+    margin-bottom: 5px; /* Space between multiple notifications */
     padding: 10px;
     background-color: #fff;
     border: 1px solid #ddd;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     z-index: 1000;
+    width: auto;
+    max-width: 300px; /* Ensure it doesn’t grow too large */
+    overflow: hidden; /* Keeps the content wrapped inside the box */
+    transition: all 0.3s ease-in-out; /* Smooth transition for appearance and disappearance */
+}
+
+.notification-box p {
+    margin: 0;
+    font-size: 14px; /* Suitable text size */
+    color: #333; /* Dark enough for readability */
 }
 
 .notification-box img {
-    width: 50px; /* Adjust as needed */
+    width: 50px;
     height: auto;
+    vertical-align: middle; /* Aligns image nicely with the text */
 }
 
 .game-ui{
@@ -778,18 +1275,143 @@
 
 
 /*END OF FINAL STAND SPELL*/
+/*PETRYFYING SPELL*/
+@keyframes pulseWarning {
+    0% {
+        filter: grayscale(100%) brightness(70%);
+        transform: scale(1);
+    }
+    50% {
+        filter: grayscale(0%) brightness(60%) sepia(100%) hue-rotate(-50deg) saturate(500%) contrast(1.2);
+        transform: scale(1.1);
+    }
+    100% {
+        filter: grayscale(100%) brightness(70%);
+        transform: scale(1);
+    }
+}
 
+.petrified {
+    animation: pulseWarning 2s infinite;
+    transition: filter 0.3s, transform 0.3s;
+    box-shadow: 0 0 10px red; /* Optional: red shadow for more alerting effect */
+}
+.petrification-timer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: red;
+    color: white;
+    font-size: 14px;
+    padding: 2px;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/*END OF PETRYFYING SPELL*/
+.hole {
+  position: absolute;
+  width: 100px; /* Double the radius of the conceptual hole */
+  height: 100px; /* Double the radius of the conceptual hole */
+  border-radius: 50%; /* Make it circular */
+  background: black; /* Or any color you want */
+  pointer-events: none; /* Makes sure they don't interfere with mouse events */
+}
+.nft-box:hover {
+    transform: scale(1.1); /* Enlarge piece on hover */
+    transition: transform 0.3s ease; /* Smooth transition */
+    border-spacing: 15px;
+}
+
+@keyframes magmaAnimation {
+  0% {background-position: 0 0;}
+  100% {background-position: 400px 0;}
+}
+
+.magma-square {
+  
+  background: linear-gradient(270deg, #ff4500, #ff8c00, #ff4500, #ff8c00);
+  
+  animation: magmaAnimation 30s linear infinite;
+}
+@keyframes pulseHole {
+  0% {
+    box-shadow: inset 0 0 5px #000, 0 0 5px #555;
+    border-radius: 50%;
+  }
+  50% {
+    box-shadow: inset 0 0 10px #000, 0 0 10px #555;
+    border-radius: 45%;
+  }
+  100% {
+    box-shadow: inset 0 0 5px #000, 0 0 5px #555;
+    border-radius: 50%;
+  }
+}
+
+.hole-square {
+  
+  background: radial-gradient(circle, #555 30%, #000 70%);
+  animation: pulseHole 2s infinite ease-in-out;
+}
+
+@keyframes shimmerRock {
+  0% {
+    background-position: top left;
+    opacity: 1;
+  }
+  50% {
+    background-position: top right;
+    opacity: 0.8;
+  }
+  100% {
+    background-position: top left;
+    opacity: 1;
+  }
+}
+
+.rock-square {
+  background-color: #707070;
+  background-image: linear-gradient(120deg, #fff0 0%, #fff3 50%, #fff0 100%), url('path/to/your/rock-texture.jpg');
+  background-size: auto, cover; /* First size for gradient, second for the rock texture */
+  animation: shimmerRock 8s infinite ease-in-out;
+}
 </style>
 </head>
 
 <body id="body">
-    <div id='background'></div>
+    <div id="particle-container"></div>
+    <!-- <div id='background'></div> -->
     
 <!-- END OF BCKGROUND CANVAS EFFECT --> 
 
 
     <!-- NFT FETCHING -->
     <script>
+//         function bypassLocalTunnelPassword(url) {
+//             console.log('bypassLocalTunnelPassword function called');
+//     // Define custom headers
+//     const headers = new Headers({
+//         'bypass-tunnel-reminder': 'any-value', // Using bypass-tunnel-reminder header
+//         'User-Agent': 'MyCustomUserAgent/1.0' // Or using a custom User-Agent
+//     });
+
+//     // Define the request options
+//     const requestOptions = {
+//         method: 'GET',
+//         headers: headers,
+//         redirect: 'follow' // Automatically follow redirects
+//     };
+
+//     // Make the fetch request
+//     fetch(url, requestOptions)
+//         .then(response => response.text())
+//         .then(result => console.log(result))
+//         .catch(error => console.error('Error:', error));
+// }
        // Function to create and display iframes for each NFT
 function displayNfts(nfts, chessGame) 
 {
@@ -797,20 +1419,21 @@ function displayNfts(nfts, chessGame)
   const container = document.getElementById('nfts-container');
   container.innerHTML = '';
   container.style.display = 'flex'; // Use flexbox to layout children horizontally
-  container.style.flexWrap = 'wrap'; // Allow items to wrap as needed
+  container.style.flexWrap = 'wrap';
+  container.style.flexDiretion = 'row-reverse';// Allow items to wrap as needed
   container.style.gap = '10px'; // Add gap between items for better spacing
   // console.log("gameStarted", gameStarted);
   nfts.forEach(nft => 
   {
     const nftBox = document.createElement('div');
     nftBox.classList.add('nft-box');
-    nftBox.style = 'min-width: 15%; position: relative;'; // Ensure minimum width and use relative positioning
+    nftBox.style = 'width: 15%; position: relative;'; // Ensure minimum width and use relative positioning
 
     const iframe = document.createElement('iframe');
     iframe.classList.add('nft-iframe');
     iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
     iframe.allowFullscreen = true;
-    iframe.style = 'width: 100%; height: 100%; border: none;';
+    iframe.style = 'width: 100%; height: 100%; border: solid; maxWidth: 30px;';
     iframe.src = nft.media.url;
     iframe.title = nft.name;
     iframe.style.pointerEvents = 'none';
@@ -878,6 +1501,23 @@ function displayNfts(nfts, chessGame)
   
 }
 
+function updateGameProfile(playerColor, selectedNft, walletAddress) {
+     console.log("updateGameProfile function called");
+    const userProfileId = playerColor === 'black' ? 'blackUserProfile' : 'whiteUserProfile';
+    const userProfile = document.getElementById(userProfileId);
+
+    // Update the selected NFT display
+    userProfile.querySelector('.selectedNftDisplay').innerHTML = '<img src="' + selectedNft.media.url + '" alt="' + selectedNft.name + '" style="width: 100px; height: 100px;">';
+
+    // Update wallet address
+    userProfile.querySelector('.walletAddress').textContent = 'Wallet: ' + walletAddress;
+
+    // Update border based on wallet address
+    const borderStyle = getBorderStyleForAddress(walletAddress);
+    userProfile.querySelector('.borderSelection').style = borderStyle;
+
+    // Additional profile updates as needed
+}
 
 async function fetchSvgFromSpellsExplain(traitType, className) {
     try {
@@ -903,16 +1543,16 @@ async function fetchSvgFromSpellsExplain(traitType, className) {
 
   // This is the JavaScript code that you want to execute in the browser
   async function fetchNFTs() {
-     try {
+        
+    try {
         const chainId = 'stargaze-1';
-          await window.keplr.enable(chainId);
+        await window.keplr.enable(chainId);
+        const offlineSigner = window.getOfflineSigner(chainId);
+        const accounts = await offlineSigner.getAccounts();
+        console.log("Connected wallet address:", accounts[0].address);
 
-   const offlineSigner = window.getOfflineSigner(chainId);
-    const accounts = await offlineSigner.getAccounts();
-    console.log("Connected wallet address:", accounts[0].address);
-
-    const query = {
-      query: `
+        const query = {
+            query: `
         query NFTs($ownerAddrOrName: String, $filterByCollectionAddrs: [String!], $limit: Int) {
           tokens(ownerAddrOrName: $ownerAddrOrName, filterByCollectionAddrs: $filterByCollectionAddrs, limit: $limit) {
             tokens {
@@ -942,8 +1582,8 @@ async function fetchSvgFromSpellsExplain(traitType, className) {
       body: JSON.stringify(query),
     });
     const data = await response.json();
-       console.log(data);
-      const nfts = data.data.tokens.tokens;
+    console.log(data);
+    const nfts = data.data.tokens.tokens;
     displayNfts(nfts);
       // Here you can update your HTML with the data received
       // For example, if you have a <div id="nft-data"></div> in your HTML
@@ -952,6 +1592,45 @@ async function fetchSvgFromSpellsExplain(traitType, className) {
     console.error('Error fetching NFTs:', error);
   }
 }
+
+async function checkNFTsOnDAO() {
+    try {
+        const chainId = 'stargaze-1';
+        await window.keplr.enable(chainId);
+        const offlineSigner = window.getOfflineSigner(chainId);
+        const accounts = await offlineSigner.getAccounts();
+
+        const indexerUrl = `https://indexer.daodao.zone/stargaze-1/contract/stars19xkrcned5fajh0tln48t9nlu4k06q8qugse907fhqjtes94t6tmsm0qndw/daoVotingCw721Staked/stakedNfts?address=${accounts[0].address}`;
+        const response = await fetch(indexerUrl);
+        const nftIds = await response.json();
+
+        const nftData = nftIds.map(nftId => {
+            return {
+                media: { 
+                    url: `https://ipfs-gw.stargaze-apis.com/ipfs/bafybeidwo4kicq35xnvmbaynl334uif26phmmk63sxncn76rhkyyo4ll6i/${nftId}.html`
+                },
+                tokenId: nftId,
+                name: `NFT ${nftId}` // Placeholder name, adjust as needed
+            };
+        });
+
+        displayNfts(nftData); // Use your existing displayNfts function
+
+        return nftData;
+    } catch (error) {
+        console.error('Error fetching NFTs from DAO:', error);
+        return [];
+    }
+}
+
+// // Example usage with a button
+// document.getElementById('fetch-dao-nfts-button').addEventListener('click', function() {
+//   const walletAddress = 'accounts[0].address'; // Replace with actual user wallet address
+//   checkNFTsOnDAO(walletAddress).then(nfts => {
+//     console.log('Staked NFTs:', nfts);
+//     // Additional processing if needed
+//   });
+// });
 
 async function fetchAndExtractClasses(htmlUrl, parentClass) {
   try {
@@ -977,62 +1656,500 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
     return null;
   }
 }
+function addPlayerToList(walletAddress) {
+    const playerList = document.getElementById("player-list");
+    const li = document.createElement("li");
+    li.className = "online-player";
+    li.dataset.address = walletAddress;
+    playerList.appendChild(li);
+}
+//MATCHMAKING SYSTEM WITH TINY SERVER TEST
+// Function to call the matchmaking server
+async function findGame(walletAddress) {
+    console.log('findGame function entered');
+    try {
+        const response = await fetch('http://192.168.1.82:8080/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ walletAddress: walletAddress }),
+        });
 
+        // Check if the response is JSON
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            const data = await response.json();
+            if (data.message === "Match found!") {
+                console.log("Match found", data.players);
+                // this.setupMatch(data.players);
+            } else {
+                console.log(data);
+            }
+        } else {
+            // If not JSON, you can still read the text response
+            console.log('Response received:', await response.text());
+        }
+    } catch (error) {
+        console.error('Error finding game:', error);
+    }
+}
+
+function setupMatch(players) {
+
+    // Assuming the first player in the list is the current user
+    const currentUserAddress = players[0].walletAddress;
+    const opponentAddress = players[1].walletAddress;
+    // console.log(currentUserAddress)
+
+
+    // Assign colors (for example, first player is white, second player is black)
+    const currentUserColor = "White";
+    const opponentColor = "Black";
+
+    // Display match information
+    document.getElementById('searchingForPlayers').style.display = 'none';
+    document.getElementById('matchFound').style.display = 'block';
+    document.getElementById('matchInfo').style.display = 'block';
+    document.getElementById('opponentInfo').textContent = `Opponent: ${opponentAddress}`;
+    document.getElementById('playerColorInfo').textContent = `You are ${currentUserColor}, Opponent is ${opponentColor}`;
+
+    // Here, you'd also initialize the game state, set up the board, etc.
+    // startGame(currentUserAddress, currentUserColor); // Example function call to start the game logic
+}
+
+function updateGameState(sessionData) {
+    console.log('Updating client game state with session data:', sessionData);
+
+    const gameIdElement = document.getElementById('game-id');
+    const gameSeedElement = document.getElementById('game-seed');
+    const playerListElement = document.getElementById('player-list');
+
+    console.log({gameIdElement, gameSeedElement, playerListElement}); // Check if elements are null
+
+    if (gameIdElement) {
+        gameIdElement.textContent = 'Game ID: ' + sessionData.gameId;
+    }
+    if (gameSeedElement && sessionData.seed) {
+        gameSeedElement.textContent = 'Seed: ' + sessionData.seed;
+    }
+    if (playerListElement && sessionData.players) {
+        playerListElement.innerHTML = ''; // Clear existing list
+        sessionData.players.forEach(player => {
+            let listItem = document.createElement('li');
+            listItem.textContent = player.walletAddress; // Assuming player object has a walletAddress
+            playerListElement.appendChild(listItem);
+        });
+    }
+}
+
+
+
+const socket = io('http://localhost:8080');
+
+    socket.on('connect', () => {
+        console.log('Connected to WebSocket server');
+    });
+
+    socket.on('requestRegister', async () => { // Mark this callback as async
+    const chainId = "stargaze-1";
+
+    // Check if Keplr is installed
+    if (window.keplr) {
+        try {
+            // Enabling Keplr for the specified chain ID
+            await window.keplr.enable(chainId);
+            const offlineSigner = window.getOfflineSigner(chainId);
+            const accounts = await offlineSigner.getAccounts();
+        
+            // Use the first account's address
+            const walletAddress = accounts[0].address;
+            socket.emit('register', { walletAddress: walletAddress });
+            console.log("walletAddress", walletAddress);
+            } catch (error) 
+            {
+                console.error('Error enabling Keplr or fetching accounts:', error);
+                // Handle the error appropriately
+            }
+        } else {
+            console.log("Keplr wallet is not installed.");
+            // Prompt the user to install Keplr or handle this case as needed
+        }
+    });
+
+    let currentMatchId = null;
+    let myColor = null; // Will be "white" or "black"
+    let myTurn = false;
+    socket.on('matchFound', function(data)
+    {
+       
+        
+         window.currentMatchId = data.matchId;
+         window.gameId = data.gameId;
+         console.log('window.currentMatchId', window.currentMatchId, 'gameId', window.gameId);
+        // client.js
+       
+         // console.log(`Player ${socket.id} joined game room: ${roomName}`);
+        console.log('Match found:', data);
+        myColor = data.color; // "white" or "black"
+        myTurn = data.yourTurn; // true or false
+        console.log('myColor', myColor, 'myTurn', myTurn);
+        // UI updates based on the match found
+        document.getElementById('searchingForPlayers').style.display = 'none';
+        document.getElementById('matchFound').style.display = 'block';
+        document.getElementById('matchInfo').style.display = 'block';
+        document.getElementById('opponentInfo').textContent = `Opponent: ${data.opponent.username}`; // Adjust based on your data structure
+
+    // Set the player color in the UI
+    document.getElementById('playerColorInfo').textContent = `You are ${myColor}`;
+    
+    // if (myTurn) {
+    //     // It's your turn to move, enable interactions for your pieces
+    //     enableMyPieceInteractions();
+    // } else {
+    //     // Not your turn, ensure interactions are disabled
+    //     disableMyPieceInteractions();
+    // }
+
+    // Further setup like resetting the board if necessary
+});
+    socket.on('gameCreated', function(data) {
+    console.log('Received gameId from server:', data.gameId);
+    window.currentGameId = data.gameId;  // Store this gameId to use for game actions
+    socket.emit('joinGame', { gameId: window.currentGameId });
+});
+   
+
+    socket.on('gameSessionUpdated', (data) => {
+    console.log('Received game session update:', data);
+    // Update your client-side game state
+    updateGameState(data.sessionData); // Implement this function based on your client-side logic
+});
+
+    // Listen for moves broadcasted by the server
+    socket.on('move', (move) => {
+    console.log('Move received from server:', move);
+    // Apply the move to the board since it's known to be from the opponent
+   
+    console.log('myTurn value during move operation but before changing turn', myTurn);
+     myTurn = !myTurn;
+     if (move.capture) {
+        chessPiece.forceRemove(move.to.row, move.to.col)  // Assuming you have a function to remove pieces
+        // this.game.game.board[move.to.row][move.to.col] = null;
+    }
+     applyMoveToBoard(move);
+     console.log('myTurn value during move operation and after changing turn', myTurn);
+    switchTurns();
+});
+    socket.on('turn', (data) => {
+    myTurn = (data.currentPlayer === myPlayerId); // Determine if it's the player's turn
+    if (myTurn) {
+        enableMyPieceInteractions();
+    } else {
+        disableMyPieceInteractions();
+    }
+});
+    socket.on('updatePositions', (shuffledPositions) => {
+    shuffledPositions.forEach(pieceUpdate => {
+        updatePiecePosition(pieceUpdate.id, pieceUpdate.newPosition);
+    });
+})
+function updatePiecePosition(pieceId, newPosition) {
+    const pieceElement = document.querySelector(`[data-piece-id="${pieceId}"]`);
+    const targetSquare = document.querySelector(`[data-square-index="${newPosition}"]`);
+
+    if (pieceElement && targetSquare) {
+        targetSquare.appendChild(pieceElement);
+        // Update any other visual or state aspects needed
+    }
+}
+
+socket.on('spellCasted', data => {
+    console.log('Spell received:', data);
+    if (data.gameId === currentGameId) {
+      
+        modulus = data.rng.modulus;
+        multiplier = data.rng.multiplier;
+       increment = data.rng.increment;
+
+     // Ensure this is for the current game
+        console.log('casting spell :', data.spellType, 'spellResult being:', data.spellResult, 'rng being ', data.rng);
+        //  displaySpellEffects()
+       window.castSpell(data.spellType, data.spellResult, data.rng);
+       console.log('about to cast spellDetail spellResult being:', data.spellResult)
+      
+        window.spellDetail(data.spellType, data.spellResult, data.rng, data);
+      
+
+} else {
+        console.log('Received spell for a different game:', data.gameId);
+    }
+});
+
+function castChaosWarpSpell(board) {
+    console.log("Casting chaos warp spell");
+
+    // Extract pieces from the game board and shuffle them
+    const shuffledPositions = chaosWarp(board);
+
+    // Emit the shuffled positions to the server
+    
+}
+
+function displaySpellEffects(spellType, nft) {
+    // Update UI or show animations specific to the spell type and NFT used
+    alert(`Enemy has cast ${spellType} with ${nft}! Prepare for effects!`);
+}
+
+    function enableMyPieceInteractions()
+    {
+    if (!myTurn) return; // If it's not the player's turn, do nothing
+
+    const pieces = document.querySelectorAll(`.chess-piece.${myColor}`);
+    pieces.forEach(piece =>
+    {
+    piece.classList.add('clickable'); // Example CSS class to show interaction is possible
+    // You may handle clicks here or have already attached a global click listener
+});
+}
+function updatePositions(shuffledPositions) {
+    console.log('updatePositions function entered with : ', shuffledPositions)
+    shuffledPositions.forEach(pieceUpdate => {
+        updatePiecePosition(pieceUpdate.id, pieceUpdate.newPosition);
+    });
+}
+
+function updatePiecePosition(pieceId, newPosition) {
+    const pieceElement = document.querySelector(`[data-id="${pieceId}"]`);
+    const targetSquare = document.querySelector(`[data-position="${newPosition}"]`);
+
+    if (pieceElement && targetSquare) {
+        targetSquare.appendChild(pieceElement);
+    }
+}
+
+function disableMyPieceInteractions() {
+    const pieces = document.querySelectorAll('.chess-piece');
+    pieces.forEach(piece => {
+        piece.classList.remove('clickable'); // Remove interaction indication
+    });
+}
+
+    // Function to send a move to the server
+    function sendMove(move) {
+        socket.emit('move', move);
+    }
+    function startNewGame(playerOneSocketId, playerTwoSocketId) {
+    // Assign colors
+    players[playerOneSocketId] = { color: 'white', turn: true }; // White starts
+    players[playerTwoSocketId] = { color: 'black', turn: false };
+    
+    // Notify players of their color and set the initial turn
+    io.to(playerOneSocketId).emit('gameStart', { color: 'white', yourTurn: true });
+    io.to(playerTwoSocketId).emit('gameStart', { color: 'black', yourTurn: false });
+}
+    // function switchTurns() {
+    //     console.log('switchTurns function entered');
+    //     Object.keys(players).forEach(playerSocketId => {
+    //         players[playerSocketId].turn = !players[playerSocketId].turn; // Switch turns
+    //         io.to(playerSocketId).emit('turnChange', { yourTurn: players[playerSocketId].turn });
+    //     });
+    // }
+    function switchTurns() {
+        console.log('this context', this);
+        // this.chessGame.endTurnMove(gameInstance);
+        this.chessGame.endTurnMoveServ(this);
+
+    }
+    function applyMoveToBoard(move) {
+        console.log('applyMoveToBoard funtion entered with', move, 'this instance being', this.ChessPiece);
+        
+        // let chessPiece = new ChessPiece(type, color, row, col, imagePath, elementId, game);
+        const piece = document.createElement('div');
+    piece.className = `chess-piece ${move.color}-${move.type}`;
+    piece.style.backgroundImage = `url('img/${move.color}-${move.type}.png')`;
+
+    // Convert 'from' and 'to' positions to your board's coordinate system if necessary
+    this.ChessPiece.forceMove(piece, move.from.row, move.from.col, move.to.row, move.to.col);
+    this.ChessPiece.forceRemove(move.from.row, move.from.col);
+
+        // this.ChessPiece.forceMove(move.color, move.type, move.from, move.to)
+    // Logic to update the board based on the move
+    // This would include moving the piece from the 'from' square to the 'to' square
+         
+    // and any additional logic for special moves or capturing pieces
+}
+
+
+
+//END OF SCRIPTS FOR SOCKETS.IO CLIENT SIDE
+//END OF MATCHMAKING SERVER SYSTEM 
+// 
+
+// SMART CONTRACT TESTING NOT FUNCTIONNING
+// async function callSmartContract() {
+//     if (!window.keplr) {
+//         alert("Please install Keplr extension");
+//         return;
+//     }
+
+//     const chainId = "stargaze-1";
+//     const contractAddress = "your-contract-address";
+    
+//     // Enabling Keplr for the specified chain ID
+//     await window.keplr.enable(chainId);
+//     const offlineSigner = window.getOfflineSigner(chainId);
+//     const accounts = await offlineSigner.getAccounts();
+
+//     // Using CosmJS to interact with the blockchain
+//     const client = await SigningCosmWasmClient.connectWithSigner(
+//         "https://rpc.elgafar-1.stargaze-apis.com", // RPC endpoint of the blockchain
+//         offlineSigner
+//     );
+
+//     // Define the message for the smart contract interaction
+//     // This is a generic example; you'll need to replace it with your actual contract function and parameters
+//     const executeMsg = {
+//         register: { /* Parameters required by your function */ },
+//     };
+
+//     try {
+//         const result = await client.execute(
+//             accounts[0].address,
+//             contractAddress,
+//             executeMsg,
+//             "auto", // Gas limit; set to "auto" or specify a limit
+//             "Executing smart contract function", // Memo (optional)
+//             [] // Additional fees (optional)
+//         );
+//         console.log("Transaction result:", result);
+//     } catch (error) {
+//         console.error("Error calling smart contract:", error);
+//     }
+// }
+
+// async function connectToBlockchain() {
+//     console.log('connectToBlockchain function called');
+//   const rpcEndpoint = "https://rpc.your-blockchain.network"; // Replace with your RPC endpoint
+//   const client = await SigningCosmWasmClient.connect(rpcEndpoint);
+//   return client;
+// }
+// async function queryContract(client, contractAddress) {
+//     console.log('queryContract function called');
+//   const queryMsg = { /* your query message */ };
+//   const result = await client.queryContractSmart(contractAddress, queryMsg);
+//   console.log(result);
+// }
+// async function submitTransaction(client, senderAddress, contractAddress) {
+//   console.log('submitTransaction function called');
+//   const executeMsg = { /* your transaction message */ };
+//   const fee = { amount: [{ denom: "token", amount: "amount" }], gas: "gasLimit" }; // Adjust accordingly
+//   const result = await client.execute(senderAddress, contractAddress, executeMsg, fee);
+//   console.log(result);
+// }
+
+        //END OF SMART CONTRACT TESTING
 // gameStarted = true;
 </script>
 <!-- END OF FETHCING NFT and SVG -->
 <!-- <div id="background"></div> -->
+<div id="player-list-container">
 
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
-    
+    <ul id="player-list">
+    <h2>Online players</h2>
+    </ul>
+</div>
+
+<div id="matchInfo" class = 'styling1' style="display:none;">
+    <p id="opponentInfo"></p>
+    <p id="playerColorInfo"></p>
+</div>
+
+
+    <div id="searchingForPlayers" class="SearchPlayerUi">
+        <p>Looking for players...</p>
+        <div class="loader"></div> <!-- Simple CSS animation can be applied here -->
+    </div>
+    <div id="matchFound" style="display: none;">Get ready!</div>
+
+
+<div id="game-info">  
 <!-- <div id="turn-timer" class="turn-timer-display">Time Left: 60 seconds</div> -->
 <div id="extra-white-timer-display" class="extra-timer-display">Extra Time for BlackPlayer: 300 seconds</div>
 <div id="extra-black-timer-display" class="extra-timer-display">Extra Time for WhitePlayer 300 seconds</div>
 
-<div id="turn-count-display" class="turn-count-display">Turn: 0</div>
+<div id="turn-count-display" class="turn-count-display">Turn:$'(myTurn)'</div>
 <div id="turn-timer" class="turn-timer-display">Time Left: -- seconds</div>
-<a href="./jsFiles/spellsExplain2.html">INFORMATIONS ABOUT SPELLS</a>
+</div>
 
 <div id="spell-buttons">
 
-  <div id="robeSpell-button" class="spell-button" data-spell="">
+  <div id="robeSpell-button" class="spell-button under-development" data-spell="">
     Cast Robe Spell
+    <div class="development-disclaimer">Under Development</div>
   </div>
 
-  <div id="hatSpell-button" class="spell-button" data-spell="">
-    Cast hat Spell
+  <div id="hatSpell-button" class="spell-button under-development" data-spell="">
+    Cast Hat Spell
+    <div class="development-disclaimer">Under Development</div>
   </div>
 
-
-<div id="staffSpell-button" class="spell-button" data-spell="">
+  <div id="staffSpell-button" class="spell-button" data-spell="">
     Cast Staff Spell
-
   </div>
 </div>
+    
 
+
+   <!-- Settings Button -->
+<button id="openSettingsBtn" class="settings-btn">
+    <img src="img/settingsButton.png" alt="Settings" />
+</button>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal">
+    <div class="settingsModalcontent">
+        <span id="closeModal" class="close">&times;</span>
+        <div id="cssCustomizer" class="customizer">
+            <!-- Customizer items -->
+            <div class="customizer-item">
+                <span>Background Color</span>
+                <input type="color" id="backgroundColorPicker">
+            </div>
+            <div class="customizer-item">
+                <span>Dark Squares Color</span>
+                <input type="color" id="darkSquaresColorPicker">
+            </div>
+            <div class="customizer-item">
+                <span>Light Squares Color</span>
+                <input type="color" id="lightSquaresColorPicker">
+            </div>
+            <!-- Add more customizable properties as needed -->
+        </div>
+    </div>
+</div>
+
+
+
+<!-- <div id="blackUserProfile" class="userProfile">
+    <div class="profilePicture"></div>
+    <div class="walletAddress"></div>
+    <div class="nftSelection"></div>
+    <div class="selectedNftDisplay"></div>
+    <div class="borderSelection"></div>
+    <div class="badgeDisplay"></div>
+</div>
+
+<div id="whiteUserProfile" class="userProfile">
+    <div class="profilePicture"></div>
+    <div class="walletAddress"></div>
+    <div class="nftSelection"></div>
+    <div class="selectedNftDisplay"></div>
+    <div class="borderSelection"></div>
+    <div class="badgeDisplay"></div>
+</div>
+
+ -->
 <div id="select-square-modal" class="modal">
   <div class="modal-content">
     <span class="close-button">&times;</span>
@@ -1053,107 +2170,118 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
 <div id="dice-container" class="dice-container">
     <img id="dice-image" src="path_to_default_dice_image.png" alt="Dice">
 </div>
-
+<div id="sidebar">
+    <button id="connectWalletButton">Connect Wallet</button>
+    <button id="fetch-nfts-button" style="display: none;" >Fetch NFT Data</button>
+    <button id="fetch-dao-nfts-button" style="display: none;" onclick= "checkNFTsOnDAO()">Fetch NFT on DAO Data</button>
+    <button id="playGame">Play Game</button>
+    <a href="https://daodao.zone/dao/stars1dyg3rf3d82kw62d54sm2xrrqar6pctk5xztpkn7huuv2kdpdtddsmm7vuv/home" target="_blank">Join DAO</a>
+    <a href="https://stargaze-zone" target="_blank">Go to Stargaze</a>
+     <a href="https://www.stargaze.zone/m/pixelwizards/tokens" target="_blank">PixlWizard collection</a>
+    <a href="https://discord.com/channels/956864780918980659/1084855016541650985" target="_blank">Join Pixel Wizard Discord</a>
+    <a href="./jsFiles/spellsExplain2.html">Spells Info</a>
+</div>
 
 
 </div>
+
   <div id="chessboard">
 
     
     <div class="chess-square dark" data-row="0" data-col="0" id="square-0-0">
         
-            <div class="white-rook" src="/WhiteROOK.png"></div>
-        
+            <div class="white-rook" src="images/whiteROOK.png"></div>
+       
     </div>
 
     <div class="chess-square light" data-row="0" data-col="1" id="square-0-1">
-        
-            <div class="white-knight" src="/WhiteKNIGHT.png"></div>
-        
+        <div class="chess-piece">
+            <div class="white-knight" src="images/whiteKNIGHT.png"></div>
+        </div>
     </div>
 
     <div class="chess-square dark" data-row="0" data-col="2" id="square-0-2">
-        
-            <div class="white-bishop" src="/WhiteBISHOP.png"></div>
-      
+        <div class="chess-piece">
+            <div class="white-bishop" src="images/whiteBISHOP.png"></div>
+        </div>
     </div>
 
     <div class="chess-square light" data-row="0" data-col="3" id="square-0-3">
-       
-            <div class="white-queen" src="/WhiteQUEEN.png"></div>
-        
+        <div class="chess-piece">
+            <div class="white-queen" src="images/whiteQUEEN.png"></div>
+        </div>
     </div>
 
     <div class="chess-square dark" data-row="0" data-col="4" id="square-0-4">
-      
-            <div class="white-king" src="/WhiteKING.png"></div>
-        
+        <div class="chess-piece">
+            <div class="white-king" src="images/whiteKING.png"></div>
+        </div>
     </div>
 
     <div class="chess-square light" data-row="0" data-col="5" id="square-0-5">
-        
-            <div class="white-bishop" src="/WhiteBISHOP.png"></div>
-    
+        <div class="chess-piece">
+            <div class="white-bishop" src="images/whiteBISHOP.png"></div>
+        </div>
     </div>
     
     <div class="chess-square dark" data-row="0" data-col="6" id="square-0-6">
-  
-            <div class="white-knight" src="/WhiteKNIGHT.png"></div>
-  
+        <div class="chess-piece">
+            <div class="white-knight" src="images/whiteKNIGHT.png"></div>
+        </div>
     </div>
 
     <div class="chess-square light" data-row="0" data-col="7" id="square-0-7">
-        
-            <div class="white-rook" src="/WhiteROOK.png"></div>
-       
+        <div class="chess-piece">
+            <div class="white-rook" src="images/whiteROOK.png"></div>
+        </div>
     </div>
 
     <div class="chess-square light" data-row="1" data-col="0" id="square-1-0">
-       
-            <div class="white-pawn" src="/WhitePAWN.png"></div>
-      
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
     </div>
 
     <div class="chess-square dark" data-row="1" data-col="1" id="square-1-1">
-    
-            <div class="white-pawn" src="/WhitePAWN.png"></div>
-     
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
     </div>
 
     <div class="chess-square light" data-row="1" data-col="2" id="square-1-2">
-        
-            <div class="white-pawn" src="/WhitePAWN.png"></div>
-    
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
     </div>
     
     <div class="chess-square dark" data-row="1" data-col="3" id="square-1-3">
-        
-            <div class="white-pawn" src="/WhitePAWN.png"></div>
-        
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
     </div>
 
     <div class="chess-square light" data-row="1" data-col="4" id="square-1-4">
-        
-            <div class="white-pawn" src="/whitePAWN.png"></div>
-        
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
     </div>
     
     <div class="chess-square dark" data-row="1" data-col="5" id="square-1-5">
-        
-            <div class="white-pawn" src="/WhitePAWN.png"></div>
-        
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
     </div>
 
     <div class="chess-square light" data-row="1" data-col="6" id="square-1-6">
-        
-            <div class="white-pawn" src="/WhitePAWN.png"></div>
-        
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
     </div>
 
     <div class="chess-square dark" data-row="1" data-col="7" id="square-1-7">
-        
-            <div class="white-pawn" src="/WhitePAWN.png"></div>
-      
+        <div class="chess-piece">
+            <div class="white-pawn" src="images/whitePAWN.png"></div>
+        </div>
     </div>
 
     <div class="chess-square dark" data-row="2" data-col="0" id="square-2-0"></div>
@@ -1190,15 +2318,15 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
     <div class="chess-square dark" data-row="5" data-col="7" id="square-5-7"></div>
 
     <div class="chess-square dark" data-row="6" data-col="0" id="square-6-0">
-        
+        <div class="chess-piece">
             <div class="black-pawn" src="images/blackPAWN.png"></div>
-        
+        </div>
     </div>
 
     <div class="chess-square light" data-row="6" data-col="1" id="square-6-1">
-        
+        <div class="chess-piece">
             <div class="black-pawn" src="images/blackPAWN.png"></div>
-      
+        </div>
     </div>
 
     <div class="chess-square dark" data-row="6" data-col="2" id="square-6-2">
@@ -1298,41 +2426,137 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
     <div id="bottomLeft-mini-board" class="mini-board"></div>
     <div id="bottomRight-mini-board" class="mini-board"></div>
 </div>
-<button id="fetch-nfts-button" onclick= "fetchNFTs()">Fetch NFT Data</button>
+
+
 <div id="nfts-container"></div>
 
 <div>
 <!-- Div to display the fetched data -->
 <div id="nft-data"></div>
 
-  <!-- Connect Wallet Button -->
-  <button id="connectWalletButton">Connect Wallet</button>
+ 
+  
     <!-- List NFTs owned by the user -->
   <div id="nft-list"></div>
   <!-- Display selected NFT traits and game options -->
   <div id="nft-details"></div>
 </div>
-
-<div id='move-history'>
-    <h3>Move History:</h3>
-  <ul id="move-list"></ul>
-</div>
   
 
 <div id="game-info">
-  <div id="turn-display">
+  <!-- <div id="turn-display">
     <p>Turn: <span id="turn-color">White</span></p>
-  </div>
-<div id="captured-pieces">
+  </div> -->
+<!-- <div id="captured-pieces">
   <h2>Captured Pieces</h2>
   <div id="white-captured" class="captured-display"></div>
-  <div id="white-captured" class="captured-display"></div>
-  </div>
+  <div id="black-captured" class="captured-display"></div>
+  </div> -->
 </div>
+<script type="text/javascript">
+    class MatchmakingSystem {
+        constructor() {
+        this.players = []; // Registered players
+        this.waitingPlayers = []; // Players waiting for a match
+        this.matchHistory = []; // Match history
+        this.gamesInProgress = []; // Tracks ongoing games
+    }
+
+        async registerPlayer(player) {
+        const chainId = 'stargaze-1';
+        await window.keplr.enable(chainId);
+        const offlineSigner = window.getOfflineSigner(chainId);
+        const accounts = await offlineSigner.getAccounts();
+        console.log("Connected wallet address:", accounts[0].address);
+        const address = accounts[0].address;
+        this.players.push({ address, player });
+        this.addPlayerToList(address); // Add player to online list
+        this.updateOnlinePlayersUI();
+    }
+        addPlayerToList(address) 
+        {
+            const playerList = document.getElementById("player-list");
+            const li = document.createElement("li");
+            li.className = "online-player";
+            li.dataset.address = address; // Set the data-address attribute to the player's wallet address
+            playerList.appendChild(li);
+        }
+
+        async findGame(player) {
+        this.waitingPlayers.push(player);
+        console.log("Waiting for another player to join...");
+        this.tryMatchPlayers(); // Attempt to match players immediately
+
+        setTimeout(() => {
+            this.tryMatchPlayers(); // Attempt to match players again after a timeout
+        }, 60000); // Timeout after 1 minute to check again
+    }
+
+    tryMatchPlayers() {
+    if (this.waitingPlayers.length >= 2) {
+        for (let i = 0; i < this.waitingPlayers.length; i++) {
+            for (let j = i + 1; j < this.waitingPlayers.length; j++) {
+                // Ensure we are not trying to match the same player
+                if (this.waitingPlayers[i].id !== this.waitingPlayers[j].id) {
+                    const player1 = this.waitingPlayers.splice(i, 1)[0]; // Remove player1 from waiting list
+                    const player2 = this.waitingPlayers.splice(j - 1, 1)[0]; // Adjust index for removed player1 and remove player2
+                    console.log("Match found between", player1, "and", player2);
+                    this.startGame(player1, player2);
+                    return; // Exit after finding a match
+                }
+            }
+        }
+    }
+}
+
+        async startGame(player1, player2) {
+        console.log("Starting game between", player1, "and", player2);
+        // Implement game start logic here
+        // For example, create a game session and track it
+        const gameSession = { player1, player2, status: 'in progress' };
+        this.gamesInProgress.push(gameSession);
+        // Notify both players that the game has started
+    }
 
 
-  <button id="newgamebutton">New Game</button>
-  
+        updateOnlinePlayersUI() {
+    const playerList = document.getElementById("player-list");
+    playerList.innerHTML = ""; // Clear the list first
+    this.players.forEach((player, index) => {
+        const li = document.createElement("li");
+        const dot = document.createElement("span");
+        dot.classList.add("online-player");
+        dot.style.backgroundColor = getRandomColor(); // Get a random color for each player
+        li.appendChild(dot);
+        playerList.appendChild(li);
+    });
+}
+}
+
+    function getRandomColor() {
+        const letters = "0123456789ABCDEF";
+        let color = "#";
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    const matchmakingSystem = new MatchmakingSystem();
+
+    async function getPlayerNFT() {
+        console.Log('getPlayerNft function entered');
+    try {
+        const response = await fetch('/api/player/nft', { method: 'GET' });
+        const data = await response.json();
+        return data.nft; // Adjust according to how data is structured.
+    } catch (error) {
+        console.error('Failed to fetch NFT:', error);
+        return null;
+    }
+}
+
+</script>
 
 
   <script type=module>
@@ -1347,6 +2571,10 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
     let row;
     let col;
     let imagePath;
+document.addEventListener('walletConnected', async () => {
+    // Assuming 'player' is defined somewhere
+    await matchmakingSystem.registerPlayer(player);
+});
 
     document.addEventListener("DOMContentLoaded", function() 
     {
@@ -1381,12 +2609,8 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
 
 
         chessPiece = new module.default(type, color, row, col, imagePath, elementId, game, squares);
-            //console.log(chessPiece)
-       // consoleLogVariables();
         chessPiece.addChessPiece(type, color, row, col, imagePath, elementId, game);
-        //chessPiece.initsquares(board, game);
-        //chessPiece.initSquares(board, game);
-
+        chessPiece.forceMove(piece, row, col, null, null);
         const squareElement = document.getElementById(chessPiece.elementId);
         if (squareElement) 
         {
@@ -1406,7 +2630,6 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
         import('./jsFiles/classBoard.js').then(module => 
         {
             chessBoard = new module.default(game, chessPiece);
-                console.log(chessBoard);
             chessBoard.generateBoardHTML();
             chessBoard.displayBoard();
             chessBoard.createBoardElements();
@@ -1414,9 +2637,6 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
             chessBoard.placePieces();
          
             consoleLogVariables();
-            console.log("Board in html", this.game.board);
-            console.log("Board in html", game.board);
-            console.log("Board in html", game);
             import('./jsFiles/classArray.js')
             .then(module => {
                 chessArray = new module.default(game);
@@ -1426,17 +2646,12 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
                 chessArray.addPiecesToBoard(chessBoard);
                 chessBoard.displayBoard();
                 
-                if (chessArray.pieces.length > 0) {
-                   let currentPiece = chessArray.pieces[0];
-
-                
+                if (chessArray.pieces.length > 0) 
+                {
+                    let currentPiece = chessArray.pieces[0];
                     chessGame = new ChessGame(chessArray, chessBoard, handlePieceSelection);
-                        console.log(chessGame);
-                    //consoleLogVariables();
                     chessGame.startNewGame();
                     chessGame.handlemove(currentPiece, row, col);
-
-               
                 } else {
                     console.error("The pieces array is empty.");
                 }
@@ -1464,24 +2679,364 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
 }
     }, false);
 
-document.getElementById('spell-buttons').addEventListener('click', function(event) {
-    console.log("Spell button clicked:", event.target.id);
-    if (event.target.classList.contains('spell-button')) {
-        const spellType = event.target.dataset.spell;
+
+    document.addEventListener('pieceMoved', function(e) {
+    const move = e.detail; // The move details
+    const matchId = getCurrentMatchId(); // Assuming you have a way to get the current match ID
+    sendMove(move, matchId);
+});
+
+
+    document.getElementById('playGame').addEventListener('click', async function() {
+        this.classList.add('hidden'); // Hide the play game button
+       document.querySelector('.SearchPlayerUi').style.display = 'block'; // Sets the display style to block
+
+
+        const chainId = 'stargaze-1';
+        await window.keplr.enable(chainId);
+        const offlineSigner = window.getOfflineSigner(chainId);
+        const accounts = await offlineSigner.getAccounts(); // Add await here
+        console.log("Connected wallet address:", accounts[0].address);
+        const currentPlayer = accounts[0].address;
+        await findGame(currentPlayer); // Assuming findGame is defined globally
+    });
+    
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+    // Call your function here
+        updateGameProfile('black', selectedNftBlack, walletAddressBlack);
+        updateGameProfile('white', selectedNftWhite, walletAddressWhite);
+        // Any other initialization code can go here
+    });
+
+    document.addEventListener('DOMContentLoaded', function() 
+    {
+        document.getElementById('fetch-nfts-button').addEventListener('click', function()
+        {
+            fetchNFTs();
+        });
+
+        document.getElementById('fetch-dao-nfts-button').addEventListener('click', function() 
+            {
+                checkNFTsOnDAO();
+            });
+    });
+
+    document.getElementById('spell-buttons').addEventListener('click', function(event) 
+    {
+        console.log("Spell button clicked:", event.target.id);
+        if (event.target.classList.contains('spell-button')) 
+        {
+            const spellType = event.target.dataset.spell;
             console.log("Spell type:", spellType);
-        if (spellType) {
-            castSpell(spellType);
+            if (spellType) 
+            {
+               // castSpell(spellType);
+            }
         }
+    });
+    document.getElementById('staffSpell-button').addEventListener('click', function(event) {
+    const spellType = this.getAttribute('data-spell');
+    if (gameId) {
+            const enemyColor = this.currentPlayer === 'white' ? 'black' : 'white';
+        console.log("Casting spell:", spellType, "for gameId:", gameId);
+        const totalEnemyPieces = document.querySelectorAll(`.chess-piece.${enemyColor}-pawn`).length;
+        const totalAllyPieces = document.querySelectorAll(`.chess-piece.${this.currentPlayer}-pawn`).length;
+
+        socket.emit('castSpell', { gameId: gameId, type: spellType });
+
+        // Assume fetchDataForSpell returns an object containing at least { duration: x }
+        const spellData = null;  // This function needs to be implemented
+
+        if (!spellData) {
+            console.log('about to call spell details with :', spellType, spellData)
+             const spellDetails = window.spellDetail(spellType, spellData);
+             console.log('after the call spell details with :', spellDetails)
+            if (spellDetails) {
+                chessPiece.showNotification(spellType, spellDetails.duration, spellDictionary.spellType);
+                console.log('Notification called for:', spellType);
+            } else {
+                console.error("Failed to retrieve spell details for:", spellType);
+            }
+        } else {
+            console.error("No data available for spell:", spellType);
+        }
+    } else {
+        console.error("No gameId defined.");
     }
 });
 
-function castSpell(spellType, board, chessBoard, chessGame) 
+
+
+    document.addEventListener('DOMContentLoaded', function() 
+    {
+        var settingsBtn = document.getElementById('openSettingsBtn');
+        var settingsModal = document.getElementById('settingsModal');
+        var closeModal = document.getElementById('closeModal');
+
+        // Existing code for modal
+        settingsBtn.addEventListener('click', function()
+        {
+            settingsModal.style.display = "block";
+        });
+
+        closeModal.addEventListener('click', function() 
+        {
+            settingsModal.style.display = "none";
+        });
+
+        window.addEventListener('click', function(event)
+        {
+            if (event.target === settingsModal)
+            {
+                settingsModal.style.display = "none";
+            }
+        });
+
+        // Add event listeners for color pickers
+        var backgroundColorPicker = document.getElementById('backgroundColorPicker');
+        var darkSquares = document.querySelectorAll('.dark');
+        var lightSquares = document.querySelectorAll('.light');
+
+        backgroundColorPicker.addEventListener('input', function() 
+        {
+        // Apply the color to the background or other elements
+            document.body.style.backgroundColor = backgroundColorPicker.value;
+        });
+
+        document.getElementById('darkSquaresColorPicker').addEventListener('input', function(e)
+        {
+            darkSquares.forEach(function(square)
+            {
+                square.style.backgroundColor = e.target.value;
+            });
+        });
+
+        document.getElementById('lightSquaresColorPicker').addEventListener('input', function(e)
+        {
+            lightSquares.forEach(function(square) 
+            {
+                square.style.backgroundColor = e.target.value;
+            });
+        });
+        // ... Add more event listeners for other color pickers if needed ...
+    });
+
+
+    
+document.getElementById('connectWalletButton').addEventListener('click', async function() {
+    console.log('Connect button clicked'); // Debugging line
+    if (window.keplr) {
+        try {
+            await window.keplr.enable('stargaze-1'); // Replace 'chain-id' with the actual chain ID.
+            console.log('Keplr wallet found and enabled'); // Debugging line
+            const connectButton = document.getElementById('connectWalletButton');
+            connectButton.parentNode.removeChild(connectButton);
+            console.log("matchmakingSystem", matchmakingSystem);
+            if (matchmakingSystem) {
+                const chainId = 'stargaze-1';
+                await window.keplr.enable(chainId);
+                const offlineSigner = window.getOfflineSigner(chainId);
+                const accounts = await offlineSigner.getAccounts();
+                console.log("Connected wallet address:", accounts[0].address);
+                console.log("Connected wallet address:", accounts[0].address);
+                const player = accounts[0].address;
+                console.log('trying to add player in box');
+                await matchmakingSystem.registerPlayer(player);
+            }
+            document.getElementById('fetch-nfts-button').style.display = 'block';
+            document.getElementById('fetch-dao-nfts-button').style.display = 'block';
+        } catch (error) {
+            console.error('Error connecting to Keplr wallet:', error);
+        }
+    } else {
+        console.log('Keplr wallet not found.'); // Debugging line
+    }
+});
+//SMART CONTRACT TEST
+// document.getElementById('queryContract').addEventListener('click', async () => {
+//             // Example function to query the contract
+//             console.log("Querying the contract...");
+//             // Add your contract querying logic here
+//         });
+
+//         document.getElementById('executeTransaction').addEventListener('click', async () => {
+//             // Example function to execute a transaction
+//             console.log("Executing transaction...");
+//             // Add your transaction execution logic here
+//         });
+//END OF SMART CONTRACT TEST
+        
+//CSS RELATED CODE FOR BACKGROUND ANIMATION
+// document.addEventListener("DOMContentLoaded", () => {
+//     const container = document.getElementById('particle-container');
+//     const particleCount = 500;
+//     const particles = [];
+//     let mouseX = -1, mouseY = -1;
+
+//     // Define the holes somewhere in your script, outside the updateParticles function
+//     const holes = [
+//         { x: 200, y: 300, radius: 50 },
+        
+//         // ... other holes
+//     ];
+
+//     for (let i = 0; i < particleCount; i++) {
+//         let particle = document.createElement('div');
+//         particle.classList.add('particle');
+//         let x = Math.random() * window.innerWidth;
+//         let y = Math.random() * window.innerHeight;
+//         particle.style.left = `${x}px`;
+//         particle.style.top = `${y}px`;
+//         container.appendChild(particle);
+//         particles.push({
+//             element: particle,
+//             x: x,
+//             y: y,
+//             xSpeed: Math.random() * 0.5 - 0.25,
+//             ySpeed: Math.random() * 0.5 - 0.25
+//         });
+//     }
+
+//     const updateParticles = () => {
+//         // Iterate through the particles array in reverse order to avoid issues
+//         // when removing particles from the array during iteration
+//         for (let i = particles.length - 1; i >= 0; i--) {
+//             let particle = particles[i];
+
+//             let dx = mouseX - particle.x;
+//             let dy = mouseY - particle.y;
+//             let distance = Math.sqrt(dx * dx + dy * dy);
+
+//             if (mouseX >= 0 && mouseY >= 0 && distance < 150) {
+//                 let angle = Math.atan2(dy, dx);
+//                 let acceleration = (1 - (distance / 150)) * 0.5;
+//                 particle.xSpeed -= Math.cos(angle) * acceleration;
+//                 particle.ySpeed -= Math.sin(angle) * acceleration;
+//             }
+
+//             particle.x += particle.xSpeed;
+//             particle.y += particle.ySpeed;
+
+//             // Screen boundaries
+//             if (particle.x < 0 || particle.x > window.innerWidth - 5) {
+//                 particle.xSpeed *= -0.9;
+//             }
+//             if (particle.y < 0 || particle.y > window.innerHeight - 5) {
+//                 particle.ySpeed *= -0.9;
+//             }
+//             let removed = false;
+//         for (let hole of holes) {
+//             const dx = particle.x - hole.x;
+//             const dy = particle.y - hole.y;
+//             const distance = Math.sqrt(dx * dx + dy * dy);
+//             if (distance < hole.radius) {
+//                 console.log('container', container);
+//                 container.removeChild(particle.element); // Remove from DOM
+//                 particles.splice(i, 1); // Remove from particles array
+//                 removed = true;
+//                 break; // Exit loop as particle is removed
+//             }
+//         }
+
+//         if (!removed && particles[i]) {
+//             particle.element.style.left = `${particle.x}px`;
+//             particle.element.style.top = `${particle.y}px`;
+//         }
+//     }
+
+//         // Only call requestAnimationFrame if there are still particles to animate
+//         if (particles.length > 0) {
+//             requestAnimationFrame(updateParticles);
+//         }
+//     };
+
+//     document.addEventListener('mousemove', (e) => {
+//         mouseX = e.clientX;
+//         mouseY = e.clientY;
+//     });
+
+//     requestAnimationFrame(updateParticles);
+// });
+
+window.spellDetail = function getSpellDetails(spellType, spellResult, rng, data) {
+    console.log('getSpellDetails function entered for', spellType, spellResult, rng, data);
+   
+    console.log('spellResult', spellResult)
+    
+    // console.log('spellResult.dur', spellResult.duration)
+    
+    const spellDictionary = {
+        "castLightsaberSpell✅": { duration: spellResult.duration, description: "A fiery explosive spell." },
+
+        "iceblast": { duration: spellResult.duration, description: "A chilling burst of ice." },
+        "adept-wand✅": {duration: spellResult.duration, description: "Teleports any piece entering the 2x2 rift to a random square for 1-6 turns."},
+
+        "staff-of-light": { duration: null, description: "" },
+        "staff-of-fire": { duration: spellResult.duration, description: "description" },
+        "staff-of-water": { duration: spellResult.duration, description: "description" },
+        "staff-of-air": { duration: spellResult.duration, description: "description" },
+        "staff-of-chaos": { duration: spellResult.duration, description: "shuffles the board." },
+        "staff-of-the-necromancer": { duration: spellResult.duration, description: "description" },
+        "stick-of-the-forest": { duration: spellResult.duration, description: "description" },
+        "stick-of-truth": { duration: spellResult.duration, description: "description" },
+        "adept-staff": { duration: spellResult.duration, description: "description" },
+        "novice-staff": { duration: spellResult.duration, description: "description" },
+        "ice": { duration: spellResult.duration, description: "description" },
+        "hourglass": { duration: spellResult.duration, description: "description" },
+        "spoon": { duration: spellResult.duration, description: "description" },
+        "samba": { duration: spellResult.duration, description: "description" },
+        "reaper-scythe": { duration: spellResult.duration, description: "description" },
+        "rebel-sword": { duration: spellResult.duration, description: "description" },
+        "orbs-of-illusion": { enemies: spellResult.selectedEnemiesCount, allies: spellResult.selectedAlliesCount, turn: spellResult.turnPetrified, turnLeft : spellResult.turnsUntilDestruction, description: "Randomly petrifies 2-4 enemy pawns and 1-3 ally pawns, freezing them in place. When dying, transfer petrification to a random allied pawn with 70% probability ✅" },
+
+        "novice-wand": { duration: spellResult.duration, description: "description" },
+        "magician-wand": { duration: spellResult.duration, description: "description" },
+        "grand-master-wand": { duration: spellResult.duration, description: "description" },
+        "grand-master-staff": { duration: spellResult.duration, description: "description" },
+        "excalibur": { duration: spellResult.duration, description: "description" },
+        "cybermancer-staff": { duration: spellResult.duration, description: "description" },
+        "calestal-staff": { duration: spellResult.duration, description: "description" },
+        "broomstick": { duration: spellResult.duration, description: "description" },
+        "arcane-hands": { duration: spellResult.duration, description: "description" },
+        "apprentice-wand": { duration: spellResult.duration, description: "description" },
+        "apprentice-staff": { duration: spellResult.duration, description: "description" }
+        
+    };
+
+    if (!spellDictionary[spellType]) {
+        console.error("Spell details not found for:", spellType);
+        return null;
+    }
+    return spellDictionary[spellType];
+}
+function showNotification(spellType, spellResult) {
+    const spellDetails = window.spellDetail(spellType, spellResult, null, null);
+    console.log('spellDetails results in showNotification', spellDetails);
+
+    var gameUI = document.getElementById('game-ui');
+    var spellNameId = spellType.toLowerCase().replace(/\s+/g, '-');
+    var notificationBox = document.createElement('div');
+    notificationBox.className = 'notification-box';
+    notificationBox.id = `${spellNameId}-notification`;
+    notificationBox.innerHTML = `<p><strong>${spellType}</strong>: ${spellDetails.description} (${spellDetails.duration} turns left)</p>`;
+    gameUI.appendChild(notificationBox);
+}
+window.castSpell = function(spellType, spellResult, data, board, chessBoard, chessGame) 
 {
+    console.log('data.rng' , data);
+    // const rng = (data.multiplier * data.seed + data.increment) % data.modulus;
+  
+
     switch (spellType) 
     {
             //STAFF SPELLS//
     case 'staff-of-fire':
-    chessPiece.preparePawnCreation('FirePawn'); // Replace 'fireElementId' with the actual element ID
+    // chessPiece.preparePawnCreation('FirePawn'); // Replace 'fireElementId' with the actual element ID
+         chessPiece.castLightsaberSpell();
+    
     break;
     
     case 'staff-of-water':  
@@ -1491,21 +3046,28 @@ function castSpell(spellType, board, chessBoard, chessGame)
     
     case 'staff-of-air':  
     // chessPiece.preparePawnCreation('AirPawn');
-        chessPiece.castTowerSpell()
+        chessPiece.castTowerSpell();
     break;
 
     case 'staff-of-light':  
+        chessPiece.chaosWarp(board, data);
+       // chessPiece.activateDaggerSpell(data);
+    showNotification(spellType, spellResult);
+          // chessPiece.chaosWarp(board, data);
+        // chessPiece.activateWindOfChangeSpell();
    // chessPiece.preparePawnCreation('LightPawn');
        
         // chessPiece.castRealityShatterSpell(); SPELL NOT WORKING AT ALL
-
+       // chessPiece.castStickOfTheForestSpell();
+       //chessPiece.castDiceOfDestinySpell(); ALMOST READY, problem with direction of spawn that are placed randomly, direction is the opposed one.
+        // chessPiece.activateGambitOfAges();
         
-
+        
 
     break;
 
     case 'staff-of-earth' : 
-    chessPiece.preparePawnCreation('Earthpawn');
+    
 
     break;
 
@@ -1524,12 +3086,13 @@ function castSpell(spellType, board, chessBoard, chessGame)
     break;
 
     case 'apprentice-wand':  
-        chessPiece.activateDaggerSpell();
+        // chessPiece.activateDaggerSpell();
 
     break;
 
     case 'lightsaber' :
-         chessPiece.castLightsaberSpell();
+       
+         chessPiece.castLightsaberSpell(data); //RNG IMPLEMENTED CORRECLTY ✅
 
     break;
 
@@ -1538,8 +3101,8 @@ function castSpell(spellType, board, chessBoard, chessGame)
     break;
     
     case 'staff-of-chaos' :
-         chessPiece.chaosWarp(board);
-
+         chessPiece.chaosWarp(board, data); //RNG IMPLEMENTED CORRECLTY ✅ (maybe issue about color&turns to check)
+showNotification(spellType, spellResult);
     break;
 
     case 'staff-of-the-necromancer' :
@@ -1548,24 +3111,37 @@ function castSpell(spellType, board, chessBoard, chessGame)
     break;
 
     case 'apprentice-staff' :
-        chessPiece.castDigitzKingSpell();
+        // chessPiece.castDigitzKingSpell();
+        chessPiece.castArcaneAnarchy();
+        
     break;
     case 'apprentice-wand' :
 
     break;
     
     case 'orbs-of-illusion' :
-              chessPiece.castChaosTheorySpell();
-
+        console.log('About to call castAdeptWandSpell with data being :', data);
+        // chessPiece.castChaosTheorySpell();
+        console.log('this.currentPlayer in the orbs of illusion spell', this.color)
+            const enemyColor = this.currentPlayer === 'white' ? 'black' : 'white';
+        const totalEnemyPieces = document.querySelectorAll(`.chess-piece.${enemyColor}-pawn`).length;
+        const totalAllyPieces = document.querySelectorAll(`.chess-piece.${this.currentPlayer}-pawn`).length;
+        console.log('totalAllyPieces', totalAllyPieces, 'totalEnemyPieces', totalEnemyPieces);
+        chessPiece.castPetrifySpell(spellResult, totalAllyPieces, totalEnemyPieces);
+        showNotification(spellType, spellResult)
 
     break;
     
     case 'adept-wand' :
- chessPiece.castAdeptWandSpell(chessBoard, chessGame); //PROBLEME AVEC le changement de tours, concernant le nombre de tours qu'il reste pour le rift spell, et sa désimplemntation.
-
+        console.log('About to call castAdeptWandSpell with gameId:', window.gameId, 'with spellResult being :', spellResult);
+        console.log('currentmatchId value before trying to call castAdeptWAndSpell', window.currentMatchId);
+        const ID = window.gameId;
+ chessPiece.castAdeptWandSpell(spellResult, chessBoard, chessGame, ID); //PROBLEME AVEC le changement de tours, concernant le nombre de tours qu'il reste pour le rift spell, et sa désimplemntation.
+showNotification(spellType, spellResult);
     break;
 
     case 'adept-staff' :
+      
 
     break;
 
@@ -1578,6 +3154,7 @@ function castSpell(spellType, board, chessBoard, chessGame)
     break;
 
     case 'staff-of-air' :
+        chessPiece.activateWindOfChangeSpell();
 
     break;
 
@@ -1589,11 +3166,13 @@ function castSpell(spellType, board, chessBoard, chessGame)
 
     break;
 
-    case 'magician-wand' :
+    case 'magician-wand' : 
+        chessPiece.castDigitzKingSpell();
 
     break;
 
     case 'trident' :
+       
 
     break;
 
@@ -1606,6 +3185,7 @@ function castSpell(spellType, board, chessBoard, chessGame)
     break;
 
     case 'wooden-staff' :
+        
 
     break;
 
@@ -1614,6 +3194,7 @@ function castSpell(spellType, board, chessBoard, chessGame)
     break;
 
     case 'celestial-staff' :
+         
 
     break;
 
@@ -1621,12 +3202,14 @@ function castSpell(spellType, board, chessBoard, chessGame)
 
     break;
 
-    case 'grand-master-staff' :
+    case 'grand-master-wand' :
+    
 
     break;
 
     case 'stick-of-the-forest' :
-
+        //chessPiece.castStickOfTheForestSpell();
+      
     break;
 
     case 'samba' :
@@ -1634,8 +3217,9 @@ function castSpell(spellType, board, chessBoard, chessGame)
     break;
   }
 }
+//SCRIPT FOR SOCKETS.IO CLIENT SIDE 
 
-
+     
   </script>
 
   
