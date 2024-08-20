@@ -5,9 +5,9 @@ module.exports = {
   entry: {
     main: [
       "@apollo/client", 
-      "./jsFile/classPiece.js", 
-      "./jsFile/classGame.js", 
-      "./jsFile/classBoard.js"
+      "./jsFiles/classPiece.js", 
+      "./jsFiles/classGame.js", 
+      "./jsFiles/classBoard.js"
       ],
   },
   output: {
