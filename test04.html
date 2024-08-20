@@ -3,33 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <script type="module" src="KeplrConnect.js" defer></script>
-    <script src="https://unpkg.com/@keplr-wallet/provider"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@chain-registry/keplr@latest/index.min.js"></script>
     <script src="./New/main.bundle.js"></script>
-    <script type="module" src="./jsFiles/seedRng.js"></script>
-   
-<script>// In your client-side script where you need to use SeededRNG
-
-</script>
+    <script type="module" src="./seedRng.js"></script>
     <!-- Load the socket.io client script from your Node.js server on port 8080 -->
-    <script src="http://192.168.1.82:8080/socket.io/socket.io.js"></script>
+    <script src="http://192.168.1.22:8080/socket.io/socket.io.js"></script>
 
     <style>
         .styling1
         {
-          position: fixed;
-    border-radius: 5px;
-    left: 250px;
-    z-index: 50;
-    border: solid;
-    padding: 10px;
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-        font-size: 20px;
-        font-weight: bold;
-        top: 250px;
-
-            
+            position: fixed;
+            border-radius: 5px;
+            left: 00px;
+            z-index: 50;
+            border: solid;
+            padding: 10px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            top: 250px;
         }
 
         .hidden {
@@ -46,6 +40,34 @@
             -webkit-animation: spin 2s linear infinite; /* Safari */
             animation: spin 2s linear infinite;
         }
+
+    @keyframes shake-red {
+  0%, 100% { transform: translateX(0); box-shadow: 0 0 10px 2px rgba(255, 0, 0, 0.8); }
+  20%, 60% { transform: translateX(-10px); box-shadow: 0 0 20px 4px rgba(255, 0, 0, 0.8); }
+  40%, 80% { transform: translateX(10px); box-shadow: 0 0 20px 4px rgba(255, 0, 0, 0.8); }
+}
+.shake-red {
+  animation: shake-red 0.5s ease;
+} 
+#game-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1.5rem;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+#game-message.show {
+  opacity: 1;
+}
 
 .SearchPlayerUi
 {
@@ -277,28 +299,8 @@
         
 
 
-#player-list-container {
-  margin-top: 20px; /* Adjust margin as needed */
-}
-.player-list-container {
-    border: 2px black;
-    background-color: #1e1616;
-  /* Add styles for the container if needed */
-}
 
 
-/* CSS for online players */
-#player-list {
-    list-style-type: none;
-    padding: 0;
-    width: 200px;
-    height: 200px;
-    border-radius: 2px;
-    border: solid;
-    background-color: darkred;
-    top: 200px;
-    position: absolute;
-}
 
 .online-player {
     display: inline-block;
@@ -645,7 +647,7 @@
   justify-content: space-evenly;
   align-items: center;
   position: relative;
-  margin-left: 260px; /* Assuming sidebar is 250px plus 10px margin */
+/*  margin-left: 260px; /* Assuming sidebar is 250px plus 10px margin */
   margin-top: 120px; /* Assuming top banner is 60px plus 10px margin */
   gap: 50px;
 
@@ -1656,19 +1658,19 @@ async function fetchAndExtractClasses(htmlUrl, parentClass) {
     return null;
   }
 }
-function addPlayerToList(walletAddress) {
-    const playerList = document.getElementById("player-list");
-    const li = document.createElement("li");
-    li.className = "online-player";
-    li.dataset.address = walletAddress;
-    playerList.appendChild(li);
-}
+// function addPlayerToList(walletAddress) {
+//     const playerList = document.getElementById("player-list");
+//     const li = document.createElement("li");
+//     li.className = "online-player";
+//     li.dataset.address = walletAddress;
+//     playerList.appendChild(li);
+// }
 //MATCHMAKING SYSTEM WITH TINY SERVER TEST
 // Function to call the matchmaking server
 async function findGame(walletAddress) {
     console.log('findGame function entered');
     try {
-        const response = await fetch('http://192.168.1.82:8080/register', {
+        const response = await fetch('http://192.168.1.22:8080/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1723,9 +1725,9 @@ function updateGameState(sessionData) {
 
     const gameIdElement = document.getElementById('game-id');
     const gameSeedElement = document.getElementById('game-seed');
-    const playerListElement = document.getElementById('player-list');
+    // const playerListElement = document.getElementById('player-list');
 
-    console.log({gameIdElement, gameSeedElement, playerListElement}); // Check if elements are null
+    console.log({gameIdElement, gameSeedElement}); // Check if elements are null
 
     if (gameIdElement) {
         gameIdElement.textContent = 'Game ID: ' + sessionData.gameId;
@@ -1753,8 +1755,9 @@ const socket = io('http://localhost:8080');
 
     socket.on('requestRegister', async () => { // Mark this callback as async
     const chainId = "stargaze-1";
-
+    console.log('window.keplr in socketIo connection', window.keplr)
     // Check if Keplr is installed
+    window.onload = async () => {
     if (window.keplr) {
         try {
             // Enabling Keplr for the specified chain ID
@@ -1775,7 +1778,9 @@ const socket = io('http://localhost:8080');
             console.log("Keplr wallet is not installed.");
             // Prompt the user to install Keplr or handle this case as needed
         }
+    }
     });
+
 
     let currentMatchId = null;
     let myColor = null; // Will be "white" or "black"
@@ -1818,7 +1823,23 @@ const socket = io('http://localhost:8080');
     window.currentGameId = data.gameId;  // Store this gameId to use for game actions
     socket.emit('joinGame', { gameId: window.currentGameId });
 });
-   
+ socket.on('checkResolved', () => {
+    console.log("Check has been resolved, resetting valid pieces to resolve check. chesspiece being", chessPiece);
+     // Clear the array to reset the state
+    chessPiece.resetCheckArray();
+});
+ 
+    socket.on('checkResolutionOptions', (data) => {
+    console.log('checkresolution option entered, data being', data);
+    const event = new CustomEvent('updateValidPiecesToResolveCheck', { 
+        detail: {
+            validPiecesToResolveCheck: data.piecesThatCanResolveCheck,
+            threateningPath: data.path
+        }
+    });
+    window.dispatchEvent(event);
+});
+
 
     socket.on('gameSessionUpdated', (data) => {
     console.log('Received game session update:', data);
@@ -1866,7 +1887,7 @@ function updatePiecePosition(pieceId, newPosition) {
 
 socket.on('spellCasted', data => {
     console.log('Spell received:', data);
-    if (data.gameId === currentGameId) {
+    if (data.gameId) {
       
         modulus = data.rng.modulus;
         multiplier = data.rng.multiplier;
@@ -1961,25 +1982,86 @@ function disableMyPieceInteractions() {
         this.chessGame.endTurnMoveServ(this);
 
     }
-    function applyMoveToBoard(move) {
-        console.log('applyMoveToBoard funtion entered with', move, 'this instance being', this.ChessPiece);
-        
-        // let chessPiece = new ChessPiece(type, color, row, col, imagePath, elementId, game);
-        const piece = document.createElement('div');
-    piece.className = `chess-piece ${move.color}-${move.type}`;
-    piece.style.backgroundImage = `url('img/${move.color}-${move.type}.png')`;
+//     function applyMoveToBoard(move) {
+//     const boardElement = document.querySelector('#chessboard');
+//     const boardArray = domToBoardArray(boardElement);
 
-    // Convert 'from' and 'to' positions to your board's coordinate system if necessary
-    this.ChessPiece.forceMove(piece, move.from.row, move.from.col, move.to.row, move.to.col);
+//     console.log('applyMoveToBoard function entered with', move, 'boardArray:', boardArray);
+
+//     const { from, to, color, type } = move;
+//     const { row: fromRow, col: fromCol } = from;
+//     const { row: toRow, col: toCol } = to;
+
+//     const piece = getPieceByRowCol(boardArray, fromRow, fromCol);
+//     console.log('piece in applyMoveToBoard', piece);
+//     if (piece) {
+//         // Remove piece from old position in DOM
+//         piece.pieceElement.style.gridRowStart = toRow + 1;
+//         piece.pieceElement.style.gridColumnStart = toCol + 1;
+
+//         console.log('Moved piece:', piece, 'to new position:', toRow, toCol);
+//     } else {
+//         console.error('Piece not found at position:', fromRow, fromCol);
+//     }
+// }
+    function applyMoveToBoard(move) {
+    const boardElement = document.querySelector('#chessboard');
+    const boardArray = domToBoardArray(boardElement);
+
+    console.log('applyMoveToBoard function entered with', move, 'boardArray:', boardArray);
+
+    const { from, to, color, type } = move;
+    const { row: fromRow, col: fromCol } = from;
+    const { row: toRow, col: toCol } = to;
+
+    const piece = getPieceByRowCol(boardArray, fromRow, fromCol);
+    console.log('piece in applyMoveToBoard', piece);
+    if (piece) {
+        // Move piece to new position in DOM
+        piece.pieceElement.style.gridRowStart = toRow + 1;
+        piece.pieceElement.style.gridColumnStart = toCol + 1;
+        this.ChessPiece.forceMove(piece, move.from.row, move.from.col, move.to.row, move.to.col);
     this.ChessPiece.forceRemove(move.from.row, move.from.col);
 
-        // this.ChessPiece.forceMove(move.color, move.type, move.from, move.to)
-    // Logic to update the board based on the move
-    // This would include moving the piece from the 'from' square to the 'to' square
-         
-    // and any additional logic for special moves or capturing pieces
+        console.log('Moved piece:', piece, 'to new position:', toRow, toCol);
+    } else {
+        console.error('Piece not found at position:', fromRow, fromCol);
+    }
 }
 
+// function applyMoveToBoard(move) {
+//         console.log('applyMoveToBoard funtion entered with', move, 'this instance being', this.ChessPiece);
+        
+//         // let chessPiece = new ChessPiece(type, color, row, col, imagePath, elementId, game);
+//         const piece = document.createElement('div');
+//     piece.className = `chess-piece ${move.color}-${move.type}`;
+//     piece.style.backgroundImage = `url('img/${move.color}-${move.type}.png')`;
+
+//     // Convert 'from' and 'to' positions to your board's coordinate system if necessary
+//     this.ChessPiece.forceMove(piece, move.from.row, move.from.col, move.to.row, move.to.col);
+//     this.ChessPiece.forceRemove(move.from.row, move.from.col);
+
+//         // this.ChessPiece.forceMove(move.color, move.type, move.from, move.to)
+//     // Logic to update the board based on the move
+//     // This would include moving the piece from the 'from' square to the 'to' square
+         
+//     // and any additional logic for special moves or capturing pieces
+// }
+
+function getPieceByRowCol(board, row, col) {
+    console.log("Board in getPieceByRowCol function", board);
+    return board.find(piece => piece.row === row && piece.col === col) || null;
+}
+function domToBoardArray(boardElement) {
+    const pieces = Array.from(boardElement.querySelectorAll('.chess-piece')).map(piece => {
+        const square = piece.parentNode;
+        const [color, type] = piece.className.split(' ')[1].split('-');
+        const row = parseInt(square.getAttribute('data-row'), 10);
+        const col = parseInt(square.getAttribute('data-col'), 10);
+        return { color, type, row, col, pieceElement: piece };
+    });
+    return pieces;
+}
 
 
 //END OF SCRIPTS FOR SOCKETS.IO CLIENT SIDE
@@ -2053,12 +2135,14 @@ function disableMyPieceInteractions() {
 </script>
 <!-- END OF FETHCING NFT and SVG -->
 <!-- <div id="background"></div> -->
-<div id="player-list-container">
+<!-- <div id="player-list-container">
 
     <ul id="player-list">
     <h2>Online players</h2>
     </ul>
-</div>
+</div> -->
+<div id="game-message" class="hidden"></div>
+
 
 <div id="matchInfo" class = 'styling1' style="display:none;">
     <p id="opponentInfo"></p>
@@ -2080,6 +2164,7 @@ function disableMyPieceInteractions() {
 
 <div id="turn-count-display" class="turn-count-display">Turn:$'(myTurn)'</div>
 <div id="turn-timer" class="turn-timer-display">Time Left: -- seconds</div>
+
 </div>
 
 <div id="spell-buttons">
@@ -2470,17 +2555,17 @@ function disableMyPieceInteractions() {
         console.log("Connected wallet address:", accounts[0].address);
         const address = accounts[0].address;
         this.players.push({ address, player });
-        this.addPlayerToList(address); // Add player to online list
+        // this.addPlayerToList(address); // Add player to online list
         this.updateOnlinePlayersUI();
     }
-        addPlayerToList(address) 
-        {
-            const playerList = document.getElementById("player-list");
-            const li = document.createElement("li");
-            li.className = "online-player";
-            li.dataset.address = address; // Set the data-address attribute to the player's wallet address
-            playerList.appendChild(li);
-        }
+        // addPlayerToList(address) 
+        // {
+        //     const playerList = document.getElementById("player-list");
+        //     const li = document.createElement("li");
+        //     li.className = "online-player";
+        //     li.dataset.address = address; // Set the data-address attribute to the player's wallet address
+        //     playerList.appendChild(li);
+        // }
 
         async findGame(player) {
         this.waitingPlayers.push(player);
@@ -2519,41 +2604,7 @@ function disableMyPieceInteractions() {
     }
 
 
-        updateOnlinePlayersUI() {
-    const playerList = document.getElementById("player-list");
-    playerList.innerHTML = ""; // Clear the list first
-    this.players.forEach((player, index) => {
-        const li = document.createElement("li");
-        const dot = document.createElement("span");
-        dot.classList.add("online-player");
-        dot.style.backgroundColor = getRandomColor(); // Get a random color for each player
-        li.appendChild(dot);
-        playerList.appendChild(li);
-    });
-}
-}
-
-    function getRandomColor() {
-        const letters = "0123456789ABCDEF";
-        let color = "#";
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
-    const matchmakingSystem = new MatchmakingSystem();
-
-    async function getPlayerNFT() {
-        console.Log('getPlayerNft function entered');
-    try {
-        const response = await fetch('/api/player/nft', { method: 'GET' });
-        const data = await response.json();
-        return data.nft; // Adjust according to how data is structured.
-    } catch (error) {
-        console.error('Failed to fetch NFT:', error);
-        return null;
-    }
+        
 }
 
 </script>
@@ -2828,6 +2879,7 @@ document.addEventListener('walletConnected', async () => {
     
 document.getElementById('connectWalletButton').addEventListener('click', async function() {
     console.log('Connect button clicked'); // Debugging line
+    
     if (window.keplr) {
         try {
             await window.keplr.enable('stargaze-1'); // Replace 'chain-id' with the actual chain ID.
@@ -2854,6 +2906,7 @@ document.getElementById('connectWalletButton').addEventListener('click', async f
     } else {
         console.log('Keplr wallet not found.'); // Debugging line
     }
+
 });
 //SMART CONTRACT TEST
 // document.getElementById('queryContract').addEventListener('click', async () => {
@@ -2993,7 +3046,7 @@ window.spellDetail = function getSpellDetails(spellType, spellResult, rng, data)
         "orbs-of-illusion": { enemies: spellResult.selectedEnemiesCount, allies: spellResult.selectedAlliesCount, turn: spellResult.turnPetrified, turnLeft : spellResult.turnsUntilDestruction, description: "Randomly petrifies 2-4 enemy pawns and 1-3 ally pawns, freezing them in place. When dying, transfer petrification to a random allied pawn with 70% probability ✅" },
 
         "novice-wand": { duration: spellResult.duration, description: "description" },
-        "magician-wand": { duration: spellResult.duration, description: "description" },
+        "magicians-wand": { duration: spellResult.duration, description: "description" },
         "grand-master-wand": { duration: spellResult.duration, description: "description" },
         "grand-master-staff": { duration: spellResult.duration, description: "description" },
         "excalibur": { duration: spellResult.duration, description: "description" },
@@ -3024,9 +3077,21 @@ function showNotification(spellType, spellResult) {
     notificationBox.innerHTML = `<p><strong>${spellType}</strong>: ${spellDetails.description} (${spellDetails.duration} turns left)</p>`;
     gameUI.appendChild(notificationBox);
 }
-window.castSpell = function(spellType, spellResult, data, board, chessBoard, chessGame) 
+window.castSpell = async function(spellType, spellResult, data, board) 
 {
     console.log('data.rng' , data);
+       const { default: ChessArray } = await import('./jsFiles/classArray.js');
+       const { default: ChessBoard } = await import('./jsFiles/classBoard.js');
+      const chessArray = new ChessArray();
+  const chessGame = new ChessGame(chessArray, null, null);
+
+  console.log("Initialized chessGame in classBoard:", chessGame);
+chessGame.syncBoardState();
+  console.log("Initialized chessGame in classBoard after the synccbOardStatecall:", chessGame);
+
+  const chessBoard = new ChessBoard(chessGame, chessPiece, null, game);
+        console.log('chessBoard in window.castSpell :', chessBoard)
+
     // const rng = (data.multiplier * data.seed + data.increment) % data.modulus;
   
 
@@ -3127,8 +3192,9 @@ showNotification(spellType, spellResult);
         const totalEnemyPieces = document.querySelectorAll(`.chess-piece.${enemyColor}-pawn`).length;
         const totalAllyPieces = document.querySelectorAll(`.chess-piece.${this.currentPlayer}-pawn`).length;
         console.log('totalAllyPieces', totalAllyPieces, 'totalEnemyPieces', totalEnemyPieces);
-        chessPiece.castPetrifySpell(spellResult, totalAllyPieces, totalEnemyPieces);
-        showNotification(spellType, spellResult)
+        console.log('check before the call to orbs of illusion chessGame being : ', chessGame)
+        chessPiece.castPetrifySpell(spellResult, totalAllyPieces, totalEnemyPieces, chessGame);
+        showNotification(spellType, spellResult);
 
     break;
     
@@ -3167,7 +3233,7 @@ showNotification(spellType, spellResult);
     break;
 
     case 'magician-wand' : 
-        chessPiece.castDigitzKingSpell();
+        chessPiece.castDigitzKingSpell(data);
 
     break;
 
