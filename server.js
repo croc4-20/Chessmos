@@ -34,6 +34,10 @@ app.use((req, res, next) => {
 
     next();
 });
+app.use(express.static(path.join(__dirname, 'public')));
+app.get('/test04.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'test04.html'));
+});
 
 app.post('/register', (req, res) => {
     const walletAddress = req.body.walletAddress;
