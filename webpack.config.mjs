@@ -18,6 +18,7 @@ export default{
       path.resolve(__dirname, "./jsFiles/utility.js"),
       path.resolve(__dirname, "./jsFiles/seedRng.js"),
       path.resolve(__dirname, "./jsFiles/KeplrConnect.js"),
+      path.resolve(__dirname, "./jsFiles/calculateValidMoves.js"),
       ],
   },
   output: {
