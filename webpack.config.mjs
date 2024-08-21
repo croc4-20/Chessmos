@@ -12,14 +12,14 @@ export default{
   entry: {
     main: [
       "@apollo/client", 
-       path.resolve(__dirname, "./jsFiles/classPiece.js"), 
-      path.resolve(__dirname, "./jsFiles/classGame.js"), 
-      path.resolve(__dirname, "./jsFiles/classBoard.js"),
-      path.resolve(__dirname, "./jsFiles/utility.js"),
-      path.resolve(__dirname, "./jsFiles/seedRng.js"),
-      path.resolve(__dirname, "./jsFiles/KeplrConnect.js"),
-      path.resolve(__dirname, "./jsFiles/calculateValidMoves.js"),
-      path.resolve(__dirname, "./jsFiles/gameSessions.js"),
+       path.resolve(__dirname, "./public/jsFiles/classPiece.js"), 
+      path.resolve(__dirname, "./public/jsFiles/classGame.js"), 
+      path.resolve(__dirname, "./public/jsFiles/classBoard.js"),
+      path.resolve(__dirname, "./public/jsFiles/utility.js"),
+      path.resolve(__dirname, "./public/jsFiles/seedRng.js"),
+      path.resolve(__dirname, "./public/jsFiles/KeplrConnect.js"),
+      path.resolve(__dirname, "./public/jsFiles/calculateValidMoves.js"),
+      path.resolve(__dirname, "./public/jsFiles/gameSessions.js"),
       
       ],
   },
