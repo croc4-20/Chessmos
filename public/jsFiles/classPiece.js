@@ -1,4 +1,4 @@
-import { getGameSession } from '../gameSessions.js'
+import { getGameSession } from './gameSessions.js'
 
 let clickedPiece;
 let pieces;
