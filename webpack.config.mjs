@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const require = createRequire(import.meta.url);
 
 export default{
-  mode: 'development',
+  mode: 'production',
   entry: {
     main: [
       "@apollo/client", 
@@ -53,8 +53,8 @@ export default{
       "stream": require.resolve("stream-browserify"),
       "crypto": require.resolve("crypto-browserify")
     },
-    modules: ['node_modules'],
-    extensions: ['.js', '.jsx', '.json'],
+   modules: [path.resolve(__dirname, 'public/jsFiles'), 'node_modules'],
+    extensions: ['.js', '.json'],
   },
   devtool: 'source-map',
 };
