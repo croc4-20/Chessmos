@@ -1,12 +1,12 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { calculateValidMoves } from './jsFiles/calculateValidMoves.js';
+import { calculateValidMoves } from './public/jsFiles/calculateValidMoves.js';
 import { createHash } from 'crypto';
 import { Server as SocketIOServer } from 'socket.io';
 import { createServer } from 'http';
-import { SeededRNG } from './jsFiles/seedRng.js';
-import { gameSessions, createGameSession, getGameSession } from './jsFiles/gameSessions.js'
+import { SeededRNG } from './public/jsFiles/seedRng.js';
+import { gameSessions, createGameSession, getGameSession } from './public/jsFiles/gameSessions.js'
 
 
 
