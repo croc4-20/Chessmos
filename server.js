@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { calculateValidMoves } from './jsFiles/calculateValidMoves.js';
 import { createHash } from 'crypto';
 import { Server as SocketIOServer } from 'socket.io';
@@ -12,6 +13,8 @@ import { gameSessions, createGameSession, getGameSession } from './gameSessions.
 const app = express();
 const PORT =  process.env.PORT || 3000;
 const socketToGameMap = new Map();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // Middleware to parse JSON bodies
 app.use(express.json());
 
