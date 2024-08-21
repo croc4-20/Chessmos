@@ -39,7 +39,12 @@ app.use((req, res, next) => {
 
     next();
 });
-
+app.use(cors({
+    origin: "https://chessmos-83a3f6f208b9.herokuapp.com", // Change this to your frontend URL
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
+}));
 app.get('/test04.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'test04.html'));
 });
