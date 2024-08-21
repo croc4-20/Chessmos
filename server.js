@@ -6,7 +6,7 @@ import { createHash } from 'crypto';
 import { Server as SocketIOServer } from 'socket.io';
 import { createServer } from 'http';
 import { SeededRNG } from './jsFiles/seedRng.js';
-import { gameSessions, createGameSession, getGameSession } from './gameSessions.js'
+import { gameSessions, createGameSession, getGameSession } from './jsFiles/gameSessions.js'
 
 
 
@@ -16,7 +16,7 @@ const socketToGameMap = new Map();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Middleware to parse JSON bodies
-app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // This will store registered players
 let players = [];
@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 
     next();
 });
-app.use(express.static(path.join(__dirname, 'public')));
+
 app.get('/test04.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'test04.html'));
 });
