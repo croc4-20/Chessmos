@@ -5695,7 +5695,7 @@ addPieceToPlayerSet(pieceElement, playerColor, game) {
     // Create a new piece element with the correct color and type
     const newPiece = document.createElement('div');
     newPiece.classList.add('chess-piece', `${playerColor}-${pieceType}`);
-    newPiece.style.backgroundImage = `url('img/${playerColor}-${pieceType}.png')`; // Update this path
+    newPiece.style.backgroundImage = `url('images/${playerColor}-${pieceType}.png')`; // Update this path
 
     // Get all empty squares
     const emptySquares = document.querySelectorAll('.chess-square:not(.has-piece)');
