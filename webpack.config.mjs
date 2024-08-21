@@ -22,7 +22,7 @@ export default{
       ],
   },
   output: {
-    path: path.resolve(__dirname, 'New'),
+    path: path.resolve(__dirname, 'public'),
     filename: '[name].bundle.js',
     publicPath: '/',  // <-- Added this line for dynamic imports
   },
