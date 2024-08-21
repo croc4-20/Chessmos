@@ -65,7 +65,7 @@ app.get('/matches', (req, res) => {
 const httpServer = createServer(app);
 const io = new SocketIOServer(httpServer, {
     cors: {
-        origin: "*", 
+        origin: "https://chessmos.herokuapp.com", 
         methods: ["GET", "POST"]
     }
 });
