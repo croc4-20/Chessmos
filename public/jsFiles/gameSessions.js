@@ -1,5 +1,5 @@
-import { SeededRNG } from './jsFiles/seedRng.js';
-import { generateSeed } from './jsFiles/utility.js';
+import { SeededRNG } from './seedRng.js';
+import { generateSeed } from './utility.js';
 
 export const gameSessions = new Map();
 
