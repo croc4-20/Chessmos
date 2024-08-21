@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'path';
 import { calculateValidMoves } from './jsFiles/calculateValidMoves.js';
 import { createHash } from 'crypto';
 import { Server as SocketIOServer } from 'socket.io';
