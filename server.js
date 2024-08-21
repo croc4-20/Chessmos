@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { calculateValidMoves } from './public/jsFiles/calculateValidMoves.js';
 import { createHash } from 'crypto';
