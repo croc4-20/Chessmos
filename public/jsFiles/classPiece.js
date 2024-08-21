@@ -84,7 +84,7 @@ async function initialize()
 { type: 'king', color: 'white', row: 0, col: 4, imagePath: 'images/WhiteKING.png', elementId: 'square-0-4', game: game },
 { type: 'bishop', color: 'white', row: 0, col: 5, imagePath: 'images/WhiteBISHOP.png', elementId: 'square-0-5', game: game },
 { type: 'knight', color: 'white', row: 0, col: 6, imagePath: 'images/WhiteKNIGHT.png', elementId: 'square-0-6', game: game },
-{ type: 'rook', color: 'white', row: 0, col: 7, imagePath: 'img/WhiteROOK.png', elementId: 'square-0-7', game: game },
+{ type: 'rook', color: 'white', row: 0, col: 7, imagePath: 'images/WhiteROOK.png', elementId: 'square-0-7', game: game },
 
 { type: 'pawn', color: 'white', row: 1, col: 0, imagePath: 'images/WhitePAWN.png', elementId: 'square-1-0', game: game },
 { type: 'pawn', color: 'white', row: 1, col: 1, imagePath: 'images/WhitePAWN.png', elementId: 'square-1-1', game: game },
