@@ -9,9 +9,7 @@
     <!-- Load the socket.io client script from your Node.js server on port 8080 -->
     
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <script>
-        const socket = io('https://chessmos.herokuapp.com');  // Point to your deployed server
-    </script>
+    
 
 
     <style>
@@ -1752,8 +1750,9 @@ function updateGameState(sessionData) {
 
 
 
-const socket = io('http://localhost:8080');
 
+    const socket = io('https://chessmos.herokuapp.com');  // Point to your deployed server
+    
     socket.on('connect', () => {
         console.log('Connected to WebSocket server');
     });
