@@ -1,0 +1,30 @@
+class MatchmakingSystem {
+  constructor() {
+    this.players = []; // Registered players
+    this.waitingPlayers = []; // Players waiting for a match
+    this.matchHistory = []; // Match history
+  }
+
+  registerPlayer(player) {
+    this.players.push(player);
+  }
+
+  findMatch(player) {
+    if (this.waitingPlayers.length > 0) {
+      const opponent = this.waitingPlayers.shift();
+      // Create a match between player and opponent
+      const match = {
+        player1: player,
+        player2: opponent,
+        // Add additional game setup information here
+      };
+      this.matchHistory.push(match);
+      console.log(`${player.name} has been matched with ${opponent.name}`);
+    } else {
+      console.log(`${player.name} is waiting for a match...`);
+      this.waitingPlayers.push(player);
+    }
+  }
+
+  // Additional methods for managing match history, preferences, etc.
+}

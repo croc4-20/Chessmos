@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chess Game Attributes and Spells</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .category {
+            margin-bottom: 30px;
+        }
+
+        .category h2 {
+            color: #4CAF50;
+        }
+
+        .attributes-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .attributes-list li {
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .attributes-list li:hover {
+            background-color: #f0f0f0;
+        }
+
+        #spell-description {
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="category">
+        <h2>Hats</h2>
+        <ul class="attributes-list" id="hats">
+            <!-- List items for hats will be added here -->
+            <g class="wizard-robe">
+<path d="M28 40h-1v1h1v-1Zm9 0h-1v1h1v-1Z" fill="#FFDBA2"></path>
+<path d="M33 43v1h-2v-1h2Z" fill="#7B5D34"></path>
+<path d="M30 38v1h-1v-1h1Zm4 0v1h1v-1h-1Zm-4 1v1h1v-1h-1Zm3 1h1v-1h-1v1Zm-2 0v1h2v-1h-2Zm0 5h1v-1h-1v1Zm2 0h1v-1h-1v1Z" fill="#5182FF"></path>
+<path d="M29 38v1h-1v-1h1Zm-2 2h1v-1h-1v1Zm9-1v-1h-1v1h-1v1h-1v1h-2v-1h-1v-1h-1v4h-1v2h3v-2h3v2h1v-5h1v-1Zm0 2v2h1v-2h-1Z" fill="#4141FF"></path>
+<path d="M31 38v1h-1v-1h1Zm3 0h-1v1h1v-1Zm-2 2h1v-1h-2v1h1Zm0 4v1h1v-1h-1Zm-3 2h1v-1h-1v1Zm5-1h-1v1h2v-1h-1Z" fill="#A2BAFF"></path>
+<path d="M33 43h1v1h-1v-1Zm-3 2h1v1h-1v-1Zm5 0h1v1h-1v-1Z" fill="#EBD320"></path>
+<g class="pw-particles-x">
+<path d="M29 39h1v1h-1v-1Zm3 2h1v1h-1v-1Zm2 1h1v1h-1v-1Zm-5 1h1v1h-1v-1Z" fill="#FFDBA2"></path>
+</g>
+        </ul>
+    </div>
+
+    <div class="category">
+        <h2>Robes</h2>
+        <ul class="attributes-list" id="robes">
+            <!-- List items for robes will be added here -->
+        </ul>
+    </div>
+
+    <div class="category">
+        <h2>Staffs</h2>
+        <ul class="attributes-list" id="staffs">
+            <!-- List items for staffs will be added here -->
+        </ul>
+    </div>
+
+    <div id="spell-description">
+        Click on an attribute to see its corresponding spell.
+    </div>
+
+</div>
+
+<script>
+    // Define your spells here. For simplicity, I'm using placeholder spells.
+    const spells = {
+        "Apprentice hat": "Spell for Apprentice Hat",
+        "Electric headphones": "Spell for Electric Headphones",
+        // Add the rest of your items and their corresponding spells
+    };
+
+    function populateAttributes(categoryId, attributes) {
+        const category = document.getElementById(categoryId);
+        attributes.forEach(attr => {
+            let li = document.createElement('li');
+            li.textContent = attr;
+            li.onclick = () => showSpell(attr);
+            category.appendChild(li);
+        });
+    }
+
+    function showSpell(attribute) {
+        document.getElementById('spell-description').textContent = spells[attribute] || "No spell description available.";
+    }
+
+    // Populating the lists with attributes
+    populateAttributes('hats', ["Apprentice hat", "Electric headphones", "Arcane hat", /* more hats here */]);
+    populateAttributes('robes', ["Robe 1", "Robe 2", /* more robes here */]);
+    populateAttributes('staffs', ["Staff 1", "Staff 2", /* more staffs here */]);
+</script>
+
+</body>
+</html>
