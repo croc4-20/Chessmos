@@ -9,8 +9,8 @@ let destinationElement;
  const validPieceTypes = ["king", "queen", "rook", "bishop", "knight", "pawn"];
 
   
-//   const { default: ChessPiece } = await import('../savedFiles/classPiece.js');
- const { default: ChessPiece } = await import('./classPiece.js');
+
+ const { default: ChessPiece } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classPiece.js');
   class ExtendedPiece extends ChessPiece {
     constructor(type, color, row, col, imagePath, elementId, game) {
       super(type, color, row, col, imagePath, elementId, game);
@@ -29,9 +29,9 @@ async function initialize(game, pieces)
 {
   
   
-  const { default: ChessGame } = await import('./classGame.js').default;
-  const { default: ChessBoard } = await import('./classBoard.js').default;
-  const { default: ChessArray } = await import('./classArray.js').default;
+  const { default: ChessBoard } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classBoard.js').default;
+  const { default: ChessGame } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classGame.js').default;
+  const { default: ChessArray } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classArray.js').default;
 
   console.log("Classes imported successfully");
 
