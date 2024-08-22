@@ -620,8 +620,8 @@ handleClick = (event, chessBoard, game) => {
     if (!clickedSquareElement) return;
     const clickedPieceElement = clickedSquareElement.querySelector('.chess-piece');
     if (!clickedPieceElement) return;
-  console.log('myTurn', myTurn, 'currentPlayerColor', this.game.currentPlayer, 'clickedSquareElement COLOR', clickedSquareElement.getAttribute('data-color'));
-  if (!myTurn || clickedSquareElement.getAttribute('data-color') !== this.game.currentPlayer) {
+  console.log('myTurn', myTurn, 'currentPlayerColor', this.game.instance.chessGame.instance.currentPlayer, 'clickedPieceElement COLOR', clickedSquareElement.getAttribute('data-color'));
+  if (!myTurn || clickedSquareElement.getAttribute('data-color') !== this.game.instance.chessGame.instance.currentPlayer) {
     this.showAlert("Wrong Turn. Wait a bit for the opponent to finish.");
     setTimeout(() => {
             clickedSquareElement.classList.add('shake-red');
