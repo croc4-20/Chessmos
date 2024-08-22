@@ -1751,8 +1751,11 @@ function updateGameState(sessionData) {
 
 
 
-    const socket = io('https://chessmos.herokuapp.com');  // Point to your deployed server
     
+    const socket = io('https://chessmos.herokuapp.com', {
+    transports: ['websocket']
+});
+
     socket.on('connect', () => {
         console.log('Connected to WebSocket server');
     });
