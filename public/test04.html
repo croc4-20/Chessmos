@@ -1872,19 +1872,29 @@ function updateGameState(sessionData) {
        // Capture the chessGame instance in a variable
 
 
-socket.on('turnChanged', (data) => {
-    console.log('data', data);
-    console.log('Turn has changed. Current player before the change:', this.game.currentPlayer);
+let chessGameInstance = null;
 
-    // Update the current player in the game instance
-    this.game.currentPlayer = data.currentPlayer;
+window.onload = () => {
+    // Initialize your game and store the reference in the variable
+    chessGameInstance = window.chessGame || this.game; // Ensure it's globally accessible or initialized here
 
-    // Optionally log it or update any UI elements
-    console.log('Turn has changed. Current player is now:', this.game.currentPlayer);
+    socket.on('turnChanged', (data) => {
+        if (chessGameInstance) {
+            console.log('Turn has changed. Current player before the change:', chessGameInstance.currentPlayer);
 
-    // Update the myTurn flag based on the player's color
-    myTurn = (this.game.currentPlayer === myColor);
-});
+            // Update the current player in the game instance
+            chessGameInstance.currentPlayer = data.currentPlayer;
+
+            // Optionally log it or update any UI elements
+            console.log('Turn has changed. Current player is now:', chessGameInstance.currentPlayer);
+
+            // Update the myTurn flag based on the player's color
+            myTurn = (chessGameInstance.currentPlayer === myColor);
+        } else {
+            console.error('Chess game instance is not defined when turnChanged event was received.');
+        }
+    });
+};
 
     socket.on('turn', (data) => {
     myTurn = (data.currentPlayer === myPlayerId); // Determine if it's the player's turn
