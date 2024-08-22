@@ -133,7 +133,10 @@ for (const piece of pieces)
 console.log("Classes imported successfully");
     
   socket.on('turnChanged', (data) => {
-    console.log('Turn has changed. Current player before the change:',ChessGame.currentPlayer);
+      console.log('windows.chessGame', windows.chessGame);
+            console.log('windows.chessGame.currentPlayer', windows.chessGame.currentPlayer);
+
+    console.log('Turn has changed. Current player before the change:', ChessGame.currentPlayer);
 
     // Update the current player in the game instance
     ChessGame.currentPlayer = data.currentPlayer;
