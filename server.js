@@ -13,8 +13,12 @@ import { gameSessions, createGameSession, getGameSession } from './public/jsFile
 
 const app = express();
 const PORT =  process.env.PORT || 3000;
+const httpServer = createServer(app);
 httpServer.listen(PORT, () => {
     console.log(`Matchmaking server running on port : ${PORT}`);
+});
+httpServer.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
 });
 const socketToGameMap = new Map();
 const __filename = fileURLToPath(import.meta.url);
@@ -71,13 +75,11 @@ app.get('/matches', (req, res) => {
     res.json(matches);
 });
 
-const httpServer = createServer(app);
-httpServer.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-});
+
+
 const io = new SocketIOServer(httpServer, {
     cors: {
-        origin: "https://chessmos.herokuapp.com", 
+        origin: "https://chessmos-83a3f6f208b9.herokuapp.com", 
         methods: ["GET", "POST"],
         allowedHeaders: ['Content-Type-Authorization'],
         credentials: true
