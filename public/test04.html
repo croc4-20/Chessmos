@@ -1870,15 +1870,15 @@ function updateGameState(sessionData) {
     switchTurns();
 });
         socket.on('turnChanged', (data) => {
-            console.log('Turn has changed. Current player before the change:', window.currentPlayer);
+        console.log('Turn has changed. Current player before the change:', this.chessGame.currentPlayer);
     // Update the current player in a global or accessible variable
-    window.currentPlayer = data.currentPlayer;
+    this.chessGame.currentPlayer === 'white' ? 'black' : 'white';
 
     // Optionally log it or update any UI elements
-    console.log('Turn has changed. Current player is now:', window.currentPlayer);
+    console.log('Turn has changed. Current player is now:', this.chessGame.currentPlayer);
 
     // Update the myTurn flag based on the player's color
-    myTurn = (window.currentPlayer === myColor);
+    myTurn = (this.chessGame.currentPlayer === myColor);
 });
     socket.on('turn', (data) => {
     myTurn = (data.currentPlayer === myPlayerId); // Determine if it's the player's turn
