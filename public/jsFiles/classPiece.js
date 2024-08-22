@@ -626,7 +626,6 @@ handleClick = (event, chessBoard, game) => {
             clickedSquareElement.classList.add('shake-red');
             
         }, 500);
-        return;
     
         console.log("Not your turn!");
     clickedPieceElement.addEventListener('click', (event) => {
