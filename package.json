@@ -40,6 +40,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "socket.io": "^4.7.5",
+    "cors": "^2.8.5",
     "symbol-observable": "^4.0.0",
     "uuid": "^9.0.0",
     "wasmd": "^0.0.0"
