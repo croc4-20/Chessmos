@@ -133,16 +133,16 @@ for (const piece of pieces)
 console.log("Classes imported successfully");
     
   socket.on('turnChanged', (data) => {
-    console.log('Turn has changed. Current player before the change:', this.game.currentPlayer);
+    console.log('Turn has changed. Current player before the change:',ChessGame.currentPlayer);
 
     // Update the current player in the game instance
-    this.game.currentPlayer = data.currentPlayer;
+    ChessGame.currentPlayer = data.currentPlayer;
 
     // Log the updated current player
-    console.log('Turn has changed. Current player is now:', this.game.currentPlayer);
+    console.log('Turn has changed. Current player is now:', ChessGame.currentPlayer);
 
     // Update the myTurn flag based on the player's color
-    myTurn = (this.game.currentPlayer === myColor);
+    myTurn = (ChessGame.currentPlayer === myColor);
     console.log('My turn status updated:', myTurn);
 });
 }
