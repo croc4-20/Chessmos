@@ -1870,6 +1870,7 @@ function updateGameState(sessionData) {
     switchTurns();
 });
         socket.on('turnChanged', (data) => {
+            console.log('Turn has changed. Current player before the change:', window.currentPlayer);
     // Update the current player in a global or accessible variable
     window.currentPlayer = data.currentPlayer;
 
