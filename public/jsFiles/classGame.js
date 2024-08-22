@@ -520,7 +520,7 @@ syncBoardState = () => {
   
   }
   changeTurn(){
-console.log('changeTurn function entered with this.currentPlayer  being :', this.currentPlayer);
+console.log('changeTurn function entered with  this being', this, 'this.currentPlayer being :', this.currentPlayer);
     if (this.currentPlayer === 'white') {
       console.log('thiscurrent player being white checking:', this.currentPlayer);
       this.currentPlayer = 'black';
