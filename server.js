@@ -13,6 +13,9 @@ import { gameSessions, createGameSession, getGameSession } from './public/jsFile
 
 const app = express();
 const PORT =  process.env.PORT || 3000;
+httpServer.listen(PORT, () => {
+    console.log(`Matchmaking server running on port : ${PORT}`);
+});
 const socketToGameMap = new Map();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1182,7 +1185,3 @@ function processChaosWarp(gameSession) {
     console.log('shuffleResult in processChaosWarp:', shuffleResult);
     return shuffleResult;
 }
-
-httpServer.listen(PORT, () => {
-    console.log(`Matchmaking server running on http://localhost:${PORT}`);
-});
