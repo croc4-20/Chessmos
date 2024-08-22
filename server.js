@@ -14,11 +14,9 @@ import { gameSessions, createGameSession, getGameSession } from './public/jsFile
 const app = express();
 const PORT =  process.env.PORT || 3000;
 const httpServer = createServer(app);
-httpServer.listen(PORT, () => {
-    console.log(`Matchmaking server running on port : ${PORT}`);
-});
+
 httpServer.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`matchmaking server running on port ${PORT}`);
 });
 const socketToGameMap = new Map();
 const __filename = fileURLToPath(import.meta.url);
@@ -32,20 +30,6 @@ let players = [];
 // This will store ongoing matches with a unique match ID
 let matches = [];
 
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header(
-        'Access-Control-Allow-Headers',
-        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-    );
-
-    if (req.method === 'OPTIONS') {
-        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-        return res.status(200).json({});
-    }
-
-    next();
-});
 app.use(cors({
     origin: "https://chessmos-83a3f6f208b9.herokuapp.com", // Change this to your frontend URL
     methods: ["GET", "POST"],
