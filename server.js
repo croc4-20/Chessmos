@@ -264,6 +264,7 @@ if (isMoveOnPath) {
     // Notify the players about the turn change
     notifyTurnChange();
     switchTurns(gameSession);
+    io.to(gameId).emit('turnChanged', { currentPlayer: gameSession.turn });
 });
 
     function simulateMove(board, piece, move) {
