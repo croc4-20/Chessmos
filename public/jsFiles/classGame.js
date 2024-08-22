@@ -268,9 +268,9 @@ checkAndUpdateSpellEffects() {
             const instanceTurnCount = myChessGame.turnCount;
             const turnPlayer = myChessGame.currentPlayer;
             console.log('instanceTurnCount', instanceTurnCount, 'turnPlayer', turnPlayer);
-            console.log('Before changeTurn, currentPlayer:', instance.currentPlayer);
+            console.log('Before changeTurn, currentPlayer:', instance.chessGame.instance.currentPlayer);
             myChessGame.changeTurn();
-            console.log('after changeTurn, currentPlayer:', instance.currentPlayer);
+            console.log('after changeTurn, currentPlayer:', instance.chessGame.instance.currentPlayer);
             myChessGame.updateTurnDisplay(myTurn, instanceTurnCount); // This should work if the method is defined and bound correctly.
   
             console.log('turn player after changing turn', instance.chessGame.instance.currentPlayer);
