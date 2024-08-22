@@ -599,7 +599,7 @@ static resetCheckArray() {
     window.dispatchEvent(resetEvent);
 }
 handleClick = (event, chessBoard, game) => {
-  
+  window.currentPlayer = this.game.currentPlayer;
   
   const previouslySelectedPieces = document.querySelectorAll('.chess-piece.selected-piece');
   previouslySelectedPieces.forEach(piece => {
