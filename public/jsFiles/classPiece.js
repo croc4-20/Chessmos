@@ -629,7 +629,10 @@ handleClick = (event, chessBoard, game) => {
         return;
     
         console.log("Not your turn!");
-      clickedPieceElement.addEventListener('click', () => this.handleClick(event, chessBoard, game), { once: true });
+    clickedPieceElement.addEventListener('click', (event) => {
+    console.log('Click listener triggered for piece:', clickedPieceElement);
+    this.handleClick(event, chessBoard, game);
+}, { once: true });
         return;
     }
     
