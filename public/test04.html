@@ -1869,17 +1869,22 @@ function updateGameState(sessionData) {
      console.log('myTurn value during move operation and after changing turn', myTurn);
     switchTurns();
 });
-       socket.on('turnChanged', (data) => {
-    console.log('Turn has changed. Current player before the change:', this.currentPlayer);
-    
-    this.currentPlayer = data.currentPlayer;  // Update the current player
+       // Capture the chessGame instance in a variable
+const chessGameInstance = this.chessGame;
+
+socket.on('turnChanged', (data) => {
+    // Now you can access chessGameInstance inside the handler
+    console.log('Turn has changed. Current player before the change:', chessGameInstance.currentPlayer);
+
+    // Update the current player
+    chessGameInstance.currentPlayer = chessGameInstance.currentPlayer === 'white' ? 'black' : 'white';
 
     // Optionally log it or update any UI elements
-    console.log('Turn has changed. Current player is now:', this.currentPlayer);
+    console.log('Turn has changed. Current player is now:', chessGameInstance.currentPlayer);
 
     // Update the myTurn flag based on the player's color
-    myTurn = (this.currentPlayer === myColor);
-}.bind(this));  // Binding the context to the chessGame instance
+    myTurn = (chessGameInstance.currentPlayer === myColor);
+});
 
     socket.on('turn', (data) => {
     myTurn = (data.currentPlayer === myPlayerId); // Determine if it's the player's turn
