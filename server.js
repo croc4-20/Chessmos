@@ -74,9 +74,9 @@ httpServer.listen(PORT, '0.0.0.0', () => {
 });
 const io = new SocketIOServer(httpServer, {
     cors: {
-        origin: "https://chessmos-83a3f6f208b9.herokuapp.com", 
+        origin: "https://chessmos.herokuapp.com", 
         methods: ["GET", "POST"],
-        allowedHeaders: ["Content-Type", "Authorization"],
+        allowedHeaders: ['Content-Type-Authorization'],
         credentials: true
     }
 });
