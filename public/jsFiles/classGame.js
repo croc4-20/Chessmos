@@ -3,13 +3,13 @@ let handlePieceSelection;
 const initialize = async () => {
   
   // const { default: ChessPiece } = await import('../savedFiles/classPiece.js');
-  const { default: ChessPiece } = await import('https://github.com/croc4-20/Chessmos/main/public/jsFiles/classPiece.js');
+  const { default: ChessPiece } = await import('./classPiece.js');
     console.log(ChessPiece);
     console.log(typeof ChessPiece);
-  const { default: ChessBoard } = await import('https://github.com/croc4-20/Chessmos/main/public/jsFiles/classBoard.js');
+  const { default: ChessBoard } = await import('./classBoard.js');
     console.log(ChessBoard);
     console.log(typeof ChessBoard);
-  const { default: ChessArray } = await import('https://github.com/croc4-20/Chessmos/main/public/jsFiles/classArray.js');
+  const { default: ChessArray } = await import('./classArray.js');
     console.log(ChessArray);
     console.log(typeof ChessArray);
     //chessArray = new ChessArray();
