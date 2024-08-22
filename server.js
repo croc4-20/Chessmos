@@ -260,6 +260,7 @@ if (isMoveOnPath) {
 
     // Switch turns
     gameSession.turn = currentTurnColor === 'white' ? 'black' : 'white';
+    console.log('Switching turns. New turn is:', gameSession.turn);
 socket.emit('turnChanged', { currentPlayer: gameSession.turn });
             socket.broadcast.emit('turnChanged', { currentPlayer: gameSession.turn });
     // Notify the players about the turn change
