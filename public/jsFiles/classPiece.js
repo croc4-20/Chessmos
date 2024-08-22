@@ -300,9 +300,7 @@ this.threateningPath = [];
     }
 
       
-   if (elementId) {
-  console.log("Type:", type, "color:", color, "! row,col: ", row, col, "imagePath: ", imagePath, "elementId :", elementId, "game", game);
-}
+   
 window.addEventListener('updateValidPiecesToResolveCheck', (event) => {
     console.log('Received valid pieces to resolve check:', event.detail);
     this.validPiecesToResolveCheck = event.detail.validPiecesToResolveCheck; // Assign only the array
