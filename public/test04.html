@@ -1870,7 +1870,7 @@ function updateGameState(sessionData) {
     switchTurns();
 });
         socket.on('turnChanged', (data) => {
-            console.log('this.chessGame', this.chessGame, 'this.game', this.game);
+            console.log('this.chessGame', this.chessGame);
         console.log('Turn has changed. Current player before the change:', this.chessGame.currentPlayer);
     // Update the current player in a global or accessible variable
     this.chessGame.currentPlayer === 'white' ? 'black' : 'white';
