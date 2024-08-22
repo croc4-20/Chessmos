@@ -1,4 +1,4 @@
-import { getGameSession } from 'https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/gameSessions.js'
+import { getGameSession } from './gameSessions.js'
 
 
 let clickedPiece;
@@ -28,10 +28,10 @@ async function initializeChessPieces(pieces, game, chessBoard) {
 async function initialize() 
 {
 
-  const { default: ChessPiece } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classPiece.js');
-  const { default: ChessBoard } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classBoard.js');
-  const { default: ChessGame } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classGame.js');
-  const { default: ChessArray } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classArray.js');
+  const { default: ChessPiece } = await import('./classPiece.js');
+  const { default: ChessBoard } = await import('./classBoard.js');
+  const { default: ChessGame } = await import('./classGame.js');
+  const { default: ChessArray } = await import('./classArray.js');
 //   const { getGameSession } = await import('../gameSessions.js');
 
 // ChessPiece.gameSession = getGameSession;
