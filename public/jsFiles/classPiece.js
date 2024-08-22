@@ -134,7 +134,7 @@ console.log("Classes imported successfully");
     
   socket.on('turnChanged', (data) => {
       console.log('windows.chessGame', window.chessGame);
-            console.log('window.chessGame.currentPlayer', window.chessGame.currentPlayer);
+            console.log('window.chessGame.instance.currentPlayer', window.chessGame.instance.currentPlayer);
 
     console.log('Turn has changed. Current player before the change:', ChessGame.currentPlayer);
 
