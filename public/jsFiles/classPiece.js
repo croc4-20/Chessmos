@@ -1,5 +1,5 @@
-import { getGameSession } from 'https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classArray.js'
-gameSessions.js'
+import { getGameSession } from 'https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/gameSessions.js'
+
 
 let clickedPiece;
 let pieces;
