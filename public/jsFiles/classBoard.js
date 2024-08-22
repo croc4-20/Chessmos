@@ -29,9 +29,9 @@ async function initialize(game, pieces)
 {
   
   
-  const { default: ChessBoard } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classBoard.js').default;
-  const { default: ChessGame } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classGame.js').default;
-  const { default: ChessArray } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classArray.js').default;
+  const { default: ChessBoard } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classBoard.js');
+  const { default: ChessGame } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classGame.js');
+  const { default: ChessArray } = await import('https://github.com/croc4-20/Chessmos/blob/main/public/jsFiles/classArray.js');
 
   console.log("Classes imported successfully");
 
