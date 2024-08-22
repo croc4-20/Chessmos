@@ -69,7 +69,7 @@ app.get('/matches', (req, res) => {
 });
 
 const httpServer = createServer(app);
-server.listen(port, '0.0.0.0', () => {
+httpServer.listen(port, '0.0.0.0', () => {
     console.log(`Server running on port ${port}`);
 });
 const io = new SocketIOServer(httpServer, {
