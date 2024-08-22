@@ -1878,7 +1878,7 @@ socket.on('turnChanged', (data) => {
     console.log('Turn has changed. Current player before the change:', chessGameInstance.currentPlayer);
 
     // Update the current player
-    chessGameInstance.currentPlayer = chessGameInstance.currentPlayer === 'white' ? 'black' : 'white';
+    chessGameInstance.currentPlayer = chessGameInstance.currentPlayer === 'black' ? 'white' : 'black';
 
     // Optionally log it or update any UI elements
     console.log('Turn has changed. Current player is now:', chessGameInstance.currentPlayer);
