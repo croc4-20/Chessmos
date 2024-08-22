@@ -1870,9 +1870,10 @@ function updateGameState(sessionData) {
     switchTurns();
 });
        // Capture the chessGame instance in a variable
-const chessGameInstance = this.chessGame;
+
 
 socket.on('turnChanged', (data) => {
+    const chessGameInstance = this.chessGame;
     // Now you can access chessGameInstance inside the handler
     console.log('Turn has changed. Current player before the change:', chessGameInstance.currentPlayer);
 
