@@ -1869,6 +1869,16 @@ function updateGameState(sessionData) {
      console.log('myTurn value during move operation and after changing turn', myTurn);
     switchTurns();
 });
+        socket.on('turnChanged', (data) => {
+    // Update the current player in a global or accessible variable
+    window.currentPlayer = data.currentPlayer;
+
+    // Optionally log it or update any UI elements
+    console.log('Turn has changed. Current player is now:', window.currentPlayer);
+
+    // Update the myTurn flag based on the player's color
+    myTurn = (window.currentPlayer === myColor);
+});
     socket.on('turn', (data) => {
     myTurn = (data.currentPlayer === myPlayerId); // Determine if it's the player's turn
     if (myTurn) {
