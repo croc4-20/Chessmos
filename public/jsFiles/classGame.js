@@ -32,6 +32,7 @@ const initialize = async () => {
       super(chessArray, chessBoard, handlePieceSelection, game);
       // this.updateTurnDisplay = this.updateTurnDisplay.bind(this);
        this.changeTurn = this.changeTurn.bind(this);
+      this.currentPlayer = 'white';
       
     }
   };
