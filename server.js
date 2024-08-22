@@ -263,7 +263,7 @@ if (isMoveOnPath) {
 
     // Notify the players about the turn change
     notifyTurnChange();
-    switchTurns(gameSession);
+    //switchTurns(gameSession);
     io.to(gameId).emit('turnChanged', { currentPlayer: gameSession.turn });
 });
 
