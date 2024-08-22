@@ -136,13 +136,13 @@ console.log("Classes imported successfully");
       console.log('windows.chessGame', window.chessGame);
             console.log('window.chessGame.instance.currentPlayer', window.chessGame.instance.currentPlayer);
 
-    console.log('Turn has changed. Current player before the change:', ChessGame.currentPlayer);
+    console.log('Turn has changed. Current player before the change:', window.chessGame.instance.currentPlayer.currentPlayer);
 
     // Update the current player in the game instance
     ChessGame.currentPlayer = data.currentPlayer;
 
     // Log the updated current player
-    console.log('Turn has changed. Current player is now:', ChessGame.currentPlayer);
+    console.log('Turn has changed. Current player is now:', window.chessGame.instance.currentPlayer.currentPlayer);
 
     // Update the myTurn flag based on the player's color
     myTurn = (ChessGame.currentPlayer === myColor);
@@ -634,8 +634,8 @@ handleClick = (event, chessBoard, game) => {
     const clickedPieceElement = clickedSquareElement.querySelector('.chess-piece');
     if (!clickedPieceElement) return;
     console.log('this.game', this.game);
-  console.log('myTurn', myTurn, 'currentPlayerColor', this.game.currentPlayer, 'clickedPieceElement COLOR', clickedSquareElement.getAttribute('data-color'));
-  if (!myTurn || clickedSquareElement.getAttribute('data-color') !== this.game.currentPlayer) {
+  console.log('myTurn', myTurn, 'currentPlayerColor',  window.chessGame.instance.currentPlayer.currentPlayer, 'clickedPieceElement COLOR', clickedSquareElement.getAttribute('data-color'));
+  if (!myTurn || clickedSquareElement.getAttribute('data-color') !==  window.chessGame.instance.currentPlayer.currentPlayer) {
     this.showAlert("Wrong Turn. Wait a bit for the opponent to finish.");
     setTimeout(() => {
             clickedSquareElement.classList.add('shake-red');
