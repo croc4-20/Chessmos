@@ -70,7 +70,7 @@ app.get('/matches', (req, res) => {
 
 const httpServer = createServer(app);
 httpServer.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Server running on port ${PORT}`);
 });
 const io = new SocketIOServer(httpServer, {
     cors: {
