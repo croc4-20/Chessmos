@@ -132,7 +132,19 @@ for (const piece of pieces)
   console.log(ChessArray);
 console.log("Classes imported successfully");
     
-  
+  socket.on('turnChanged', (data) => {
+    console.log('Turn has changed. Current player before the change:', this.game.currentPlayer);
+
+    // Update the current player in the game instance
+    this.game.currentPlayer = data.currentPlayer;
+
+    // Log the updated current player
+    console.log('Turn has changed. Current player is now:', this.game.currentPlayer);
+
+    // Update the myTurn flag based on the player's color
+    myTurn = (this.game.currentPlayer === myColor);
+    console.log('My turn status updated:', myTurn);
+});
 }
 initialize().then(() => {
   // Get all chess squares
@@ -599,19 +611,7 @@ static resetCheckArray() {
     window.dispatchEvent(resetEvent);
 }
 handleClick = (event, chessBoard, game) => {
-socket.on('turnChanged', (data) => {
-    console.log('Turn has changed. Current player before the change:', this.game.currentPlayer);
 
-    // Update the current player in the game instance
-    this.game.currentPlayer = data.currentPlayer;
-
-    // Log the updated current player
-    console.log('Turn has changed. Current player is now:', this.game.currentPlayer);
-
-    // Update the myTurn flag based on the player's color
-    myTurn = (this.game.currentPlayer === myColor);
-    console.log('My turn status updated:', myTurn);
-});
   
   const previouslySelectedPieces = document.querySelectorAll('.chess-piece.selected-piece');
   previouslySelectedPieces.forEach(piece => {
