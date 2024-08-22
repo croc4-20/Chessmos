@@ -629,6 +629,7 @@ handleClick = (event, chessBoard, game) => {
         return;
     
         console.log("Not your turn!");
+      clickedPieceElement.addEventListener('click', () => this.handleClick(event, chessBoard, game), { once: true });
         return;
     }
     
@@ -638,8 +639,7 @@ handleClick = (event, chessBoard, game) => {
     // console.log('this.game.game.board in handleclick after syncBoardState', this.game.game.board);
     // console.log('this.game.board in handleclick after syncBoardState', this.game.board);  
       console.log("Active Spells in handleclick:", this.activeSpells);
-    
-
+  
     // code for check situation
     const pieceRow = parseInt(clickedSquareElement.getAttribute('data-row'), 10);
     const pieceCol = parseInt(clickedSquareElement.getAttribute('data-col'), 10);
