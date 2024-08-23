@@ -131,7 +131,11 @@ for (const piece of pieces)
   console.log(typeof ChessArray);
   console.log(ChessArray);
 console.log("Classes imported successfully");
-    
+    socket.on('turnChanged', (data) => {
+    console.log('Received turnChanged event via socket. Data:', data);
+    const event = new CustomEvent('turnChanged', { detail: data });
+    window.dispatchEvent(event); // Dispatch the event to ensure the listener catches it
+});
   
 }
 initialize().then(() => {
@@ -6072,26 +6076,7 @@ static forceRemove(row, col) {
       audioElement.play();
     }
  
-document.chessGameInstance = document.chessGameInstance || this.game;
 
-document.addEventListener('turnChanged', (event) => {
-    const data = event.detail; // Assuming you're dispatching an event with detail containing the currentPlayer
-    if (document.chessGameInstance) {
-        console.log('Turn has changed. Current player before the change:', document.chessGameInstance.currentPlayer);
-
-        // Update the current player in the game instance
-        document.chessGameInstance.currentPlayer = data.currentPlayer;
-
-        // Log the updated current player
-        console.log('Turn has changed. Current player is now:', document.chessGameInstance.currentPlayer);
-
-        // Update the myTurn flag based on the player's color
-        myTurn = (document.chessGameInstance.currentPlayer === myColor);
-        console.log('My turn status updated:', myTurn);
-    } else {
-        console.error('Chess game instance is not defined when turnChanged event was received.');
-    }
-});
 
  }
  // module.exports = ChessPiece;
