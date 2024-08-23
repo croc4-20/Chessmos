@@ -1880,7 +1880,7 @@ window.onload = () => {
 
     socket.on('turnChanged', (data) => {
         if (chessGameInstance) {
-            console.log('Turn has changed. Current player before the change:', chessGameInstance.currentPlayer);
+            console.log('Turn has changed. Current player before the change:', data.currentPlayer);
 
             // Update the current player in the game instance
             chessGameInstance.currentPlayer = data.currentPlayer;
