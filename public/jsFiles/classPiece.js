@@ -136,6 +136,12 @@ console.log("Classes imported successfully");
     const event = new CustomEvent('turnChanged', { detail: data });
     window.dispatchEvent(event); // Dispatch the event to ensure the listener catches it
 });
+    window.addEventListener('turnChanged', (event) => {
+    console.log('TurnChanged event received. Updating currentPlayer.', event.detail);
+    if (window.chessGame && window.chessGame.instance) {
+        window.chessGame.instance.currentPlayer = event.detail.currentPlayer;
+    }
+});
   
 }
 initialize().then(() => {
