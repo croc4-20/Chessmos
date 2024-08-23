@@ -287,29 +287,7 @@ this.threateningPath = [];
         console.error(`Event listener already attached to: ${this.element}`);
     }
 
-      let chessGameInstance = null;
-
-window.onload = () => {
-    // Initialize your game and store the reference in the variable
-    chessGameInstance = window.chessGame || this.game; // Ensure it's globally accessible or initialized here
-
-    socket.on('turnChanged', (data) => {
-        if (chessGameInstance) {
-            console.log('Turn has changed. Current player before the change:', data.currentPlayer);
-
-            // Update the current player in the game instance
-            chessGameInstance.currentPlayer = data.currentPlayer;
-
-            // Optionally log it or update any UI elements
-            console.log('Turn has changed. Current player is now:', chessGameInstance.currentPlayer);
-
-            // Update the myTurn flag based on the player's color
-            myTurn = (chessGameInstance.currentPlayer === myColor);
-        } else {
-            console.error('Chess game instance is not defined when turnChanged event was received.');
-        }
-    });
-};
+      
    
 window.addEventListener('updateValidPiecesToResolveCheck', (event) => {
     console.log('Received valid pieces to resolve check:', event.detail);
