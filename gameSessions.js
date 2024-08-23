@@ -33,8 +33,10 @@ export function createGameSession(playerIds, gameId) {
     const session = {
         gameId,
         players: playerIds,
-        rng// Random Number Generator instance specific to this session
-        // additional session-related data
+        rng,
+        turn: 'white',
+ isInCheck: false,
+     threateningPath: []
     };
     console.log('session value un createGameSession function', session);
     gameSessions.set(gameId, session);
