@@ -1134,7 +1134,7 @@ function switchTurns(gameSession) {
     // Switch turns between players
   gameSession.turn = gameSession.turn === 'white' ? 'black' : 'white';
 
-    console.log(`Turn switched. It's now ${gameSession.currentTurn}'s turn.`);
+    console.log(`Turn switched. It's now ${gameSession.turn}'s turn.`);
 }
 
 
