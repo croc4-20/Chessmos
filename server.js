@@ -156,7 +156,7 @@ io.on('connection', (socket) => {
         return;
     }
 
-    const gameSession = gameSessions.get(gameId);
+    const gameSession = gameSessions.get(gameId, session);
     if (!gameSession) {
         console.error('No gameSession found for gameId:', gameId);
         return;
