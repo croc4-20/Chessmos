@@ -156,13 +156,14 @@ io.on('connection', (socket) => {
         return;
     }
 
-    const gameSession = gameSessions.get(gameId, session);
+    const gameSession = gameSessions.get(gameId);
     if (!gameSession) {
         console.error('No gameSession found for gameId:', gameId);
         return;
     }
 
     const currentTurnColor = gameSession.turn;
+        console.log('gameSession.session', gameSession.session)
 
     console.log('about to cast move with gameSession being :', gameSession, 'gameID being ', gameId);
 
