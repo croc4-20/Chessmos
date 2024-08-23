@@ -6072,7 +6072,26 @@ static forceRemove(row, col) {
       audioElement.play();
     }
  
+window.chessGameInstance = window.chessGameInstance || this.game;
 
+window.addEventListener('turnChanged', (event) => {
+    const data = event.detail; // Assuming you're dispatching an event with detail containing the currentPlayer
+    if (window.chessGameInstance) {
+        console.log('Turn has changed. Current player before the change:', window.chessGameInstance.currentPlayer);
+
+        // Update the current player in the game instance
+        window.chessGameInstance.currentPlayer = data.currentPlayer;
+
+        // Log the updated current player
+        console.log('Turn has changed. Current player is now:', window.chessGameInstance.currentPlayer);
+
+        // Update the myTurn flag based on the player's color
+        myTurn = (window.chessGameInstance.currentPlayer === myColor);
+        console.log('My turn status updated:', myTurn);
+    } else {
+        console.error('Chess game instance is not defined when turnChanged event was received.');
+    }
+});
 
  }
  // module.exports = ChessPiece;
@@ -6109,26 +6128,7 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       });
     }
   });
-    window.chessGameInstance = window.chessGameInstance || this.game;
-
-window.addEventListener('turnChanged', (event) => {
-    const data = event.detail; // Assuming you're dispatching an event with detail containing the currentPlayer
-    if (window.chessGameInstance) {
-        console.log('Turn has changed. Current player before the change:', window.chessGameInstance.currentPlayer);
-
-        // Update the current player in the game instance
-        window.chessGameInstance.currentPlayer = data.currentPlayer;
-
-        // Log the updated current player
-        console.log('Turn has changed. Current player is now:', window.chessGameInstance.currentPlayer);
-
-        // Update the myTurn flag based on the player's color
-        myTurn = (window.chessGameInstance.currentPlayer === myColor);
-        console.log('My turn status updated:', myTurn);
-    } else {
-        console.error('Chess game instance is not defined when turnChanged event was received.');
-    }
-});
+    
 
   document.addEventListener('turnChanged', (e) => {
     console.log('turn changed');
