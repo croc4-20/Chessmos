@@ -1131,10 +1131,11 @@ function notifyPlayersOfMatch(matchPlayers, matchId, gameId) {
 }
 
 function switchTurns(gameSession) {
+    console.log('gamesession.turn before trying to change it in sitchTurn function', gameSession.turn);
     // Switch turns between players
   gameSession.turn = gameSession.turn === 'white' ? 'black' : 'white';
 
-    console.log(`Turn switched. It's now ${gameSession.turn}'s turn.`);
+    console.log(`Turn switched. It's now ${gameSession.turn}'s turn. in switch turn function`);
 }
 
 
