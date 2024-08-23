@@ -37,7 +37,10 @@ export function createGameSession(playerIds, gameId) {
         gameId,
         players: playerIds,
         rng,
-        board: initsServBoard()
+        board: initsServBoard(),
+     turn: 'white',
+        isInCheck: false,
+        threateningPath: []
         // additional session-related data
     };
     console.log('session value un createGameSession function', session);
