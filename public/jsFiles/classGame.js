@@ -299,7 +299,7 @@ checkAndUpdateSpellEffects() {
         }
     } else {
         // If the turn ended normally, switch players and start the next turn
-         this.currentPlayer = player === 'white' ? 'black' : 'white';
+       
       console.log('instance before trying to call startTurnServ', instance);
 
         this.startTurn();
