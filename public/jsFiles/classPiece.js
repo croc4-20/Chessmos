@@ -608,7 +608,7 @@ static resetCheckArray() {
 }
 handleClick = (event, chessBoard, game) => {
 
-  
+   const currentPlayer = window.chessGame.instance.currentPlayer;
   const previouslySelectedPieces = document.querySelectorAll('.chess-piece.selected-piece');
   previouslySelectedPieces.forEach(piece => {
     piece.removeEventListener('click', this.handleClick); // Prevent potential duplicates
@@ -631,8 +631,8 @@ handleClick = (event, chessBoard, game) => {
     console.log('window', window);
     console.log('window.chessGame', window.chessGame);
     console.log('window.chessGame.instance', window.chessGame.instance);
-  console.log('myTurn', myTurn, 'currentPlayerColor',  window.chessGame.instance.currentPlayer, 'clickedPieceElement COLOR', clickedSquareElement.getAttribute('data-color'));
-  if (!myTurn || clickedSquareElement.getAttribute('data-color') !==  window.chessGame.instance.currentPlayer) {
+  console.log('myTurn', myTurn, 'currentPlayerColor',  currentPlayer, 'clickedPieceElement COLOR', clickedSquareElement.getAttribute('data-color'));
+  if (!myTurn || clickedSquareElement.getAttribute('data-color') !==  currentPlayer) {
     this.showAlert("Wrong Turn. Wait a bit for the opponent to finish.");
     setTimeout(() => {
             clickedSquareElement.classList.add('shake-red');
