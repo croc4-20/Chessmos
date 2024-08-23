@@ -1137,6 +1137,7 @@ function switchTurns(gameSession) {
 
 
 function notifyTurnChange() {
+    console.log('notify turn change function entered');
     // Example implementation could involve finding the current game and its players
     // Then emitting a 'turn' event to each player with the updated turn information
     players.forEach(player => {
