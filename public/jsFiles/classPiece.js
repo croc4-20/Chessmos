@@ -608,12 +608,32 @@ static resetCheckArray() {
     const resetEvent = new CustomEvent('resetValidPiecesToResolveCheck');
     window.dispatchEvent(resetEvent);
 }
-    isKingInCheck(playerColor) {
-        // Find the king's position
+    wouldPutKingInCheck(move) {
+        console.log('wouldPutKingInCheck function entered, move being :', move);
+        
+        // Clone the current board to simulate the move
+        const simulatedBoard = this.cloneBoard(this.game.board);
+
+        // Simulate the move on the cloned board
+        this.movePieceFR(simulatedBoard, move.from.row, move.from.col, move.to.row, move.to.col);
+
+        // Check if the king of the current player is in check after the move
+        const currentPlayerColor = this.game.currentPlayer;
+
+        return this.isKingInCheck(simulatedBoard, currentPlayerColor);
+    }
+
+    cloneBoard(board) {
+        // Create a deep copy of the board
+        return board.map(row => row.map(piece => piece ? { ...piece } : null));
+    }
+
+    isKingInCheck(board, playerColor) {
+        // Find the king's position on the board
         let kingPosition = null;
-        for (let row = 0; row < this.chessBoard.board.length; row++) {
-            for (let col = 0; col < this.chessBoard.board[row].length; col++) {
-                const piece = this.chessBoard.board[row][col];
+        for (let row = 0; row < board.length; row++) {
+            for (let col = 0; col < board[row].length; col++) {
+                const piece = board[row][col];
                 if (piece && piece.type === 'king' && piece.color === playerColor) {
                     kingPosition = { row, col };
                     break;
@@ -624,15 +644,15 @@ static resetCheckArray() {
 
         if (!kingPosition) {
             console.error("King not found on the board!");
-            return false; // King not found, return false as a safe fallback
+            return false; // Safe fallback if king is not found
         }
 
         // Check if any opposing piece can move to the king's position
-        for (let row = 0; row < this.chessBoard.board.length; row++) {
-            for (let col = 0; col < this.chessBoard.board[row].length; col++) {
-                const piece = this.chessBoard.board[row][col];
+        for (let row = 0; row < board.length; row++) {
+            for (let col = 0; col < board[row].length; col++) {
+                const piece = board[row][col];
                 if (piece && piece.color !== playerColor) {
-                    const validMoves = piece.getValidMoves(this.chessBoard.board);
+                    const validMoves = piece.calculateValidMovesForPiece(); // Get all valid moves for the piece
                     for (const move of validMoves) {
                         if (move.row === kingPosition.row && move.col === kingPosition.col) {
                             return true; // King is in check
@@ -644,13 +664,12 @@ static resetCheckArray() {
 
         return false; // King is not in check
     }
-    wouldPutKingInCheck(move) {
-        console.log('wouldPutKinfIncheck function entered, move being :', move);
-        // Simulate the move and check if it would result in a check
-        const simulatedBoard = this.cloneBoard(this.board);
-        this.movePiece(simulatedBoard, move.from.row, move.from.col, move.to.row, move.to.col);
-
-        return this.isKingInCheck(simulatedBoard, this.currentPlayer);
+    
+    // Assumes `movePiece` is a method that updates the board with the new move
+    movePieceFR(board, fromRow, fromCol, toRow, toCol) {
+        const piece = board[fromRow][fromCol];
+        board[toRow][toCol] = piece;
+        board[fromRow][fromCol] = null;
     }
 handleClick = (event, chessBoard, game) => {
 
