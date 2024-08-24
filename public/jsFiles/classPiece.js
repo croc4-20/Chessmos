@@ -649,10 +649,10 @@ static resetCheckArray() {
 
         // Check if any opposing piece can move to the king's position
         for (let row = 0; row < board.length; row++) {
-            for (let col = 0; col < board[row].length; col++) {
+            for (let col = 0; col < this.game.board[row].length; col++) {
                 const piece = board[row][col];
                 if (piece && piece.color !== playerColor) {
-                    const validMoves = piece.calculateValidMovesForPiece(); // Get all valid moves for the piece
+                    const validMoves = this.calculateValidMovesForPiece(piece); // Get all valid moves for the piece
                     for (const move of validMoves) {
                         if (move.row === kingPosition.row && move.col === kingPosition.col) {
                             return true; // King is in check
@@ -1979,7 +1979,7 @@ refreshPieceEventListeners(enableListeners) {
 //   return validMoves;
 // }
 
- calculateValidMovesForPiece() {
+ calculateValidMovesForPiece(piece) {
     const { row, col, type, color } = this; // Assuming these properties exist on the instance
     return ChessPiece.calculateValidMoves(row, col, this.game.board, type, color);
   }
