@@ -643,6 +643,7 @@ static resetCheckArray() {
         return false; // King is not in check
     }
     wouldPutKingInCheck(move) {
+        console.log('wouldPutKinfIncheck function entered, move being :', move);
         // Simulate the move and check if it would result in a check
         const simulatedBoard = this.cloneBoard(this.chessBoard.board);
         this.movePiece(simulatedBoard, move.from.row, move.from.col, move.to.row, move.to.col);
