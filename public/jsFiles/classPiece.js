@@ -629,6 +629,7 @@ static resetCheckArray() {
     }
 
     isKingInCheck(board, playerColor) {
+         console.log('isKingInCheck function entered, board being', board, 'playerColorbeing :', playerColor);
         // Find the king's position on the board
         let kingPosition = null;
         for (let row = 0; row < board.length; row++) {
