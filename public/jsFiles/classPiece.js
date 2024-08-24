@@ -1980,8 +1980,9 @@ refreshPieceEventListeners(enableListeners) {
 // }
 
  calculateValidMovesForPiece(piece) {
+  console.log('calculateValidMovesForPiece funciton entered, piece being', piece);
     const { row, col, type, color } = this; // Assuming these properties exist on the instance
-    return ChessPiece.calculateValidMoves(row, col, this.game.board, type, color);
+    return this.calculateValidMoves(row, col, this.game.board, type, color);
   }
   calculateValidMoves(row, col, board, type, color, game) {
   console.log("calculateValidMoves called for", row, col);
