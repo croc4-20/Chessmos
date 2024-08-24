@@ -629,43 +629,50 @@ static resetCheckArray() {
     }
 
     isKingInCheck(board, playerColor) {
-         console.log('isKingInCheck function entered, board being', this.game.board, 'playerColorbeing :', playerColor);
-        // Find the king's position on the board
-        let kingPosition = null;
-        for (let row = 0; row < this.game.board.length; row++) {
-            for (let col = 0; col < this.game.board[row].length; col++) {
-                const piece = this.game.board[row][col];
-                if (piece && piece.type === 'king' && piece.color === playerColor) {
-                    kingPosition = { row, col };
-                    break;
-                }
+    console.log('isKingInCheck function entered, board:', board, 'playerColor:', playerColor);
+
+    // Find the king's position on the board
+    let kingPosition = null;
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board[row].length; col++) {
+            const piece = board[row][col];
+            if (piece && piece.type === 'king' && piece.color === playerColor) {
+                kingPosition = { row, col };
+                break;
             }
-            if (kingPosition) break;
         }
+        if (kingPosition) break;
+    }
 
-        if (!kingPosition) {
-            console.error("King not found on the board!");
-            return false; // Safe fallback if king is not found
-        }
+    if (!kingPosition) {
+        console.error("King not found on the board!");
+        return false; // Safe fallback if king is not found
+    }
 
-        // Check if any opposing piece can move to the king's position
-        for (let row = 0; row < this.game.board.length; row++) {
-            for (let col = 0; col < this.game.board[row].length; col++) {
-                const piece = board[row][col];
-                if (piece && piece.color !== playerColor) {
-                    const validMoves = this.calculateValidMovesForPiece(piece); // Get all valid moves for the piece
-                    for (const move of validMoves) {
-                        if (move.row === kingPosition.row && move.col === kingPosition.col) {
-                            return true; // King is in check
-                        }
+    console.log('King position found at:', kingPosition);
+
+    // Check if any opposing piece can move to the king's position
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board[row].length; col++) {
+            const piece = board[row][col];
+            if (piece && piece.color !== playerColor) {
+                const validMoves = this.calculateValidMovesForPiece(piece);
+                console.log('validmoves recevived in isKingInCHeck', validMoves);
+                for (const move of validMoves) {
+                    console.log(`Checking move to see if it threatens the king:`, move);
+                    if (move.row === kingPosition.row && move.col === kingPosition.col) {
+                        console.log('King is in check by piece at:', { row, col });
+                        return true; // King is in check
                     }
                 }
             }
         }
-
-        return false; // King is not in check
     }
-    
+
+    console.log('King is not in check.');
+    return false; // King is not in check
+}
+
     // Assumes `movePiece` is a method that updates the board with the new move
     movePieceFR(board, fromRow, fromCol, toRow, toCol) {
         const piece = board[fromRow][fromCol];
