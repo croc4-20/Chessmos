@@ -610,6 +610,7 @@ static resetCheckArray() {
 }
     wouldPutKingInCheck(move) {
         console.log('wouldPutKingInCheck function entered, move being :', move);
+        console.log('this.game.board being:', this.game.board);
         
         // Clone the current board to simulate the move
         const simulatedBoard = this.cloneBoard(this.game.board);
