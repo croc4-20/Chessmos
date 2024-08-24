@@ -606,6 +606,49 @@ static resetCheckArray() {
     const resetEvent = new CustomEvent('resetValidPiecesToResolveCheck');
     window.dispatchEvent(resetEvent);
 }
+    isKingInCheck(playerColor) {
+        // Find the king's position
+        let kingPosition = null;
+        for (let row = 0; row < this.chessBoard.board.length; row++) {
+            for (let col = 0; col < this.chessBoard.board[row].length; col++) {
+                const piece = this.chessBoard.board[row][col];
+                if (piece && piece.type === 'king' && piece.color === playerColor) {
+                    kingPosition = { row, col };
+                    break;
+                }
+            }
+            if (kingPosition) break;
+        }
+
+        if (!kingPosition) {
+            console.error("King not found on the board!");
+            return false; // King not found, return false as a safe fallback
+        }
+
+        // Check if any opposing piece can move to the king's position
+        for (let row = 0; row < this.chessBoard.board.length; row++) {
+            for (let col = 0; col < this.chessBoard.board[row].length; col++) {
+                const piece = this.chessBoard.board[row][col];
+                if (piece && piece.color !== playerColor) {
+                    const validMoves = piece.getValidMoves(this.chessBoard.board);
+                    for (const move of validMoves) {
+                        if (move.row === kingPosition.row && move.col === kingPosition.col) {
+                            return true; // King is in check
+                        }
+                    }
+                }
+            }
+        }
+
+        return false; // King is not in check
+    }
+    wouldPutKingInCheck(move) {
+        // Simulate the move and check if it would result in a check
+        const simulatedBoard = this.cloneBoard(this.chessBoard.board);
+        this.movePiece(simulatedBoard, move.from.row, move.from.col, move.to.row, move.to.col);
+
+        return this.isKingInCheck(simulatedBoard, this.currentPlayer);
+    }
 handleClick = (event, chessBoard, game) => {
 
    const currentPlayer = window.chessGame.instance.currentPlayer;
@@ -761,6 +804,10 @@ this.selectedPiece = clickedPiece;
     if (this.selectedPiece && clickedSquareElement.classList.contains('valid-move')) {
       console.log("trying to executeMove fnution in handlelick:");
       console.log("clickedSquareElement passed :", clickedSquareElement);
+        if (this.wouldPutKingInCheck(move, game)) {
+            alert('Invalid move! Your move would put your king in check.');
+            return; // Exit early to prevent the move
+        }
 
         this.executeMove(game.board, clickedSquareElement, chessBoard);
         
