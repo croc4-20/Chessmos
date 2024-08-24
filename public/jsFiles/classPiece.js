@@ -629,12 +629,12 @@ static resetCheckArray() {
     }
 
     isKingInCheck(board, playerColor) {
-         console.log('isKingInCheck function entered, board being', board, 'playerColorbeing :', playerColor);
+         console.log('isKingInCheck function entered, board being', this.game.board, 'playerColorbeing :', playerColor);
         // Find the king's position on the board
         let kingPosition = null;
-        for (let row = 0; row < board.length; row++) {
-            for (let col = 0; col < board[row].length; col++) {
-                const piece = board[row][col];
+        for (let row = 0; row < this.game.board.length; row++) {
+            for (let col = 0; col < this.game.board[row].length; col++) {
+                const piece = this.game.board[row][col];
                 if (piece && piece.type === 'king' && piece.color === playerColor) {
                     kingPosition = { row, col };
                     break;
@@ -649,7 +649,7 @@ static resetCheckArray() {
         }
 
         // Check if any opposing piece can move to the king's position
-        for (let row = 0; row < board.length; row++) {
+        for (let row = 0; row < this.game.board.length; row++) {
             for (let col = 0; col < this.game.board[row].length; col++) {
                 const piece = board[row][col];
                 if (piece && piece.color !== playerColor) {
