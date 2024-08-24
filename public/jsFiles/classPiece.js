@@ -944,7 +944,11 @@ executeMove(board, clickedSquareElement, chessBoard, activeSpells) {
   const oldSquare = oldPiece.parentNode;
   const oldType = oldSquare.getAttribute('data-type');
   const oldColor = oldSquare.getAttribute('data-color');
-  
+  console.log('move before calling wouldPutKingInCheck', move, 'game', this.game);
+    if (this.wouldPutKingInCheck(move)) {
+        alert('Invalid move! Your move would put your king in check.');
+        return; // Exit early to prevent the move
+    }
   console.log(`oldPiece`, oldPiece);
 
   console.log(`Chaos Theory activated for ${this.chaosTheoryTurnsLeft} turns.`);
