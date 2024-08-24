@@ -198,6 +198,7 @@ export default class ChessPiece {
 this.initObserver();
 this.validPiecesToResolveCheck = [];
 this.wouldPutKingInCheck = this.wouldPutKingInCheck.bind(this);
+      this.isKingInCheck = this.isKingInCheck.bind(this);
 this.threateningPath = [];
     this.board = chessBoard;
     console.log("this.board in chessPiece constructor", this.board);
