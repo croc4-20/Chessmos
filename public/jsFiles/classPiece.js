@@ -1016,7 +1016,17 @@ console.log('game.board', this.game.game.board);
 const thisGameGameBoard = this.game.game.board;
 const captureOccurred = isCapture(thisGameGameBoard, newRow, newCol, oldColor);
 console.log('piece', oldPiece, 'fromPosition sending the to the serv', fromPosition, 'toPosition sending to the serv', toPosition);
-
+const move = {
+        from: { row: oldRow, col: oldCol },
+        to: { row: newRow, col: newCol },
+        piece: { type: oldType, color: oldColor }
+    };
+    console.log('move before calling wouldPutKingInCheck', move, 'game', this.game);
+ 
+    if (this.wouldPutKingInCheck(move)) {
+        alert('Invalid move! Your move would put your king in check.');
+        return; // Exit early to prevent the move
+    }
 const moveEvent = new CustomEvent('pieceMoved', {
     detail: {
         color: oldColor,
