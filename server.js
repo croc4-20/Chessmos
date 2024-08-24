@@ -181,11 +181,33 @@ io.on('connection', (socket) => {
     }
 
     // Move the piece on the board
+    const originalPosition = { row: piece.row, col: piece.col };
+    const originalTargetPiece = gameSession.board.find(p => p.row === move.to.row && p.col === move.to.col);
     movePiece(gameSession, move.from.row, move.from.col, move.to.row, move.to.col);
     piece.row = move.to.row;
     piece.col = move.to.col;
 
-    // Check if the move results in the king being in check
+    // Check if this move puts the moving player's king in check
+    if (isKingInCheck(gameSession.board, currentTurnColor)) {
+        console.log('Move would put the king in check, reverting the move.');
+        
+        // Revert the move
+        piece.row = originalPosition.row;
+        piece.col = originalPosition.col;
+        movePiece(gameSession, move.to.row, move.to.col, move.from.row, move.from.col);
+
+        // If there was a piece captured by the move, restore it
+        if (originalTargetPiece) {
+            originalTargetPiece.row = move.to.row;
+            originalTargetPiece.col = move.to.col;
+            gameSession.board.push(originalTargetPiece);
+        }
+
+        socket.emit('invalidMove', move); // Notify the client that the move is invalid
+        return;
+    }
+
+    // Check if the move results in the enemy king being in check
     if (isKingInCheck(gameSession.board, currentTurnColor)) {
         console.log('King is in check, proceeding with gathering valid pieces to resolve check.');
 
