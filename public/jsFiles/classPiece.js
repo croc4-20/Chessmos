@@ -659,7 +659,7 @@ static resetCheckArray() {
                 const validMoves = this.calculateValidMovesForPiece(piece);
                 console.log('validmoves recevived in isKingInCHeck', validMoves);
                 for (const validMove of validMoves) {
-                    console.log(`Checking move to see if it threatens the king:`, move);
+                    
                     if (validMove.row === kingPosition.row && validMove.col === kingPosition.col) {
                         console.log('King is in check by piece at:', { row, col });
                        console.log('piece if moved will put allied king in check returning.')
