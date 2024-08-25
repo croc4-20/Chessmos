@@ -604,36 +604,100 @@ static resetCheckArray() {
     window.dispatchEvent(resetEvent);
 }
     calculateValidMovesForPieceOnBoard(piece, board, currentRow, currentCol) {
+        console.log('board in calculatemoveforpeiceonboard', board);
     console.log(`calculateValidMovesForPieceOnBoard entered for ${piece.type} at (${currentRow}, ${currentCol}) on the given board`);
-    // Your existing valid move logic here, but use the `board` parameter instead of `this.game.board`
     const validMoves = [];
 
-    // Example logic, replace with your own
     switch (piece.type) {
         case 'pawn':
-            // Add pawn moves based on the board state
+            // Pawns move forward but capture diagonally
+            const direction = piece.color === 'white' ? -1 : 1; // White pawns move up, black pawns move down
+            if (this.isInBounds(currentRow + direction, currentCol) && !board[currentRow + direction][currentCol]) {
+                validMoves.push({ row: currentRow + direction, col: currentCol }); // Move forward
+            }
+            // Capture diagonally
+            if (this.isInBounds(currentRow + direction, currentCol - 1) && board[currentRow + direction][currentCol - 1]?.color !== piece.color) {
+                validMoves.push({ row: currentRow + direction, col: currentCol - 1 });
+            }
+            if (this.isInBounds(currentRow + direction, currentCol + 1) && board[currentRow + direction][currentCol + 1]?.color !== piece.color) {
+                validMoves.push({ row: currentRow + direction, col: currentCol + 1 });
+            }
             break;
+
         case 'rook':
-            // Add rook moves based on the board state
+            // Rooks move horizontally or vertically
+            this.addLinearMoves(validMoves, board, currentRow, currentCol, piece.color, [[1, 0], [-1, 0], [0, 1], [0, -1]]);
             break;
+
         case 'bishop':
-            // Add bishop moves based on the board state
+            // Bishops move diagonally
+            this.addLinearMoves(validMoves, board, currentRow, currentCol, piece.color, [[1, 1], [-1, -1], [1, -1], [-1, 1]]);
             break;
+
         case 'queen':
-            // Add queen moves based on the board state
+            // Queens combine the movement of rooks and bishops
+            this.addLinearMoves(validMoves, board, currentRow, currentCol, piece.color, 
+                [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]);
             break;
+
         case 'knight':
-            // Add knight moves based on the board state
+            // Knights move in an L-shape
+            const knightMoves = [
+                [2, 1], [2, -1], [-2, 1], [-2, -1],
+                [1, 2], [1, -2], [-1, 2], [-1, -2]
+            ];
+            for (const [dRow, dCol] of knightMoves) {
+                const newRow = currentRow + dRow;
+                const newCol = currentCol + dCol;
+                if (this.isInBounds(newRow, newCol) && (!board[newRow][newCol] || board[newRow][newCol].color !== piece.color)) {
+                    validMoves.push({ row: newRow, col: newCol });
+                }
+            }
             break;
+
         case 'king':
-            // Add king moves based on the board state
+            // Kings move one square in any direction
+            const kingMoves = [
+                [1, 0], [-1, 0], [0, 1], [0, -1],
+                [1, 1], [-1, -1], [1, -1], [-1, 1]
+            ];
+            for (const [dRow, dCol] of kingMoves) {
+                const newRow = currentRow + dRow;
+                const newCol = currentCol + dCol;
+                if (this.isInBounds(newRow, newCol) && (!board[newRow][newCol] || board[newRow][newCol].color !== piece.color)) {
+                    validMoves.push({ row: newRow, col: newCol });
+                }
+            }
             break;
+
         default:
             console.error('Unknown piece type:', piece.type);
             break;
     }
 
     return validMoves;
+}
+
+addLinearMoves(validMoves, board, startRow, startCol, color, directions) {
+    for (const [dRow, dCol] of directions) {
+        let newRow = startRow + dRow;
+        let newCol = startCol + dCol;
+        while (this.isInBounds(newRow, newCol)) {
+            if (board[newRow][newCol]) {
+                if (board[newRow][newCol].color !== color) {
+                    validMoves.push({ row: newRow, col: newCol }); // Capture
+                }
+                break; // Stop at the first piece encountered
+            }
+            validMoves.push({ row: newRow, col: newCol });
+            newRow += dRow;
+            newCol += dCol;
+        }
+    }
+}
+
+isInBounds(row, col) {
+    return row >= 0 && row < 8 && col >= 0 && col < 8;
 }
    wouldPutKingInCheck(move) {
     console.log('wouldPutKingInCheck function entered, move being:', move);
