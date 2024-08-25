@@ -39,17 +39,17 @@ async function initialize()
 
  const seededRNG = import('./seedRng.js');
  
- console.log('seededRNG', seededRNG);
+ 
  let rng;
  
   const chessArray = new ChessArray();
   const chessBoard = new ChessBoard();
-  console.log("chessBoard", chessBoard);
+ 
   chessBoard.initializeBoard();
 
   chessBoard.populateBoardWithPieces();
   const game = new ChessGame(chessArray, chessBoard, this);
-  console.log("game");
+ ;
   // try {
   //   await
   // } catch (error) {
@@ -124,12 +124,7 @@ for (const piece of pieces)
 
 // console.log(typeof ChessPiece);
   // console.log(ChessPiece);
-  console.log(typeof ChessBoard);
-  console.log("ChessBoard in classPiiece", ChessBoard);
-  console.log(typeof ChessGame);
-  console.log(ChessGame);
-  console.log(typeof ChessArray);
-  console.log(ChessArray);
+  
 console.log("Classes imported successfully");
     socket.on('turnChanged', (data) => {
     console.log('Received turnChanged event via socket. Data:', data);
@@ -663,11 +658,11 @@ static resetCheckArray() {
                 console.log('Valid moves for this piece:', validMoves);
 
                 // Step 4: Check if any move directly threatens the king's position
-                for (const move of validMoves) {
+                for (const validMove of validMoves) {
                     console.log('Checking if move threatens the king:', move);
 
                     // Ensure the move matches the movement pattern of the piece type
-                    if (this.isMoveValidForPiece(piece, move, kingPosition)) {
+                    if (this.isMoveValidForPiece(piece, validMove, kingPosition)) {
                         console.log(`Move ${move} puts the king in check!`);
                         return true; // King is in check
                     }
