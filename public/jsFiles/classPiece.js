@@ -714,6 +714,18 @@ isMoveValidForPiece(piece, move, kingPosition) {
     console.log('calculateValidMovesForPiece function entered for the alliedKINGINCHECK, piece being', piece, 'this.game', this.game);
     return this.calculateValidMoves(currentRow, currentCol, board, piece.type, piece.color, this.game);
 }
+    findKingPosition(board, playerColor) {
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board[row].length; col++) {
+            const piece = board[row][col];
+            if (piece && piece.type === 'king' && piece.color === playerColor) {
+                return { row, col };
+            }
+        }
+    }
+    console.error("King not found on the board!");
+    return null;
+}
 handleClick = (event, chessBoard, game) => {
 
    const currentPlayer = window.chessGame.instance.currentPlayer;
