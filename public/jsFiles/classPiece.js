@@ -871,11 +871,7 @@ this.selectedPiece = clickedPiece;
     if (this.selectedPiece && clickedSquareElement.classList.contains('valid-move')) {
       console.log("trying to executeMove fnution in handlelick:");
       console.log("clickedSquareElement passed :", clickedSquareElement);
-        console.log('move before calling  wouldPutKingInCheck', move, 'game', this.game);
-        if (this.wouldPutKingInCheck(move, game)) {
-            alert('Invalid move! Your move would put your king in check.');
-            return; // Exit early to prevent the move
-        }
+        
 
         this.executeMove(game.board, clickedSquareElement, chessBoard);
         
