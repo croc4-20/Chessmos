@@ -604,7 +604,7 @@ static resetCheckArray() {
     window.dispatchEvent(resetEvent);
 }
     wouldPutKingInCheck(move) {
-    console.log('wouldPutKingInCheck function entered, move being:', move);
+    console.log('wouldPutKingInCheck function entered alliedKINGINCHECK, move being:', move);
 
     // Store the original state
     const simulatedBoard = this.cloneBoard(this.game.board);
@@ -618,7 +618,7 @@ static resetCheckArray() {
     // Check if this move puts the moving player's king in check
     const currentTurnColor = piece.color;
     if (this.isKingInCheck(simulatedBoard, currentTurnColor)) {
-        console.log('Move would put the king in check, reverting the move.');
+        console.log('Move would put the king in check alliedKINGINCHECK, reverting the move.');
 
         // Revert the move
         this.movePieceFR(simulatedBoard, move.to.row, move.to.col, originalPosition.row, originalPosition.col);
@@ -662,7 +662,7 @@ cloneBoard(board) {
 }
 
     isKingInCheck(board, playerColor) {
-    console.log('isKingInCheck function entered, board being', board, 'playerColor being:', playerColor);
+    console.log('isKingInCheck function entered alliedKINGINCHECK, board being', board, 'playerColor being:', playerColor);
 
     // Step 1: Find the king's position on the board
     let kingPosition = null;
@@ -714,6 +714,7 @@ cloneBoard(board) {
 }
 
 isMoveValidForPiece(piece, move, kingPosition) {
+    console.log('Ismovevalidfor piece entered alliedKINGINCHECK, piece being', piece, 'move being', move);
     const deltaRow = Math.abs(kingPosition.row - move.row);
     const deltaCol = Math.abs(kingPosition.col - move.col);
 
@@ -748,6 +749,7 @@ isMoveValidForPiece(piece, move, kingPosition) {
 }
     // Assumes `movePiece` is a method that updates the board with the new move
     movePieceFR(board, fromRow, fromCol, toRow, toCol) {
+
         const piece = board[fromRow][fromCol];
         piece.row = toRow;  // Add this line
         piece.col = toCol;
@@ -755,7 +757,7 @@ isMoveValidForPiece(piece, move, kingPosition) {
         board[fromRow][fromCol] = null;
     }
     calculateValidMovesForPiece(piece, board, currentRow, currentCol) {
-    console.log('calculateValidMovesForPiece function entered, piece being', piece, 'this.game', this.game);
+    console.log('calculateValidMovesForPiece function entered for the alliedKINGINCHECK, piece being', piece, 'this.game', this.game);
     return this.calculateValidMoves(currentRow, currentCol, board, piece.type, piece.color, this.game);
 }
 handleClick = (event, chessBoard, game) => {
