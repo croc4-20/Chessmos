@@ -663,7 +663,7 @@ static resetCheckArray() {
 
                     // Ensure the move matches the movement pattern of the piece type
                     if (this.isMoveValidForPiece(piece, validMove, kingPosition)) {
-                        console.log(`Move ${move} puts the king in check!`);
+                        console.log(`Move ${validMove} puts the king in check!`);
                         return true; // King is in check
                     }
                 }
