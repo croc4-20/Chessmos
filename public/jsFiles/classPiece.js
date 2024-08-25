@@ -655,7 +655,7 @@ static resetCheckArray() {
                 console.log(`Checking opponent piece at row ${row}, col ${col}, type ${piece.type}, color ${piece.color}`);
 
                 // Step 3: Calculate valid moves for the opponent's piece considering its type
-                const validMoves = this.calculateValidMoves(row, col, board, piece.type, piece.color, this.game);
+                const validMoves = this.calculateValidMovesForPiece(row, col, board, piece.type, piece.color, this.game);
                 
                 console.log('Valid moves for this piece:', validMoves);
 
@@ -713,9 +713,15 @@ isMoveValidForPiece(piece, move, kingPosition) {
     // Assumes `movePiece` is a method that updates the board with the new move
     movePieceFR(board, fromRow, fromCol, toRow, toCol) {
         const piece = board[fromRow][fromCol];
+        piece.row = toRow;  // Add this line
+        piece.col = toCol;
         board[toRow][toCol] = piece;
         board[fromRow][fromCol] = null;
     }
+    calculateValidMovesForPiece(piece, board, currentRow, currentCol) {
+    console.log('calculateValidMovesForPiece function entered, piece being', piece, 'this.game', this.game);
+    return this.calculateValidMoves(currentRow, currentCol, board, piece.type, piece.color, this.game);
+}
 handleClick = (event, chessBoard, game) => {
 
    const currentPlayer = window.chessGame.instance.currentPlayer;
@@ -2020,16 +2026,7 @@ refreshPieceEventListeners(enableListeners) {
 //   return validMoves;
 // }
 
- calculateValidMovesForPiece(piece, board) {
-  console.log('calculateValidMovesForPiece funciton entered, piece being', piece);
-  const pieceRow = piece.row;
-  const pieceCol = piece.col;
-  const pieceType = piece.type;
-  const pieceColor = piece.color;
-         console.log('validoves', this.calculateValidMoves(pieceRow, pieceCol, this.game.board, pieceType, pieceColor));
-    return this.calculateValidMoves(pieceRow, pieceCol, board, pieceType, pieceColor);
-   
-  }
+ 
   calculateValidMoves(row, col, board, type, color, game) {
   console.log("calculateValidMoves called for", row, col);
   console.log("Board state in calculateValidMoves:", board);
