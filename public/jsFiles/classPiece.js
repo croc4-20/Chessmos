@@ -655,7 +655,8 @@ static resetCheckArray() {
                 console.log(`Checking opponent piece at row ${row}, col ${col}, type ${piece.type}, color ${piece.color}`);
 
                 // Step 3: Calculate valid moves for the opponent's piece considering its type
-                const validMoves = this.calculateValidMovesForPiece(piece, board);
+                const validMoves = this.calculateValidMoves(row, col, board, piece.type, piece.color, this.game);
+                
                 console.log('Valid moves for this piece:', validMoves);
 
                 // Step 4: Check if any move directly threatens the king's position
