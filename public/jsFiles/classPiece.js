@@ -603,21 +603,53 @@ static resetCheckArray() {
     const resetEvent = new CustomEvent('resetValidPiecesToResolveCheck');
     window.dispatchEvent(resetEvent);
 }
+    calculateValidMovesForPieceOnBoard(piece, board, currentRow, currentCol) {
+    console.log(`calculateValidMovesForPieceOnBoard entered for ${piece.type} at (${currentRow}, ${currentCol}) on the given board`);
+    // Your existing valid move logic here, but use the `board` parameter instead of `this.game.board`
+    const validMoves = [];
+
+    // Example logic, replace with your own
+    switch (piece.type) {
+        case 'pawn':
+            // Add pawn moves based on the board state
+            break;
+        case 'rook':
+            // Add rook moves based on the board state
+            break;
+        case 'bishop':
+            // Add bishop moves based on the board state
+            break;
+        case 'queen':
+            // Add queen moves based on the board state
+            break;
+        case 'knight':
+            // Add knight moves based on the board state
+            break;
+        case 'king':
+            // Add king moves based on the board state
+            break;
+        default:
+            console.error('Unknown piece type:', piece.type);
+            break;
+    }
+
+    return validMoves;
+}
    wouldPutKingInCheck(move) {
     console.log('wouldPutKingInCheck function entered, move being:', move);
 
-    // Step 1: Clone the current board state to simulate the move
+    // Clone the current board state to simulate the move
     const simulatedBoard = this.cloneBoard(this.game.board);
 
-    // Step 2: Perform the move on the simulated board
+    // Perform the move on the simulated board
     this.movePieceFR(simulatedBoard, move.from.row, move.from.col, move.to.row, move.to.col);
 
-    // Step 3: Find the position of the player's king after the move
+    // Find the position of the player's king after the move
     const currentTurnColor = move.piece.color;
     const kingPosition = this.findKingPosition(simulatedBoard, currentTurnColor);
 
-    // Step 4: Check if the opponent can attack the king's position
-    if (this.isKingInCheck(simulatedBoard, kingPosition, currentTurnColor)) {
+    // Check if the opponent can attack the king's position immediately
+    if (this.isKingInImmediateCheck(simulatedBoard, kingPosition, currentTurnColor)) {
         console.log('Move would put the king in check, reverting the move.');
         return true; // Move would put the king in check
     }
@@ -644,16 +676,15 @@ cloneBoard(board) {
         row.map(piece => piece ? this.clonePiece(piece) : null)
     );
 }
+isKingInImmediateCheck(board, kingPosition, playerColor) {
+    console.log('isKingInImmediateCheck function entered, board being:', board, 'kingPosition being:', kingPosition, 'playerColor being:', playerColor);
 
-   isKingInCheck(board, kingPosition, playerColor) {
-    console.log('isKingInCheck function entered, board being:', board, 'kingPosition being:', kingPosition, 'playerColor being:', playerColor);
-
-    // Check if any opponent piece can move to the king's position immediately
+    // Check if any opponent piece can immediately attack the king's position
     for (let row = 0; row < board.length; row++) {
         for (let col = 0; col < board[row].length; col++) {
             const piece = board[row][col];
             if (piece && piece.color !== playerColor) {
-                const validMoves = this.calculateValidMovesForPiece(piece, board, row, col);
+                const validMoves = this.calculateValidMovesForPieceOnBoard(piece, board, row, col);
                 for (const validMove of validMoves) {
                     if (validMove.row === kingPosition.row && validMove.col === kingPosition.col) {
                         return true; // King is in check
@@ -665,42 +696,6 @@ cloneBoard(board) {
     return false; // King is not in check
 }
 
-isMoveValidForPiece(piece, move, kingPosition) {
-  
-    console.log(`alliedKINGINCHECK Checking ${piece.type} from (${move.row}, ${move.col}) against king at (${kingPosition.row}, ${kingPosition.col})`);
-
-    const deltaRow = Math.abs(kingPosition.row - move.row);
-    const deltaCol = Math.abs(kingPosition.col - move.col);
-
-    switch (piece.type) {
-        case 'pawn':
-            // Pawns can only attack diagonally
-            return deltaRow === 1 && deltaCol === 1;
-
-        case 'rook':
-            // Rooks move in straight lines
-            return (deltaRow === 0 || deltaCol === 0);
-
-        case 'bishop':
-            // Bishops move diagonally
-            return deltaRow === deltaCol;
-
-        case 'queen':
-            // Queens combine the movement of rooks and bishops
-            return (deltaRow === 0 || deltaCol === 0 || deltaRow === deltaCol);
-
-        case 'knight':
-            // Knights move in an L-shape
-            return (deltaRow === 2 && deltaCol === 1) || (deltaRow === 1 && deltaCol === 2);
-
-        case 'king':
-            // Kings move one square in any direction
-            return deltaRow <= 1 && deltaCol <= 1;
-
-        default:
-            return false;
-    }
-}
     // Assumes `movePiece` is a method that updates the board with the new move
     movePieceFR(board, fromRow, fromCol, toRow, toCol) {
 
