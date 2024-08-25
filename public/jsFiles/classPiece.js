@@ -630,15 +630,16 @@ static resetCheckArray() {
     }
 
     isKingInCheck(board, playerColor) {
-    console.log('isKingInCheck function entered, board:', board, 'playerColor:', playerColor);
+    console.log('isKingInCheck function entered, board being', board, 'playerColor being:', playerColor);
 
-    // Find the king's position on the board
+    // Step 1: Find the king's position on the board
     let kingPosition = null;
     for (let row = 0; row < board.length; row++) {
         for (let col = 0; col < board[row].length; col++) {
             const piece = board[row][col];
             if (piece && piece.type === 'king' && piece.color === playerColor) {
                 kingPosition = { row, col };
+                console.log(`King found at position:`, kingPosition);
                 break;
             }
         }
@@ -650,21 +651,24 @@ static resetCheckArray() {
         return false; // Safe fallback if king is not found
     }
 
-    console.log('King position found at:', kingPosition);
-
-    // Check if any opposing piece can move to the king's position
+    // Step 2: Check if any opposing piece can move to the king's position considering their movement patterns
     for (let row = 0; row < board.length; row++) {
         for (let col = 0; col < board[row].length; col++) {
             const piece = board[row][col];
             if (piece && piece.color !== playerColor) {
                 console.log(`Checking opponent piece at row ${row}, col ${col}, type ${piece.type}, color ${piece.color}`);
-                const validMoves = this.calculateValidMovesForPiece(piece);
-                console.log('validmoves recevived in isKingInCHeck', validMoves);
+
+                // Step 3: Calculate valid moves for the opponent's piece considering its type
+                const validMoves = this.calculateValidMovesForPiece(row, col, board, piece.type, piece.color);
+                console.log('Valid moves for this piece:', validMoves);
+
+                // Step 4: Check if any move directly threatens the king's position
                 for (const move of validMoves) {
-                      console.log('Checking if move threatens the king:', move);
-                    if (move.row === kingPosition.row && move.col === kingPosition.col) {
-                        console.log('King is in check by piece at:', { row, col });
-                       console.log('piece if moved will put allied king in check returning.')
+                    console.log('Checking if move threatens the king:', move);
+
+                    // Ensure the move matches the movement pattern of the piece type
+                    if (this.isMoveValidForPiece(piece, move, kingPosition)) {
+                        console.log(`Move ${move} puts the king in check!`);
                         return true; // King is in check
                     }
                 }
@@ -676,6 +680,39 @@ static resetCheckArray() {
     return false; // King is not in check
 }
 
+isMoveValidForPiece(piece, move, kingPosition) {
+    const deltaRow = Math.abs(kingPosition.row - move.row);
+    const deltaCol = Math.abs(kingPosition.col - move.col);
+
+    switch (piece.type) {
+        case 'pawn':
+            // Pawns can only attack diagonally
+            return deltaRow === 1 && deltaCol === 1;
+
+        case 'rook':
+            // Rooks move in straight lines
+            return (deltaRow === 0 || deltaCol === 0);
+
+        case 'bishop':
+            // Bishops move diagonally
+            return deltaRow === deltaCol;
+
+        case 'queen':
+            // Queens combine the movement of rooks and bishops
+            return (deltaRow === 0 || deltaCol === 0 || deltaRow === deltaCol);
+
+        case 'knight':
+            // Knights move in an L-shape
+            return (deltaRow === 2 && deltaCol === 1) || (deltaRow === 1 && deltaCol === 2);
+
+        case 'king':
+            // Kings move one square in any direction
+            return deltaRow <= 1 && deltaCol <= 1;
+
+        default:
+            return false;
+    }
+}
     // Assumes `movePiece` is a method that updates the board with the new move
     movePieceFR(board, fromRow, fromCol, toRow, toCol) {
         const piece = board[fromRow][fromCol];
