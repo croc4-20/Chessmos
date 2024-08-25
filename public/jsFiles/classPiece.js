@@ -671,7 +671,7 @@ cloneBoard(board) {
             const piece = board[row][col];
             if (piece && piece.type === 'king' && piece.color === playerColor) {
                 kingPosition = { row, col };
-                console.log(`King found at position:`, kingPosition);
+                console.log(`alliedKINGINCHECK King found at position:`, kingPosition);
                 break;
             }
         }
@@ -688,20 +688,23 @@ cloneBoard(board) {
         for (let col = 0; col < board[row].length; col++) {
             const piece = board[row][col];
             if (piece && piece.color !== playerColor) {
-                console.log(`Checking opponent piece at row ${row}, col ${col}, type ${piece.type}, color ${piece.color}`);
+                console.log(`alliedKINGINCHECK Checking opponent piece at row ${row}, col ${col}, type ${piece.type}, color ${piece.color}`);
 
                 // Step 3: Calculate valid moves for the opponent's piece considering its type
                 const validMoves = this.calculateValidMovesForPiece(piece, board, row, col);
-                
-                console.log('Valid moves for this piece:', validMoves);
+              console.log(`alliedKINGINCHECK Valid moves for ${piece.type} at (${row}, ${col}):`, validMoves);
+
+            
 
                 // Step 4: Check if any move directly threatens the king's position
                 for (const validMove of validMoves) {
-                    console.log('Checking if move threatens the king:', validMove);
+                   
+        console.log(`alliedKINGINCHECK Checking if move to (${validMove.row}, ${validMove.col}) threatens the king at ${kingPosition.row}, ${kingPosition.col}`);
+
 
                     // Ensure the move matches the movement pattern of the piece type
                     if (this.isMoveValidForPiece(piece, validMove, kingPosition)) {
-                        console.log(`Move ${validMove} puts the king in check!`);
+                        console.log(`alliedKINGINCHECK Move ${validMove} puts the king in check!`);
                         return true; // King is in check
                     }
                 }
@@ -714,7 +717,9 @@ cloneBoard(board) {
 }
 
 isMoveValidForPiece(piece, move, kingPosition) {
-    console.log('Ismovevalidfor piece entered alliedKINGINCHECK, piece being', piece, 'move being', move);
+  
+    console.log(`alliedKINGINCHECK Checking ${piece.type} from (${move.row}, ${move.col}) against king at (${kingPosition.row}, ${kingPosition.col})`);
+
     const deltaRow = Math.abs(kingPosition.row - move.row);
     const deltaCol = Math.abs(kingPosition.col - move.col);
 
