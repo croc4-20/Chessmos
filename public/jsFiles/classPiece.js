@@ -614,7 +614,8 @@ static resetCheckArray() {
         this.movePieceFR(simulatedBoard, move.from.row, move.from.col, move.to.row, move.to.col);
 
         // Check if the king of the current player is in check after the move
-        const currentPlayerColor = this.game.currentPlayer;
+        const currentPlayerColor = move.piece.color === 'white' ? 'white' : 'black';
+
 
         return this.isKingInCheck(simulatedBoard, currentPlayerColor);
     }
