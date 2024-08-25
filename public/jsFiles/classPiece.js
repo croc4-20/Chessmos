@@ -621,9 +621,8 @@ static resetCheckArray() {
     }
 
     cloneBoard(board) {
-        // Create a deep copy of the board
-        return board.map(row => row.map(piece => piece ? { ...piece } : null));
-    }
+    return board.map(row => row.map(piece => piece ? JSON.parse(JSON.stringify(piece)) : null));
+}
 
     isKingInCheck(board, playerColor) {
     console.log('isKingInCheck function entered, board being', board, 'playerColor being:', playerColor);
