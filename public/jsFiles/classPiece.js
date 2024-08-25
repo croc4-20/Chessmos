@@ -620,8 +620,23 @@ static resetCheckArray() {
         return this.isKingInCheck(simulatedBoard, currentPlayerColor);
     }
 
-    cloneBoard(board) {
-    return board.map(row => row.map(piece => piece ? JSON.parse(JSON.stringify(piece)) : null));
+   clonePiece(piece) {
+    return {
+        type: piece.type,
+        color: piece.color,
+        // Add other properties as needed, but avoid any circular references
+        // For example, if your piece has additional properties like 'hasMoved' or 'id', copy those as well
+        hasMoved: piece.hasMoved || false,  // Example additional property
+        id: piece.id  // Example unique identifier for the piece
+        // Ensure you do not include properties that cause circular references
+    };
+}
+
+// Function to clone the entire board
+cloneBoard(board) {
+    return board.map(row => 
+        row.map(piece => piece ? this.clonePiece(piece) : null)
+    );
 }
 
     isKingInCheck(board, playerColor) {
