@@ -657,11 +657,12 @@ static resetCheckArray() {
         for (let col = 0; col < board[row].length; col++) {
             const piece = board[row][col];
             if (piece && piece.color !== playerColor) {
+                console.log(`Checking opponent piece at row ${row}, col ${col}, type ${piece.type}, color ${piece.color}`);
                 const validMoves = this.calculateValidMovesForPiece(piece);
                 console.log('validmoves recevived in isKingInCHeck', validMoves);
-                for (const validMove of validMoves) {
-                    
-                    if (validMove.row === kingPosition.row && validMove.col === kingPosition.col) {
+                for (const move of validMoves) {
+                      console.log('Checking if move threatens the king:', move);
+                    if (move.row === kingPosition.row && move.col === kingPosition.col) {
                         console.log('King is in check by piece at:', { row, col });
                        console.log('piece if moved will put allied king in check returning.')
                         return true; // King is in check
