@@ -659,7 +659,7 @@ static resetCheckArray() {
 
                 // Step 4: Check if any move directly threatens the king's position
                 for (const validMove of validMoves) {
-                    console.log('Checking if move threatens the king:', move);
+                    console.log('Checking if move threatens the king:', validMove);
 
                     // Ensure the move matches the movement pattern of the piece type
                     if (this.isMoveValidForPiece(piece, validMove, kingPosition)) {
