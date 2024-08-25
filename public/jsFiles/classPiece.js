@@ -603,39 +603,23 @@ static resetCheckArray() {
     const resetEvent = new CustomEvent('resetValidPiecesToResolveCheck');
     window.dispatchEvent(resetEvent);
 }
-    wouldPutKingInCheck(move) {
-    console.log('wouldPutKingInCheck function entered alliedKINGINCHECK, move being:', move);
+   wouldPutKingInCheck(move) {
+    console.log('wouldPutKingInCheck function entered, move being:', move);
 
-    // Store the original state
+    // Step 1: Clone the current board state to simulate the move
     const simulatedBoard = this.cloneBoard(this.game.board);
-    const piece = simulatedBoard[move.from.row][move.from.col];
-    const originalPosition = { row: move.from.row, col: move.from.col };
-    const originalTargetPiece = simulatedBoard[move.to.row][move.to.col];
 
-    // Move the piece on the simulated board
+    // Step 2: Perform the move on the simulated board
     this.movePieceFR(simulatedBoard, move.from.row, move.from.col, move.to.row, move.to.col);
 
-    // Check if this move puts the moving player's king in check
-    const currentTurnColor = piece.color;
-    if (this.isKingInCheck(simulatedBoard, currentTurnColor)) {
-        console.log('Move would put the king in check alliedKINGINCHECK, reverting the move.');
+    // Step 3: Find the position of the player's king after the move
+    const currentTurnColor = move.piece.color;
+    const kingPosition = this.findKingPosition(simulatedBoard, currentTurnColor);
 
-        // Revert the move
-        this.movePieceFR(simulatedBoard, move.to.row, move.to.col, originalPosition.row, originalPosition.col);
-
-        // If a piece was captured, restore it
-        if (originalTargetPiece) {
-            originalTargetPiece.row = move.to.row;
-            originalTargetPiece.col = move.to.col;
-            simulatedBoard[move.to.row][move.to.col] = originalTargetPiece;
-        } else {
-            simulatedBoard[move.to.row][move.to.col] = null;
-        }
-
-        // Optionally, notify the player that the move is invalid
-        // Example: this.socket.emit('invalidMove', move);
-
-        return true; // Move puts the king in check
+    // Step 4: Check if the opponent can attack the king's position
+    if (this.isKingInCheck(simulatedBoard, kingPosition, currentTurnColor)) {
+        console.log('Move would put the king in check, reverting the move.');
+        return true; // Move would put the king in check
     }
 
     return false; // Move does not put the king in check
@@ -661,58 +645,23 @@ cloneBoard(board) {
     );
 }
 
-    isKingInCheck(board, playerColor) {
-    console.log('isKingInCheck function entered alliedKINGINCHECK, board being', board, 'playerColor being:', playerColor);
+   isKingInCheck(board, kingPosition, playerColor) {
+    console.log('isKingInCheck function entered, board being:', board, 'kingPosition being:', kingPosition, 'playerColor being:', playerColor);
 
-    // Step 1: Find the king's position on the board
-    let kingPosition = null;
-    for (let row = 0; row < board.length; row++) {
-        for (let col = 0; col < board[row].length; col++) {
-            const piece = board[row][col];
-            if (piece && piece.type === 'king' && piece.color === playerColor) {
-                kingPosition = { row, col };
-                console.log(`alliedKINGINCHECK King found at position:`, kingPosition);
-                break;
-            }
-        }
-        if (kingPosition) break;
-    }
-
-    if (!kingPosition) {
-        console.error("King not found on the board!");
-        return false; // Safe fallback if king is not found
-    }
-
-    // Step 2: Check if any opposing piece can move to the king's position considering their movement patterns
+    // Check if any opponent piece can move to the king's position immediately
     for (let row = 0; row < board.length; row++) {
         for (let col = 0; col < board[row].length; col++) {
             const piece = board[row][col];
             if (piece && piece.color !== playerColor) {
-                console.log(`alliedKINGINCHECK Checking opponent piece at row ${row}, col ${col}, type ${piece.type}, color ${piece.color}`);
-
-                // Step 3: Calculate valid moves for the opponent's piece considering its type
                 const validMoves = this.calculateValidMovesForPiece(piece, board, row, col);
-              console.log(`alliedKINGINCHECK Valid moves for ${piece.type} at (${row}, ${col}):`, validMoves);
-
-            
-
-                // Step 4: Check if any move directly threatens the king's position
                 for (const validMove of validMoves) {
-                   
-        console.log(`alliedKINGINCHECK Checking if move to (${validMove.row}, ${validMove.col}) threatens the king at ${kingPosition.row}, ${kingPosition.col}`);
-
-
-                    // Ensure the move matches the movement pattern of the piece type
-                    if (this.isMoveValidForPiece(piece, validMove, kingPosition)) {
-                        console.log(`alliedKINGINCHECK Move ${validMove} puts the king in check!`);
+                    if (validMove.row === kingPosition.row && validMove.col === kingPosition.col) {
                         return true; // King is in check
                     }
                 }
             }
         }
     }
-
-    console.log('King is not in check.');
     return false; // King is not in check
 }
 
