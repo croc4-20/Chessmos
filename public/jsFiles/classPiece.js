@@ -604,21 +604,43 @@ static resetCheckArray() {
     window.dispatchEvent(resetEvent);
 }
     wouldPutKingInCheck(move) {
-        console.log('wouldPutKingInCheck function entered, move being :', move);
-        console.log('this.game.board being:', this.game.board);
-        
-        // Clone the current board to simulate the move
-        const simulatedBoard = this.cloneBoard(this.game.board);
+    console.log('wouldPutKingInCheck function entered, move being:', move);
 
-        // Simulate the move on the cloned board
-        this.movePieceFR(simulatedBoard, move.from.row, move.from.col, move.to.row, move.to.col);
+    // Store the original state
+    const simulatedBoard = this.cloneBoard(this.game.board);
+    const piece = simulatedBoard[move.from.row][move.from.col];
+    const originalPosition = { row: move.from.row, col: move.from.col };
+    const originalTargetPiece = simulatedBoard[move.to.row][move.to.col];
 
-        // Check if the king of the current player is in check after the move
-        const currentPlayerColor = move.piece.color === 'white' ? 'white' : 'black';
+    // Move the piece on the simulated board
+    this.movePieceFR(simulatedBoard, move.from.row, move.from.col, move.to.row, move.to.col);
 
+    // Check if this move puts the moving player's king in check
+    const currentTurnColor = piece.color;
+    if (this.isKingInCheck(simulatedBoard, currentTurnColor)) {
+        console.log('Move would put the king in check, reverting the move.');
 
-        return this.isKingInCheck(simulatedBoard, currentPlayerColor);
+        // Revert the move
+        this.movePieceFR(simulatedBoard, move.to.row, move.to.col, originalPosition.row, originalPosition.col);
+
+        // If a piece was captured, restore it
+        if (originalTargetPiece) {
+            originalTargetPiece.row = move.to.row;
+            originalTargetPiece.col = move.to.col;
+            simulatedBoard[move.to.row][move.to.col] = originalTargetPiece;
+        } else {
+            simulatedBoard[move.to.row][move.to.col] = null;
+        }
+
+        // Optionally, notify the player that the move is invalid
+        // Example: this.socket.emit('invalidMove', move);
+
+        return true; // Move puts the king in check
     }
+
+    return false; // Move does not put the king in check
+}
+
 
    clonePiece(piece) {
     return {
