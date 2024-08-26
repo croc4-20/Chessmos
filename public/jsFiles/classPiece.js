@@ -1594,7 +1594,7 @@ static switchTurn() {
     // Any other logic required to switch turns
 }
     clearValidMoves() {
-        
+        debugger;
       console.log('clearValidMoves function entered');
     const validMoveSquares = document.querySelectorAll('.valid-move');
     validMoveSquares.forEach(square => {
