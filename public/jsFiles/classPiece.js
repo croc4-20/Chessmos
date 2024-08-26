@@ -1066,7 +1066,7 @@ extractPieceInfo(pieceElement) {
 // }
 
 deselectAndClear() {
-   debugger;
+   
     console.log('deselectAndClear function entered, selectedPiece being:', this.selectedPiece);
     if (this.selectedPiece) {
         // Check if this.selectedPiece is an object with an .element property
@@ -1593,6 +1593,7 @@ static switchTurn() {
     // Any other logic required to switch turns
 }
     clearValidMoves() {
+        debugger;
       console.log('clearValidMoves function entered');
     const validMoveSquares = document.querySelectorAll('.valid-move');
     validMoveSquares.forEach(square => {
