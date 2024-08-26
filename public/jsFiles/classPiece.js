@@ -5820,10 +5820,7 @@ movePiece(oldRow, oldCol, newRow, newCol) {
     // Move the piece in the game state and update the DOM
     // This will depend on your game's implementation
 }
-removePiece(row, col) {
-    // Remove the piece from the game state and update the DOM
-    // This will depend on your game's implementation
-}
+
 
 //END OF GRAVITATIONNAL SPELL
 //BEGIN OF NECROMANCER SPELL
