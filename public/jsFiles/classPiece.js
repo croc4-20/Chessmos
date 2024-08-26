@@ -1081,7 +1081,7 @@ deselectAndClear() {
             console.log('selectedPiece does not have a classList to modify:', this.selectedPiece);
         }
         this.clearValidMoves();
-        this.selectedPiece = null;
+        //this.selectedPiece = null;
     }
 }
 
