@@ -762,14 +762,35 @@ isKingInImmediateCheck(board, kingPosition, playerColor) {
 
     // Assumes `movePiece` is a method that updates the board with the new move
     movePieceFR(board, fromRow, fromCol, toRow, toCol) {
-        console.log('movePieceFR entered, board being', board, 'fromRow', fromRow, 'fromCol', fromCol, 'toRow', toRow, 'tOcol', toCol);
+    console.log('movePieceFR entered, board being', board, 'fromRow', fromRow, 'fromCol', fromCol, 'toRow', toRow, 'toCol', toCol);
 
-        const piece = board[fromRow][fromCol];
-        piece.row = toRow;  // Add this line
-        piece.col = toCol;
-        board[toRow][toCol] = piece;
-        board[fromRow][fromCol] = null;
+    // Check if the fromRow and fromCol are within the board's boundaries
+    if (fromRow < 0 || fromRow >= board.length || fromCol < 0 || fromCol >= board.length) {
+        console.error('Invalid fromRow or fromCol values. They are out of bounds.');
+        return;
     }
+
+    const piece = board[fromRow][fromCol];
+
+    // Check if the piece exists
+    if (!piece) {
+        console.error(`No piece found at position (${fromRow}, ${fromCol}).`);
+        return;
+    }
+
+    // Update the piece's row and column
+    piece.row = toRow;
+    piece.col = toCol;
+
+    // Move the piece to the new position on the board
+    board[toRow][toCol] = piece;
+
+    // Clear the old position
+    board[fromRow][fromCol] = null;
+
+    console.log('Move successful. Updated board:', board);
+}
+
     calculateValidMovesForPiece(piece, board, currentRow, currentCol) {
     console.log('calculateValidMovesForPiece function entered for the alliedKINGINCHECK, piece being', piece, 'this.game', this.game);
     return this.calculateValidMoves(currentRow, currentCol, board, piece.type, piece.color, this.game);
