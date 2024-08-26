@@ -1566,7 +1566,7 @@ let filteredValidMoves = validMoves;
       this.checkMiniBoardAndEndFinalStand();
     }
     // After executing the move, you may also wish to clear selections and valid moves
-    this.deselectAndClear();
+    //this.deselectAndClear();
   };
 
     // Save this click event listener so we can remove it later
