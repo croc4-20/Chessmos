@@ -1593,15 +1593,39 @@ static switchTurn() {
 
     // Any other logic required to switch turns
 }
-    clearValidMoves() {
-      console.log('clearValidMoves function entered');
+    
+
+
+
+clearValidMoves() {
+    console.log('clearValidMoves function entered');
     const validMoveSquares = document.querySelectorAll('.valid-move');
+    
+    // Define the subfunction
+    function clearSpecificPattern(square) {
+        // Find the specific child element you want to remove
+        const patternElement = square.querySelector('.pattern[data-listener-attached="true"]');
+        
+        // If the pattern element is found, remove it
+        if (patternElement) {
+            console.log('Removing pattern element:', patternElement.outerHTML);
+            patternElement.remove();
+        }
+    }
+    
+    // Iterate over all valid move squares
     validMoveSquares.forEach(square => {
+        console.log('Processing square:', square.outerHTML);
+        
+        // Remove the specific pattern element without affecting other children
+        clearSpecificPattern(square);
+        
+        // Remove the 'valid-move' class
         square.classList.remove('valid-move');
-        //square.innerHTML = '';
+        
+        // Other code to handle move indicators if needed
     });
-}
-     
+} 
     
 
     
