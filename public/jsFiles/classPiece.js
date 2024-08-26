@@ -762,7 +762,7 @@ isKingInImmediateCheck(board, kingPosition, playerColor) {
 
     // Assumes `movePiece` is a method that updates the board with the new move
     movePieceFR(board, fromRow, fromCol, toRow, toCol) {
-        console.log('movePieceFR entered, board being', board, 'fromRow', fromRow, 'fromCol', fromCol, 'toRow', 'toRow', 'tOcol', toCol);
+        console.log('movePieceFR entered, board being', board, 'fromRow', fromRow, 'fromCol', fromCol, 'toRow', toRow, 'tOcol', toCol);
 
         const piece = board[fromRow][fromCol];
         piece.row = toRow;  // Add this line
