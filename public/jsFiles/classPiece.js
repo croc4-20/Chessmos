@@ -1091,6 +1091,7 @@ initChessBoard() {
 }
 
 executeMove(board, clickedSquareElement, chessBoard, activeSpells) {
+    debugger;
   const oldPiece = document.querySelector(".selected-piece");
   const oldSquare = oldPiece.parentNode;
   const oldType = oldSquare.getAttribute('data-type');
