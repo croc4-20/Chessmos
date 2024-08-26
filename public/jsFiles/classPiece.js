@@ -808,7 +808,7 @@ isKingInImmediateCheck(board, kingPosition, playerColor) {
     return null;
 }
 handleClick = (event, chessBoard, game) => {
-debugger;
+
    const currentPlayer = window.chessGame.instance.currentPlayer;
   const previouslySelectedPieces = document.querySelectorAll('.chess-piece.selected-piece');
   previouslySelectedPieces.forEach(piece => {
@@ -1092,6 +1092,7 @@ initChessBoard() {
 }
 
 executeMove(board, clickedSquareElement, chessBoard, activeSpells) {
+    debugger;
     
   const oldPiece = document.querySelector(".selected-piece");
   const oldSquare = oldPiece.parentNode;
