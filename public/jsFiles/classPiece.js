@@ -1603,15 +1603,15 @@ clearValidMoves() {
     
     // Define the subfunction
     function clearSpecificPattern(square) {
-        // Find the specific child element you want to remove
-        const patternElement = square.querySelector('.pattern[data-listener-attached="true"]');
-        
-        // If the pattern element is found, remove it
-        if (patternElement) {
-            console.log('Removing pattern element:', patternElement.outerHTML);
-            patternElement.remove();
-        }
+    // Find the specific child element you want to remove (adjusted selector)
+    const patternElement = square.querySelector('.pattern');
+    
+    // If the pattern element is found, remove it
+    if (patternElement) {
+        console.log('Removing pattern element:', patternElement.outerHTML);
+        patternElement.remove();
     }
+}
     
     // Iterate over all valid move squares
     validMoveSquares.forEach(square => {
