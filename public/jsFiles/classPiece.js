@@ -1594,20 +1594,14 @@ static switchTurn() {
     // Any other logic required to switch turns
 }
     clearValidMoves() {
-    console.log('clearValidMoves function entered');
+      console.log('clearValidMoves function entered');
     const validMoveSquares = document.querySelectorAll('.valid-move');
     validMoveSquares.forEach(square => {
         square.classList.remove('valid-move');
-        const moveIndicator = square.querySelector('.move-indicator');
-        if (moveIndicator) {
-            console.log('Removing move indicator from square:', square.outerHTML);
-            moveIndicator.remove();
-        } else {
-            console.log('Square does not have a move indicator, not clearing innerHTML:', square.outerHTML);
-        }
+        //square.innerHTML = '';
     });
 }
-   
+     
     
 
     
