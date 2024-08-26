@@ -1066,6 +1066,7 @@ extractPieceInfo(pieceElement) {
 // }
 
 deselectAndClear() {
+   debugger;
     console.log('deselectAndClear function entered, selectedPiece being:', this.selectedPiece);
     if (this.selectedPiece) {
         // Check if this.selectedPiece is an object with an .element property
@@ -1091,7 +1092,7 @@ initChessBoard() {
 }
 
 executeMove(board, clickedSquareElement, chessBoard, activeSpells) {
-    debugger;
+    
   const oldPiece = document.querySelector(".selected-piece");
   const oldSquare = oldPiece.parentNode;
   const oldType = oldSquare.getAttribute('data-type');
