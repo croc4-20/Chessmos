@@ -1066,7 +1066,7 @@ extractPieceInfo(pieceElement) {
 // }
 
 deselectAndClear() {
-   
+   debugger;
     console.log('deselectAndClear function entered, selectedPiece being:', this.selectedPiece);
     if (this.selectedPiece) {
         // Check if this.selectedPiece is an object with an .element property
@@ -1566,7 +1566,7 @@ let filteredValidMoves = validMoves;
       this.checkMiniBoardAndEndFinalStand();
     }
     // After executing the move, you may also wish to clear selections and valid moves
-    //this.deselectAndClear();
+    this.deselectAndClear();
   };
 
     // Save this click event listener so we can remove it later
