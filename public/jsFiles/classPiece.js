@@ -937,7 +937,7 @@ this.selectedPiece = clickedPiece;
     // }
 
     // If a valid move is selected, execute the move
-    console.log('this.selectedPiece before the check for cancelling autocheck by allied movemet ', this.selectedPiece, 'clickedSquareElement', clickedSquareElement);
+    console.log('this.selectedPiece before the check for cancelling autocheck by allied movemet ', this.selectedPiece, 'clickedSquareElement', clickedSquareElement, 'clickedPiecceElement', clickedPieceElement);
     if (this.selectedPiece && clickedSquareElement.classList.contains('valid-move')) {
       console.log("trying to executeMove fnution in handlelick:");
       console.log("clickedSquareElement passed :", clickedSquareElement);
