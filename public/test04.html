@@ -3139,8 +3139,9 @@ chessGame.syncBoardState();
         chessPiece.castTowerSpell();
     break;
 
-    case 'staff-of-light':  
-        chessPiece.chaosWarp(board, data);
+    case 'staff-of-light':
+            chessPiece.activateWindOfChangeSpell(); 
+            //chessPiece.chaosWarp(board, data);
        // chessPiece.activateDaggerSpell(data);
     showNotification(spellType, spellResult);
           // chessPiece.chaosWarp(board, data);
