@@ -982,14 +982,17 @@ function processSpell(gameSession, spellType) {
             // const seed = rng.next(); // Now this should work if rng is correctly an instance of SeededRNG
            return processChaosWarp(gameSession);
            io.in('gameRoom-' + data.gameId).emit('updatePositions', result);
-           // break;
+           break;
         
-    } else if (spellType === 'adept-wand') {
-        const riftDuration = Math.floor(rng.next() * 6) + 1;
-        result.type = 'Rift';
-        result.duration = riftDuration;
-        console.log(`Processed spell 'adept-wand' with duration: ${riftDuration}`);
-    
+    } else if (spellType === 'staff-of-light') {
+        // const spellExpiration = Math.floor(rng.next() * 6) + 1;
+        // result.type = 'Rift';
+        // result.duration = riftDuration;
+        //console.log(`Processed spell 'adept-wand' with duration: ${riftDuration}`);
+        const windOfChangeResult = processWindOfChange(gameSession);
+        io.in('gameRoom-' + data.gameId).emit('applyWindOfChange', { spellType, windOfChangeResult });
+        return windOfChangeResult;
+        break;
     } else if (spellType === 'adept-wand') {
         const riftDuration = Math.floor(rng.next() * 6) + 1;
         result.type = 'Rift';
@@ -1052,6 +1055,27 @@ function processSpell(gameSession, spellType) {
     }
     console.log('result', result)
     return result;
+}
+function processWindOfChange(gameSession) {
+    const { rng } = gameSession;
+    const directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
+    const spellResult = [];
+    
+    const allPawns = getAllPawnPositions(gameSession); // Assuming this function returns all pawns' positions
+    
+    allPawns.forEach(pawn => {
+        const spellDuration = Math.floor(rng.next() * 4) + 2; // Duration from 2 to 5 turns
+        const randomDirection = directions[Math.floor(rng.next() * directions.length)];
+        
+        spellResult.push({
+            position: pawn.position, // Position of the pawn on the board
+            spellDuration: spellDuration,
+            direction: randomDirection,
+        });
+    });
+    
+    console.log('Wind of Change processed with result:', spellResult);
+    return spellResult;
 }
 
 function getPieceByIndex(gameSession, index, color) {
