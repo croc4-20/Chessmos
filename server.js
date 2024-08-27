@@ -982,7 +982,7 @@ function processSpell(gameSession, spellType) {
             // const seed = rng.next(); // Now this should work if rng is correctly an instance of SeededRNG
            return processChaosWarp(gameSession);
            io.in('gameRoom-' + data.gameId).emit('updatePositions', result);
-           break;
+           
         
     } else if (spellType === 'staff-of-light') {
         // const spellExpiration = Math.floor(rng.next() * 6) + 1;
@@ -992,7 +992,7 @@ function processSpell(gameSession, spellType) {
         const windOfChangeResult = processWindOfChange(gameSession);
         io.in('gameRoom-' + data.gameId).emit('applyWindOfChange', { spellType, windOfChangeResult });
         return windOfChangeResult;
-        break;
+
     } else if (spellType === 'adept-wand') {
         const riftDuration = Math.floor(rng.next() * 6) + 1;
         result.type = 'Rift';
