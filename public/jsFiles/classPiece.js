@@ -1,5 +1,5 @@
 import { getGameSession } from './gameSessions.js'
-import { seededRNG } from './seedRng.js'
+import { SeededRNG } from './seedRng.js'
 
 
 let clickedPiece;
