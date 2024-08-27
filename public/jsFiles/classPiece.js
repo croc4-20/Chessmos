@@ -194,7 +194,7 @@ export default class ChessPiece {
 this.initObserver();
 this.validPiecesToResolveCheck = [];
 this.wouldPutKingInCheck = this.wouldPutKingInCheck.bind(this);
-      
+       this.setupSocketListeners();
 this.threateningPath = [];
     this.board = chessBoard;
     console.log("this.board in chessPiece constructor", this.board);
@@ -5275,12 +5275,14 @@ activateWindOfChangeSpell(data) {
     this.updateBoardVisuals();
 }
 
-// Receiving the spell data from the server
-socket.on('applyWindOfChange', (data) => {
-    if (data.spellType === 'staff-of-light') {
-        this.activateWindOfChangeSpell(data);
+setupSocketListeners() {
+        // Set up the listener once, and it will remain active
+        socket.on('applyWindOfChange', (data) => {
+            if (data.spellType === 'staff-of-light') {
+                this.activateWindOfChangeSpell(data);
+            }
+        });
     }
-});
 
 
 
