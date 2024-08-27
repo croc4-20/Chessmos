@@ -5251,9 +5251,9 @@ isOutsideMiniBoard(row, col) {
 // END OF CASTENCHANTEDGROUNDSPELL\\
 //BEGINNING OF RANDOMPAWNMOVE
 // Method to activate the Wind of Change spell for all pawns
-activateWindOfChangeSpell() {
-  const rng = new SeededRNG();
-  console.log('rng', rng);
+activateWindOfChangeSpell(data) {
+ 
+  console.log('windofchange function entered, data being:', data);
     const allPawnElements = document.querySelectorAll('.chess-piece.white-pawn, .chess-piece.black-pawn');
     const currentTurn = this.game.turnCount; // Assuming this is available globally
     allPawnElements.forEach(pawnElement => {
