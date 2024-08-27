@@ -5253,36 +5253,35 @@ isOutsideMiniBoard(row, col) {
 // Method to activate the Wind of Change spell for all pawns
 activateWindOfChangeSpell(data) {
     console.log('windofchange function entered, data being:', data);
-    const allPawnElements = document.querySelectorAll('.chess-piece.white-pawn, .chess-piece.black-pawn');
+
     const currentTurn = this.game.turnCount; // Assuming this is available globally
     
-    const directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
-    const spellData = {
-        spellExpiration: Math.floor(Math.random() * 4) + 2, // Duration from 2 to 5 turns
-        directions: []
-    };
-
-    allPawnElements.forEach(pawnElement => {
-        const randomDirection = directions[Math.floor(Math.random() * directions.length)];
-        pawnElement.classList.remove(...directions); // Remove existing direction classes
-        pawnElement.classList.add(randomDirection, 'pawn-random-move'); // Add new direction and spell effect
-
-        // Update spell expiration turn for each pawn
-        pawnElement.dataset.spellExpirationTurn = currentTurn + spellData.spellExpiration;
-
-        // Store the direction for syncing with the server
-        const position = pawnElement.dataset.position; // Assuming pawns have a data-position attribute
-        spellData.directions.push({ position, direction: randomDirection });
+    data.windOfChangeResult.forEach(spell => {
+        const pawnElement = document.querySelector(`[data-position="${spell.position}"]`);
+        if (pawnElement) {
+            // Set spell expiration turn
+            pawnElement.dataset.spellExpirationTurn = currentTurn + spell.spellDuration;
+            
+            const directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
+            pawnElement.classList.remove(...directions); // Remove existing direction classes
+            pawnElement.classList.add(spell.direction, 'pawn-random-move'); // Add new direction and spell effect
+            
+            console.log(`Pawn at ${spell.position} will move ${spell.direction} for ${spell.spellDuration} turns.`);
+        }
     });
 
-    // Emit this data to the server
-    this.emitSpellDataToServer('staff-of-light', spellData);
+    // Optionally, you can update the internal state or UI to reflect this change
+    this.updateInternalBoardStateFromDOM();
+    this.updateBoardVisuals();
 }
 
-// Emit the data to the server (pseudo-code, adapt as needed)
-emitSpellDataToServer(spellType, spellData) {
-    socket.emit('castSpell', { spellType, spellData });
-}
+// Receiving the spell data from the server
+socket.on('applyWindOfChange', (data) => {
+    if (data.spellType === 'staff-of-light') {
+        this.activateWindOfChangeSpell(data);
+    }
+});
+
 
 
 // Method to check and update spell effects for all pawns
