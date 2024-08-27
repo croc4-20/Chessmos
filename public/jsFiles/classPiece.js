@@ -5252,20 +5252,38 @@ isOutsideMiniBoard(row, col) {
 //BEGINNING OF RANDOMPAWNMOVE
 // Method to activate the Wind of Change spell for all pawns
 activateWindOfChangeSpell(data) {
- 
-  console.log('windofchange function entered, data being:', data);
+    console.log('windofchange function entered, data being:', data);
     const allPawnElements = document.querySelectorAll('.chess-piece.white-pawn, .chess-piece.black-pawn');
     const currentTurn = this.game.turnCount; // Assuming this is available globally
-    allPawnElements.forEach(pawnElement => {
-        const spellDuration = Math.floor(Math.random() * 4) + 2; // Duration from 2 to 5 turns
-        pawnElement.dataset.spellExpirationTurn = currentTurn + spellDuration;
+    
+    const directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
+    const spellData = {
+        spellExpiration: Math.floor(Math.random() * 4) + 2, // Duration from 2 to 5 turns
+        directions: []
+    };
 
-        const directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
+    allPawnElements.forEach(pawnElement => {
         const randomDirection = directions[Math.floor(Math.random() * directions.length)];
         pawnElement.classList.remove(...directions); // Remove existing direction classes
         pawnElement.classList.add(randomDirection, 'pawn-random-move'); // Add new direction and spell effect
+
+        // Update spell expiration turn for each pawn
+        pawnElement.dataset.spellExpirationTurn = currentTurn + spellData.spellExpiration;
+
+        // Store the direction for syncing with the server
+        const position = pawnElement.dataset.position; // Assuming pawns have a data-position attribute
+        spellData.directions.push({ position, direction: randomDirection });
     });
+
+    // Emit this data to the server
+    this.emitSpellDataToServer('staff-of-light', spellData);
 }
+
+// Emit the data to the server (pseudo-code, adapt as needed)
+emitSpellDataToServer(spellType, spellData) {
+    socket.emit('castSpell', { spellType, spellData });
+}
+
 
 // Method to check and update spell effects for all pawns
 // checkAndUpdateSpellEffects() {
