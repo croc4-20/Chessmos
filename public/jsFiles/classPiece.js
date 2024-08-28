@@ -5279,6 +5279,7 @@ setupSocketListeners() {
         // Set up the listener once, and it will remain active
         socket.on('applyWindOfChange', (data) => {
             if (data.spellType === 'staff-of-light') {
+                console.log('spell received', data);
                 this.activateWindOfChangeSpell(data);
             }
         });
