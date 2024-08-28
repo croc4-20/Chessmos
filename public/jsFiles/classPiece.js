@@ -1094,7 +1094,7 @@ initChessBoard() {
 }
 
 executeMove(board, clickedSquareElement, chessBoard, activeSpells) {
-    debugger;
+   
     
   const oldPiece = document.querySelector(".selected-piece");
   const oldSquare = oldPiece.parentNode;
@@ -1129,7 +1129,7 @@ executeMove(board, clickedSquareElement, chessBoard, activeSpells) {
     // Update petrification status for all pieces
     this.updatePetrifiedPieces();
     console.log('chesspiece before trying to call checkandupdateeffects', chessPiece);
-    chessPiece.checkAndUpdateSpellEffects();
+    chessPiece.checkAndUpdateSpellEffects(chessPiece);
 
   
 
