@@ -5252,23 +5252,37 @@ isOutsideMiniBoard(row, col) {
 //BEGINNING OF RANDOMPAWNMOVE
 // Method to activate the Wind of Change spell for all pawns
 activateWindOfChangeSpell(windOfChangeResult) {
-    console.log('windofchange function entered, data being:', windOfChangeResult);
+    console.log('windofchange function entered, windOfChangeResult being:', windOfChangeResult);
+
+    if (!Array.isArray(windOfChangeResult)) {
+        console.error('windOfChangeResult is not an array or is undefined:', windOfChangeResult);
+        return;
+    }
 
     const currentTurn = this.game.turnCount; // Assuming this is available globally
-    
-    windOfChangeResult.forEach(spell => {
-        const pawnElement = document.querySelector(`[data-row="${spell.row}"][data-col="${spell.col}"]`);
+
+    windOfChangeResult.forEach((spell, index) => {
+        console.log(`Processing spell #${index + 1}:`, spell);
+
+        const { row, col, spellDuration, direction } = spell;
+
+        if (row === undefined || col === undefined || spellDuration === undefined || direction === undefined) {
+            console.error('Missing properties in spell:', spell);
+            return;
+        }
+
+        const pawnElement = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
         if (pawnElement) {
             // Set spell expiration turn
-            pawnElement.dataset.spellExpirationTurn = currentTurn + spell.spellDuration;
-            
+            pawnElement.dataset.spellExpirationTurn = currentTurn + spellDuration;
+
             const directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
             pawnElement.classList.remove(...directions); // Remove existing direction classes
-            pawnElement.classList.add(spell.direction, 'pawn-random-move'); // Add new direction and spell effect
-            
-            console.log(`Pawn at row ${spell.row}, col ${spell.col} will move ${spell.direction} for ${spell.spellDuration} turns.`);
+            pawnElement.classList.add(direction, 'pawn-random-move'); // Add new direction and spell effect
+
+            console.log(`Pawn at row ${row}, col ${col} will move ${direction} for ${spellDuration} turns.`);
         } else {
-            console.warn(`No pawn found at row ${spell.row}, col ${spell.col}.`);
+            console.warn(`No pawn found at row ${row}, col ${col}.`);
         }
     });
 
@@ -5276,6 +5290,7 @@ activateWindOfChangeSpell(windOfChangeResult) {
     this.updateInternalBoardStateFromDOM();
     this.updateBoardVisuals();
 }
+
 
 
 setupSocketListeners() {
