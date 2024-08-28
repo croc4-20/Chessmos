@@ -1128,6 +1128,8 @@ executeMove(board, clickedSquareElement, chessBoard, activeSpells) {
 
     // Update petrification status for all pieces
     this.updatePetrifiedPieces();
+    console.log('chesspiece before trying to call checkandupdateeffects', chessPiece);
+    chessPiece.checkAndUpdateSpellEffects();
 
   
 
