@@ -5254,6 +5254,7 @@ isOutsideMiniBoard(row, col) {
 // Method to activate the Wind of Change spell for all pawns
 activateWindOfChangeSpell(windOfChangeResult) {
     this.isWindOfChangeActive = true;
+      chessPiece.isWindOfChangeActive = true;
     console.log('windofchange function entered, windOfChangeResult being:', windOfChangeResult);
 
     if (!Array.isArray(windOfChangeResult)) {
