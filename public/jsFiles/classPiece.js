@@ -192,7 +192,7 @@ export default class ChessPiece {
     throw new Error("Invalid piece type");
 }
 this.initObserver();
-      static isWindOfChangeActive = false;
+
 this.validPiecesToResolveCheck = [];
 this.wouldPutKingInCheck = this.wouldPutKingInCheck.bind(this);
        this.setupSocketListeners();
@@ -312,7 +312,7 @@ window.addEventListener('resetValidPiecesToResolveCheck', () => {
 
 }
 // funtion to listen to moves made to reproduce them.
-
+      static isWindOfChangeActive = false;
 setupMoveListener() {
   console.log('setupMoveListener function entered');
         document.addEventListener('moveReceived', (e) => {
