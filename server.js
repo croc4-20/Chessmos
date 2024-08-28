@@ -1068,11 +1068,14 @@ function processWindOfChange(gameSession) {
     const allPawns = getAllPawns(gameSession.board); // Assuming this function returns all pawns' positions
     
     allPawns.forEach(pawn => {
+        const pawnRow = pawn.row;
+        const pawnCol = pawn.col;
         const spellDuration = Math.floor(rng.next() * 4) + 2; // Duration from 2 to 5 turns
         const randomDirection = directions[Math.floor(rng.next() * directions.length)];
         
         spellResult.push({
-            position: pawn.position, // Position of the pawn on the board
+            row: pawnRow,
+            col: pawnCol,
             spellDuration: spellDuration,
             direction: randomDirection,
         });
