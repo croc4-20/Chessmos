@@ -1056,12 +1056,15 @@ function processSpell(gameSession, spellType) {
     console.log('result', result)
     return result;
 }
+function getAllPawns(board) {
+    return board.filter(piece => piece.type === 'pawn');
+}
 function processWindOfChange(gameSession) {
-    const { rng } = gameSession;
+    const { rng } = gameSession.rng;
     const directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
     const spellResult = [];
     
-    const allPawns = getAllPawnPositions(gameSession); // Assuming this function returns all pawns' positions
+    const allPawns = getAllPawns(gameSession.board); // Assuming this function returns all pawns' positions
     
     allPawns.forEach(pawn => {
         const spellDuration = Math.floor(rng.next() * 4) + 2; // Duration from 2 to 5 turns
