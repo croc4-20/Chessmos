@@ -5291,7 +5291,7 @@ activateWindOfChangeSpell(windOfChangeResult) {
     
 }
 static checkAndUpdateSpellEffects() {
-    if (!instance.isWindOfChangeActive) return;
+    if (!this.isWindOfChangeActive) return;
     console.log('checkAndUpdateSpellEffects function entered in classPiece');
     const allPawnElements = document.querySelectorAll('.chess-piece.pawn-random-move');
     allPawnElements.forEach(pawnElement => {
