@@ -1861,7 +1861,7 @@ function updateGameState(sessionData) {
     socket.on('move', (move) => {
     console.log('Move received from server:', move);
     // Apply the move to the board since it's known to be from the opponent
-       chessPiece.checkAndUpdateSpellEffects();
+       chessPiece.checkAndUpdateSpellEffects(chessPiece);
     console.log('myTurn value during move operation but before changing turn', myTurn);
      myTurn = !myTurn;
      if (move.capture) {
