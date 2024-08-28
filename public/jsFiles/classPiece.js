@@ -5278,8 +5278,9 @@ activateWindOfChangeSpell(data) {
 setupSocketListeners() {
         // Set up the listener once, and it will remain active
         socket.on('applyWindOfChange', (data) => {
+            console.log('socket messhae received, data beng:', data)
             if (data.spellType === 'staff-of-light') {
-                console.log('spell received', data);
+                console.log('Applying wind of change spell', data);
                 this.activateWindOfChangeSpell(data);
             }
         });
