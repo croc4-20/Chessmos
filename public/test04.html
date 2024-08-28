@@ -3140,8 +3140,8 @@ chessGame.syncBoardState();
     break;
 
     case 'staff-of-light':
-            console.log('data before calling activateWindOfChangeSpell', data);
-            //chessPiece.activateWindOfChangeSpell(data); 
+            console.log('data before calling activateWindOfChangeSpell', data, 'spellresult', spellResult);
+            chessPiece.activateWindOfChangeSpell(spellResult); 
             //chessPiece.chaosWarp(board, data);
        // chessPiece.activateDaggerSpell(data);
     //showNotification(spellType, spellResult);
