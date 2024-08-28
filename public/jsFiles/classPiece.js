@@ -5252,6 +5252,7 @@ isOutsideMiniBoard(row, col) {
 //BEGINNING OF RANDOMPAWNMOVE
 // Method to activate the Wind of Change spell for all pawns
 activateWindOfChangeSpell(windOfChangeResult) {
+    this.isWindOfChangeActive = true;
     console.log('windofchange function entered, windOfChangeResult being:', windOfChangeResult);
 
     if (!Array.isArray(windOfChangeResult)) {
@@ -5290,7 +5291,22 @@ activateWindOfChangeSpell(windOfChangeResult) {
     
 }
 
-
+checkAndUpdateSpellEffects() {
+    if (!this.isWindOfChangeActive) return;
+    console.log('checkAndUpdateSpellEffects function entered in classPiece');
+    const allPawnElements = document.querySelectorAll('.chess-piece.pawn-random-move');
+    allPawnElements.forEach(pawnElement => {
+        const spellExpirationTurn = parseInt(pawnElement.dataset.spellExpirationTurn, 10);
+        if (spellExpirationTurn > 0) {
+            pawnElement.dataset.spellExpirationTurn = spellExpirationTurn - 1; // Decrement the value
+        } else {
+            // If the expiration turn has passed, remove the spell effect
+            ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight', 'pawn-random-move'].forEach(dir => pawnElement.classList.remove(dir));
+            // Clean up data attribute
+            delete pawnElement.dataset.spellExpirationTurn; // Corrected to delete the dataset attribute
+        }
+    });
+}
 
 setupSocketListeners() {
         // Set up the listener once, and it will remain active
