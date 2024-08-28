@@ -5251,13 +5251,13 @@ isOutsideMiniBoard(row, col) {
 // END OF CASTENCHANTEDGROUNDSPELL\\
 //BEGINNING OF RANDOMPAWNMOVE
 // Method to activate the Wind of Change spell for all pawns
-activateWindOfChangeSpell(data) {
-    console.log('windofchange function entered, data being:', data);
+activateWindOfChangeSpell(windOfChangeResult) {
+    console.log('windofchange function entered, data being:', windOfChangeResult);
 
     const currentTurn = this.game.turnCount; // Assuming this is available globally
     
-    data.windOfChangeResult.forEach(spell => {
-        const pawnElement = document.querySelector(`[data-position="${spell.position}"]`);
+    windOfChangeResult.forEach(spell => {
+        const pawnElement = document.querySelector(`[data-row="${spell.row}"][data-col="${spell.col}"]`);
         if (pawnElement) {
             // Set spell expiration turn
             pawnElement.dataset.spellExpirationTurn = currentTurn + spell.spellDuration;
@@ -5266,7 +5266,9 @@ activateWindOfChangeSpell(data) {
             pawnElement.classList.remove(...directions); // Remove existing direction classes
             pawnElement.classList.add(spell.direction, 'pawn-random-move'); // Add new direction and spell effect
             
-            console.log(`Pawn at ${spell.position} will move ${spell.direction} for ${spell.spellDuration} turns.`);
+            console.log(`Pawn at row ${spell.row}, col ${spell.col} will move ${spell.direction} for ${spell.spellDuration} turns.`);
+        } else {
+            console.warn(`No pawn found at row ${spell.row}, col ${spell.col}.`);
         }
     });
 
@@ -5274,6 +5276,7 @@ activateWindOfChangeSpell(data) {
     this.updateInternalBoardStateFromDOM();
     this.updateBoardVisuals();
 }
+
 
 setupSocketListeners() {
         // Set up the listener once, and it will remain active
