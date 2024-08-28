@@ -3047,16 +3047,16 @@ window.spellDetail = function getSpellDetails(spellType, spellResult, rng, data)
     // console.log('spellResult.dur', spellResult.duration)
     
     const spellDictionary = {
-        "castLightsaberSpell✅": { duration: spellResult.duration, description: "A fiery explosive spell." },
+        "castLightsaberSpell": { duration: spellResult.duration, description: "A fiery explosive spell✅." },
 
         "iceblast": { duration: spellResult.duration, description: "A chilling burst of ice." },
-        "adept-wand✅": {duration: spellResult.duration, description: "Teleports any piece entering the 2x2 rift to a random square for 1-6 turns."},
+        "adept-wand": {duration: spellResult.duration, description: "Teleports any piece entering the 2x2 rift to a random square for 1-6 turns.✅"},
 
-        "staff-of-light": { duration: spellResult.duration, description: "" },
+        "staff-of-light": { duration: spellResult.duration, description: "✅" },
         "staff-of-fire": { duration: spellResult.duration, description: "description" },
         "staff-of-water": { duration: spellResult.duration, description: "description" },
         "staff-of-air": { duration: spellResult.duration, description: "description" },
-        "staff-of-chaos": { duration: spellResult.duration, description: "shuffles the board." },
+        "staff-of-chaos": { duration: spellResult.duration, description: "shuffles the board.✅" },
         "staff-of-the-necromancer": { duration: spellResult.duration, description: "description" },
         "stick-of-the-forest": { duration: spellResult.duration, description: "description" },
         "stick-of-truth": { duration: spellResult.duration, description: "description" },
@@ -3144,7 +3144,7 @@ chessGame.syncBoardState();
             chessPiece.activateWindOfChangeSpell(spellResult); 
             //chessPiece.chaosWarp(board, data);
        // chessPiece.activateDaggerSpell(data);
-    //showNotification(spellType, spellResult);
+    showNotification(spellType, spellResult);
           // chessPiece.chaosWarp(board, data);
         // chessPiece.activateWindOfChangeSpell();
    // chessPiece.preparePawnCreation('LightPawn');
