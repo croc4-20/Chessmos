@@ -991,7 +991,8 @@ function processSpell(gameSession, spellType) {
         // result.duration = riftDuration;
         //console.log(`Processed spell 'adept-wand' with duration: ${riftDuration}`);
         const windOfChangeResult = processWindOfChange(gameSession);
-        io.in('gameRoom-' + gameId).emit('applyWindOfChange', { spellType, windOfChangeResult });
+        io.in('gameRoom-' + gameId).emit('applyWindOfChange', { spellType: type, windOfChangeResult });
+        console.log('Broadcasted spell result for gameId:', gameId, 'spell being :', windOfChangeResult);
         return windOfChangeResult;
 
     } else if (spellType === 'adept-wand') {
