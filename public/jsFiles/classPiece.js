@@ -5272,13 +5272,14 @@ activateWindOfChangeSpell(windOfChangeResult) {
         }
 
         const pawnElement = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        if (pawnElement) {
+        const child = pawnElement.firstChild;
+        if (child) {
             // Set spell expiration turn
-            pawnElement.dataset.spellExpirationTurn = currentTurn + spellDuration;
+            child.dataset.spellExpirationTurn = currentTurn + spellDuration;
 
             const directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
-            pawnElement.classList.remove(...directions); // Remove existing direction classes
-            pawnElement.classList.add(direction, 'pawn-random-move'); // Add new direction and spell effect
+            child.classList.remove(...directions); // Remove existing direction classes
+            child.classList.add(direction, 'pawn-random-move'); // Add new direction and spell effect
 
             console.log(`Pawn at row ${row}, col ${col} will move ${direction} for ${spellDuration} turns.`);
         } else {
