@@ -5286,9 +5286,7 @@ activateWindOfChangeSpell(windOfChangeResult) {
         }
     });
 
-    // Optionally, you can update the internal state or UI to reflect this change
-    this.updateInternalBoardStateFromDOM();
-    this.updateBoardVisuals();
+    
 }
 
 
