@@ -192,6 +192,7 @@ export default class ChessPiece {
     throw new Error("Invalid piece type");
 }
 this.initObserver();
+      static isWindOfChangeActive = false;
 this.validPiecesToResolveCheck = [];
 this.wouldPutKingInCheck = this.wouldPutKingInCheck.bind(this);
        this.setupSocketListeners();
