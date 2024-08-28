@@ -5290,9 +5290,8 @@ activateWindOfChangeSpell(windOfChangeResult) {
 
     
 }
-
-checkAndUpdateSpellEffects() {
-    if (!this.isWindOfChangeActive) return;
+static checkAndUpdateSpellEffects() {
+    if (!instance.isWindOfChangeActive) return;
     console.log('checkAndUpdateSpellEffects function entered in classPiece');
     const allPawnElements = document.querySelectorAll('.chess-piece.pawn-random-move');
     allPawnElements.forEach(pawnElement => {
@@ -5306,7 +5305,11 @@ checkAndUpdateSpellEffects() {
             delete pawnElement.dataset.spellExpirationTurn; // Corrected to delete the dataset attribute
         }
     });
+    if (document.querySelectorAll('.chess-piece.pawn-random-move').length === 0) {
+            instance.isWindOfChangeActive = false; // Deactivate the flag if no active effects remain
+        }
 }
+
 
 setupSocketListeners() {
         // Set up the listener once, and it will remain active
