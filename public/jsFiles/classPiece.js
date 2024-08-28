@@ -5290,11 +5290,14 @@ activateWindOfChangeSpell(windOfChangeResult) {
 
     
 }
-static checkAndUpdateSpellEffects() {
-    if (!this.isWindOfChangeActive) return;
+static checkAndUpdateSpellEffects(instance) {
+    console.log('checkandupdatespelleffects function entered');
+    if (!instance.isWindOfChangeActive) return;
     console.log('checkAndUpdateSpellEffects function entered in classPiece');
     const allPawnElements = document.querySelectorAll('.chess-piece.pawn-random-move');
+    console.log('pawns', allPawnElements);
     allPawnElements.forEach(pawnElement => {
+        
         const spellExpirationTurn = parseInt(pawnElement.dataset.spellExpirationTurn, 10);
         if (spellExpirationTurn > 0) {
             pawnElement.dataset.spellExpirationTurn = spellExpirationTurn - 1; // Decrement the value
