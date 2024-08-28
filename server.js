@@ -1060,7 +1060,8 @@ function getAllPawns(board) {
     return board.filter(piece => piece.type === 'pawn');
 }
 function processWindOfChange(gameSession) {
-    const { rng } = gameSession.rng;
+    console.log('processWindOfChange function entered, gameSession being:', gameSession)
+    const rng = gameSession.rng;
     const directions = ['forward', 'left', 'right', 'diagonalLeft', 'diagonalRight'];
     const spellResult = [];
     
