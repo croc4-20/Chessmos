@@ -975,13 +975,14 @@ function countPieces(gameSession, color) {
 function processSpell(gameSession, spellType) {
     console.log('processSpell function entered, gameSession being :', gameSession);
     const rng = gameSession.rng;
+    const gameId = gameSession.gameId;
     console.log('rng in processSpell function', rng);
     let result = {};
 
     if (spellType === 'chaos-warp') {
             // const seed = rng.next(); // Now this should work if rng is correctly an instance of SeededRNG
            return processChaosWarp(gameSession);
-           io.in('gameRoom-' + data.gameId).emit('updatePositions', result);
+           io.in('gameRoom-' + gameId).emit('updatePositions', result);
            
         
     } else if (spellType === 'staff-of-light') {
@@ -990,7 +991,7 @@ function processSpell(gameSession, spellType) {
         // result.duration = riftDuration;
         //console.log(`Processed spell 'adept-wand' with duration: ${riftDuration}`);
         const windOfChangeResult = processWindOfChange(gameSession);
-        io.in('gameRoom-' + data.gameId).emit('applyWindOfChange', { spellType, windOfChangeResult });
+        io.in('gameRoom-' + gameId).emit('applyWindOfChange', { spellType, windOfChangeResult });
         return windOfChangeResult;
 
     } else if (spellType === 'adept-wand') {
